@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[Mysql] NOT IN 문제 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2024-09-10</p>
+            <h1>[Mysql] NOT IN 문제</h1>
+          </header>
+          <div class="article-content">
+<h2 id="-null과-not-in"><span class="me-2">⛔ Null과 NOT IN</span><a href="#-null과-not-in" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>SQL 문제를 풀면서 NOT IN을 사용했는데, 원하는 대로 조회가 되지 않았던 문제가 발생했다.<br /> 아래 코드는 프로그래머스의 <a href="https://school.programmers.co.kr/learn/courses/30/lessons/273712">SQL문제</a>이다.</p><div class="language-sql highlighter-rouge"><div class="code-header"> <span data-label-text="Sql"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="k">SELECT</span> <span class="n">ITEM_ID</span><span class="p">,</span> <span class="n">ITEM_NAME</span><span class="p">,</span> <span class="n">RARITY</span>
+<span class="k">FROM</span> <span class="n">ITEM_INFO</span>
+<span class="k">WHERE</span> <span class="n">ITEM_ID</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span><span class="p">(</span><span class="n">PARENT_ITEM_ID</span><span class="p">)</span>
+    <span class="k">FROM</span> <span class="n">ITEM_TREE</span>
+<span class="p">)</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ITEM_ID</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></table></code></div></div><blockquote><p>결과</p></blockquote><div class="table-wrapper"><table><thead><tr><th>ITEM_ID<th>ITEM_NAME<th>RARITY<tbody><tr><td> <td> <td> </table></div><h3 id="-문제와-문제-좁히기"><span class="me-2">❓ 문제와 문제 좁히기</span><a href="#-문제와-문제-좁히기" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><code class="language-plaintext highlighter-rouge">PARENT_ITEM_ID</code>에 속하지 않는 <code class="language-plaintext highlighter-rouge">ITEM_ID</code>를 찾으려고 <code class="language-plaintext highlighter-rouge">NOT IN</code>을 사용했으나, 아무것도 출력되지 않았다.</p><p>그래서 원인을 찾고자 NOT IN에서 <code class="language-plaintext highlighter-rouge">NOT</code>을 제거해봤다.<br /> 결과적으로 IN은 아래처럼 제대로 실행되었고, <code class="language-plaintext highlighter-rouge">NOT IN</code>을 사용하면서 문제가 생긴 것을 알 수 있었다.</p><div class="language-sql highlighter-rouge"><div class="code-header"> <span data-label-text="Sql"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="k">SELECT</span> <span class="n">ITEM_ID</span><span class="p">,</span> <span class="n">ITEM_NAME</span><span class="p">,</span> <span class="n">RARITY</span>
+<span class="k">FROM</span> <span class="n">ITEM_INFO</span>
+<span class="k">WHERE</span> <span class="n">ITEM_ID</span> <span class="k">IN</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span><span class="p">(</span><span class="n">PARENT_ITEM_ID</span><span class="p">)</span>
+    <span class="k">FROM</span> <span class="n">ITEM_TREE</span>
+<span class="p">)</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ITEM_ID</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></table></code></div></div><blockquote><p>결과</p></blockquote><div class="table-wrapper"><table><thead><tr><th>ITEM_ID<th>ITEM_NAME<th>RARITY<tbody><tr><td>1<td>ITEM_B<td>RARE<tr><td>0<td>ITEM_A<td>RARE</table></div><h3 id="️-원인"><span class="me-2">⚠️ 원인</span><a href="#️-원인" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>그래서 이 문제의 해결책을 찾고자 검색해보니,<br /> <code class="language-plaintext highlighter-rouge">NOT IN</code> 색인 과정에서 <code class="language-plaintext highlighter-rouge">NULL</code>과 비교하는 순간,<br /> 이게 NULL에 포함되는 값인지, 포함되지 않는 값인지 모른다는 식으로 처리가 된다고 한다.</p><p>그래서 <code class="language-plaintext highlighter-rouge">IN</code>이 처리된 이유를 검색해보니,<br /> <code class="language-plaintext highlighter-rouge">IN</code>만 사용을 했을 때는 정확하게 일치하는 값이 있었기 때문에 문제가 없었지만,<br /> <code class="language-plaintext highlighter-rouge">NOT IN</code>을 사용했을 때는 매치되는 값도 없고, 그렇다고 매치가 되는지 안되는지도 모르는 <code class="language-plaintext highlighter-rouge">NULL</code>이 들어있었기 때문에 처리되지 않은 것이다.</p><p>앞으로는 Null값을 생각하면서 SQL문을 작성해야겠다.</p><div class="language-sql highlighter-rouge"><div class="code-header"> <span data-label-text="Sql"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="k">SELECT</span> <span class="n">ITEM_ID</span><span class="p">,</span> <span class="n">ITEM_NAME</span><span class="p">,</span> <span class="n">RARITY</span>
+<span class="k">FROM</span> <span class="n">ITEM_INFO</span>
+<span class="k">WHERE</span> <span class="n">ITEM_ID</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span><span class="p">(</span><span class="n">PARENT_ITEM_ID</span><span class="p">)</span>
+    <span class="k">FROM</span> <span class="n">ITEM_TREE</span>
+    <span class="k">WHERE</span> <span class="n">PARENT_ITEM_ID</span> <span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">)</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ITEM_ID</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></table></code></div></div></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

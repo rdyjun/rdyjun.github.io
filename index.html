@@ -4,43 +4,173 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Junby | SungJun Joo</title>
+    <meta name="description" content="주성준(SungJun Joo) · Backend Developer 포트폴리오" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header>
-      <nav>
-        <span class="logo">rdyjun</span>
-        <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="https://rdyjun.github.io/blog" target="_blank">Blog</a></li>
-        </ul>
-      </nav>
-    </header>
 
-    <main>
-      <section id="hero">
-        <h1>SungJun Joo</h1>
-        <p class="tagline">Backend Developer</p>
-      </section>
+    <!-- 모바일 상단 바 -->
+    <div class="mobile-bar">
+      <a class="sb-logo" href="#about">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
 
-      <section id="about">
-        <h2>About</h2>
-        <p>안녕하세요, 주성준입니다.</p>
-      </section>
+    <div class="layout">
 
-      <section id="projects">
-        <h2>Projects</h2>
-        <div class="project-grid">
-          <!-- 프로젝트 카드 추가 예정 -->
+      <!-- ── 사이드바 (네비게이션) ── -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="#about">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
         </div>
-      </section>
-    </main>
+
+        <nav class="sb-nav">
+          <a class="sb-navlink active" href="#about" data-section="about">
+            <span class="nav-num">01</span>About
+          </a>
+          <a class="sb-navlink" href="#history" data-section="history">
+            <span class="nav-num">02</span>History
+          </a>
+          <a class="sb-navlink" href="#projects" data-section="projects">
+            <span class="nav-num">03</span>Projects
+          </a>
+          <a class="sb-navlink" href="#articles" data-section="articles">
+            <span class="nav-num">04</span>Articles
+          </a>
+        </nav>
+
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ── 메인 콘텐츠 ── -->
+      <main class="main-content">
+
+        <!-- 01 About -->
+        <section id="about">
+          <h2 class="section-title"><span class="num">01</span>About</h2>
+          <p class="about-lead">
+            실시간 처리, 무중단 배포 등 <strong>운영·성능·확장성</strong> 중심의 백엔드 아키텍처 개선 경험을 보유하고 있습니다.
+          </p>
+          <p class="about-body">
+            문제를 깊게 고민하고 스스로 해결책을 찾되, 필요할 때는 생산성을 위해 주저 없이 질문합니다.
+            다양한 관점을 가진 팀원들과 협력하며 더 나은 솔루션을 만들어가는 과정을 중요하게 생각합니다.
+          </p>
+          <ul class="skill-grid">
+            <li><span class="skill-label">Language</span><span>Java · TypeScript · Python</span></li>
+            <li><span class="skill-label">Framework</span><span>Spring Boot · Nest.js</span></li>
+            <li><span class="skill-label">Infra</span><span>Docker · Nginx · AWS · NCP · OCI</span></li>
+            <li><span class="skill-label">Database</span><span>PostgreSQL · MySQL · Redis</span></li>
+          </ul>
+        </section>
+
+        <!-- 02 History -->
+        <section id="history">
+          <h2 class="section-title"><span class="num">02</span>History</h2>
+
+          <div class="history-group">
+            <h3 class="history-group-title">경력</h3>
+            <article class="history-item">
+              <div class="hi-left">
+                <span class="hi-period">2026.03 ~</span>
+              </div>
+              <div class="hi-body">
+                <h4>주식회사 앤유코퍼레이션</h4>
+                <ul>
+                  <li>AWS Step Functions + SAGA 패턴으로 결제 흐름 멱등성·동시성 보장</li>
+                  <li>R2·SQS·Lambda 기반 비동기 영상 인코딩 파이프라인 구축</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="history-group">
+            <h3 class="history-group-title">교육</h3>
+            <article class="history-item">
+              <div class="hi-left">
+                <span class="hi-period">2024.06 – 12</span>
+              </div>
+              <div class="hi-body">
+                <h4>네이버 부스트캠프 9기</h4>
+                <ul>
+                  <li>웹 프론트엔드·백엔드 미션 기반 구현, 페어프로그래밍</li>
+                  <li>현직자 멘토링을 통한 아키텍처 설계·코드 품질 향상</li>
+                  <li>팀 내 개발일지·트러블슈팅 문서화 시스템 구축</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="history-group">
+            <h3 class="history-group-title">학력</h3>
+            <article class="history-item">
+              <div class="hi-left">
+                <span class="hi-period">2022 – 2026</span>
+              </div>
+              <div class="hi-body">
+                <h4>동양미래대학교 컴퓨터소프트웨어공학과</h4>
+                <ul>
+                  <li>전문학사 조기졸업 2024.08 · GPA 4.46 / 4.5 · 성적우수 장학금 4회</li>
+                  <li>전공심화 과정(야간) 졸업예정 · GPA 4.36 / 4.5 · 교내 스마트 프로젝트 경진대회 입상</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="history-group">
+            <h3 class="history-group-title">자격증</h3>
+            <div class="cert-row">
+              <div class="cert-item glass">
+                <p class="cert-name">정보처리기사</p>
+                <p class="cert-sub">한국산업인력공단 · 2025.12</p>
+              </div>
+              <div class="cert-item glass">
+                <p class="cert-name">PCCE Lv.4</p>
+                <p class="cert-sub">(주) 그렙 · 2025.06</p>
+              </div>
+              <div class="cert-item glass">
+                <p class="cert-name">SQLD</p>
+                <p class="cert-sub">한국데이터산업진흥원 · 2026.03</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 Projects -->
+        <section id="projects">
+          <div class="section-title-row">
+            <h2 class="section-title"><span class="num">03</span>Projects</h2>
+            <a class="more-link" href="project.html">전체보기 →</a>
+          </div>
+
+          <h3 class="sub-heading">대표 프로젝트</h3>
+          <div class="featured-grid" id="featured-grid"></div>
+
+          <h3 class="sub-heading" style="margin-top:3rem;">그 외 작업들</h3>
+          <div class="project-grid" id="project-grid"></div>
+        </section>
+
+        <!-- 04 Articles -->
+        <section id="articles">
+          <h2 class="section-title"><span class="num">04</span>Articles</h2>
+          <div class="blog-list" id="blog-preview"></div>
+          <a class="btn btn-ghost more-btn" href="article.html">더보기 →</a>
+        </section>
+
+      </main>
+    </div>
 
     <footer>
-      <p>
-        <a href="https://github.com/rdyjun" target="_blank">GitHub</a>
-      </p>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
     </footer>
 
     <script src="script.js"></script>

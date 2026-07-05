@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QueryDSL 충돌 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2025-07-15</p>
+            <h1>QueryDSL 충돌</h1>
+          </header>
+          <div class="article-content">
+<blockquote><p>참고 사이트<br /> https://castle-of-gyu.tistory.com/87<br /> https://github.com/querydsl/querydsl/issues/3428</p></blockquote><h2 id="문제-정의"><span class="me-2">문제 정의</span><a href="#문제-정의" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>QueryDSL을 사용해서 각 행으로 분리된 권한 데이터를 List로 합치는 과정에서 아래와 같은 문제에 직면했다.</p><blockquote><p>예를 들어, 아래와 같이 테이블이 있을 경우 권한 부분을 합쳐서 가져온다.</p><div class="table-wrapper"><table><thead><tr><th>게시글ID<th>권한<tbody><tr><td>1<td>USER<tr><td>1<td>CUSTOMER</table></div><p>{ ID: 1, Role: [USER, CUSTOMER] }</p></blockquote><p>기존에 <code class="language-plaintext highlighter-rouge">string_agg</code> 방식으로 구현했을 때 발생한 문제는 아니고, <code class="language-plaintext highlighter-rouge">transform</code>방식으로 변경하려다 발생한 문제이다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">jakarta</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">ServletException</span><span class="o">:</span> <span class="nc">Handler</span> <span class="n">dispatch</span> <span class="nl">failed:</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">NoSuchMethodError</span><span class="o">:</span> <span class="err">'</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Object</span> <span class="n">org</span><span class="o">.</span><span class="na">hibernate</span><span class="o">.</span><span class="na">ScrollableResults</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="err">'</span>
+<span class="o">...</span>
+<span class="nc">Caused</span> <span class="nl">by:</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">NoSuchMethodError</span><span class="o">:</span> <span class="err">'</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Object</span> <span class="n">org</span><span class="o">.</span><span class="na">hibernate</span><span class="o">.</span><span class="na">ScrollableResults</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="err">'</span>
+</pre></table></code></div></div><p>기존 코드에서 QueryDSL의 <code class="language-plaintext highlighter-rouge">Expressions.stringTemplate()</code> 과 <code class="language-plaintext highlighter-rouge">string_agg</code>를 사용하여 String 타입의 <code class="language-plaintext highlighter-rouge">권한1,권한2,권한3</code> 구조로 가져온 후 콤마(,)를 기준으로 배열로 분류하는 구조였다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="c1">// "권한1,권한2,권한3"</span>
+<span class="nc">Expressions</span><span class="o">.</span><span class="na">stringTemplate</span><span class="o">(</span><span class="s">"string_agg({0}, ',')"</span><span class="o">,</span> <span class="n">memberRole</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">role</span><span class="o">.</span><span class="na">roleType</span><span class="o">)</span>
+
+<span class="c1">// [권한1, 권한2, 권한3]</span>
+<span class="n">result</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">","</span><span class="o">);</span>
+</pre></table></code></div></div><p>하지만 <code class="language-plaintext highlighter-rouge">string_agg</code>은 DB 종속적인 함수면서 정적 문자열로 사용해야 한다는 점에서 추후 DB 마이그레이션 과정에서 문제가 생길 것을 우려해 <code class="language-plaintext highlighter-rouge">transform</code>을 도입하기로 결정했다.</p><p>이 transform 코드는 아래와 같다. transform의 동작은 transform 호출 직전의 쿼리 결과를 가지고 변형하는 동작이다.</p><blockquote><p>아래 코드에서는 쿼리 결과를 가져와서 member id로 그룹화하고,<br /> 기존 필드는 그대로 constructor에 넣고, List로 표시하려는 role 필드만 GroupBy.list를 사용해주어 권한을 하나의 List로 가져온다.</p></blockquote><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="n">queryFactory</span>
+        <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">member</span><span class="o">)</span>
+        <span class="o">...</span> <span class="c1">// 생략</span>
+        <span class="o">.</span><span class="na">transform</span><span class="o">(</span>
+                <span class="n">groupBy</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">id</span><span class="o">).</span><span class="na">list</span><span class="o">(</span>
+                        <span class="nc">Projections</span><span class="o">.</span><span class="na">constructor</span><span class="o">(</span><span class="nc">MemberDetails</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                                <span class="n">member</span><span class="o">.</span><span class="na">id</span><span class="o">,</span>
+                                <span class="n">member</span><span class="o">.</span><span class="na">nickname</span><span class="o">,</span>
+                                <span class="n">member</span><span class="o">.</span><span class="na">email</span><span class="o">,</span>
+                                <span class="n">member</span><span class="o">.</span><span class="na">department</span><span class="o">.</span><span class="na">id</span><span class="o">,</span>
+                                <span class="nc">GroupBy</span><span class="o">.</span><span class="na">list</span><span class="o">(</span><span class="n">memberRole</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">role</span><span class="o">.</span><span class="na">roleType</span><span class="o">)))</span>
+        <span class="o">).</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</pre></table></code></div></div><p>하지만 위 쿼리 실행 시 아래와 같이 예외가 발생했다. 예외 내용에서는 <code class="language-plaintext highlighter-rouge">transform</code>이 반환한 <code class="language-plaintext highlighter-rouge">ScrollableResults</code> 인스턴스에서 <code class="language-plaintext highlighter-rouge">get(int)</code> 메서드를 찾을 수 없다는 내용이었다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/post/querydsl-crash-1.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/post/querydsl-crash-1.png" alt="image.png" loading="lazy"></a></p><p>하지만 IDE에서는 정상적으로 보이고, 컴파일 시에도 아무런 예외나 에러를 반환하지 않았다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/post/querydsl-crash-2.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/post/querydsl-crash-2.png" alt="image.png" loading="lazy"></a></p><h2 id="해결책"><span class="me-2">해결책</span><a href="#해결책" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>이를 검색했을 때, Hibernate 6.x 버전과 QueryDSL의 5.0.0 버전이 호환되지 않아서 생기는 문제인 것을 알 수 있었다.</p><p>추가로 해결 방법이 있는데, <code class="language-plaintext highlighter-rouge">JPAQueryFactory</code> 빈을 등록하는 과정에서 <code class="language-plaintext highlighter-rouge">JPQLTemplates.DEFAULT</code> 를 추가해주면 문제를 해결할 수 있는 것으로 알게되었다.</p><h3 id="jpqltemplatesdefault를-넣으면-왜-동작이-될까"><span class="me-2">JPQLTemplates.DEFAULT를 넣으면 왜 동작이 될까?</span><a href="#jpqltemplatesdefault를-넣으면-왜-동작이-될까" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>우선 <code class="language-plaintext highlighter-rouge">JPQLTemplates.DEFAULT</code>를 넣지 않은 상태를 알아보자.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="nd">@Bean</span>
+<span class="kd">public</span> <span class="nc">JPAQueryFactory</span> <span class="nf">jpaQueryFactory</span><span class="o">(</span><span class="nc">EntityManager</span> <span class="n">em</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">JPAQueryFactory</span><span class="o">(</span><span class="n">em</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>위처럼 <code class="language-plaintext highlighter-rouge">EntityManager</code>만으로 생성하는 구조가 된다. 이렇게 되면 <code class="language-plaintext highlighter-rouge">EntityManager</code>를 통해 현재 사용중인 JPA 구현체를 감지한다.</p><blockquote><p>나의 프로젝트에서 JPA 구현체는 <code class="language-plaintext highlighter-rouge">Hibernate</code>이다.</p></blockquote><p><code class="language-plaintext highlighter-rouge">Hibernate</code>가 감지되면, <code class="language-plaintext highlighter-rouge">Querydsl</code>은 Hibernate에 특화된 기능 사용을 위해 <code class="language-plaintext highlighter-rouge">HibernateJPQLTemplates</code>과 같은 전용 템플릿을 로드한다.</p><p>이 Hibernate 전용 템플릿은 <code class="language-plaintext highlighter-rouge">transform</code>과 같은 그룹화 작업을 수행할 때, 메모리를 효율적으로 사용하기 위해 Hibernate가 제공하는 <code class="language-plaintext highlighter-rouge">ScrollableResults</code>라는 특수한 기능을 사용하도록 설계되어있다.</p><blockquote><p>이는 모든 결과를 메모리에 올리지 않고 스트리밍 방식으로 처리하여 성능을 높이는 최적화 기법이라고 한다.</p></blockquote><p>하지만 이 <code class="language-plaintext highlighter-rouge">ScrollableResults</code> 기능과 그 안의 <code class="language-plaintext highlighter-rouge">get(int)</code> 메소드는 Hibernate 5.x 버전에 있던 기능이다. 현재 프로젝트에 사용중인 Spring Boot 3.4.3과 함께 사용중인 Hibernate 6.x 버전에서는 이 메소드가 사라졌다. 결국 구버전 Querydsl이 신버전 Hibernate에 제거된 기능을 호출하려다 <code class="language-plaintext highlighter-rouge">NoSuchMethodError</code>를 발생시킨 것이 문제였다.</p><hr /><p>이제 <code class="language-plaintext highlighter-rouge">JPQLTemplates.DEFAULT</code>를 넣었을 때를 살펴보자.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="nd">@Bean</span>
+<span class="kd">public</span> <span class="nc">JPAQueryFactory</span> <span class="nf">jpaQueryFactory</span><span class="o">(</span><span class="nc">EntityManager</span> <span class="n">em</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">JPAQueryFactory</span><span class="o">(</span><span class="nc">JPQLTemplates</span><span class="o">.</span><span class="na">DEFAULT</span><span class="o">,</span> <span class="n">em</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">JPQLTemplates.DEFAULT</code>라는 표준 JPQL 템플릿을 직접 주입했으므로, Querydsl은 JPA 프로바이더를 감지하거나 Hibernate 전용 템플릿을 로드하는 과정을 건너뛴다.</p><p>이렇게 되면 표준 JPQL 방식으로 fallback 되면서 Hibernate 전용 기능을 사용하지 않게 된다. 즉, 위 <code class="language-plaintext highlighter-rouge">transform</code> 코드에서 <code class="language-plaintext highlighter-rouge">Hibernate</code> 전용 최적화 기능인 <code class="language-plaintext highlighter-rouge">ScrollableResults</code>의 존재 자체를 모르고, 표준 방식을 쓰게 된다.</p><p>대신, 어떤 환경에서나 동작하는 가장 안전하고 표준적인 방식으로 데이터를 처리한다. 보통은 <code class="language-plaintext highlighter-rouge">fetch()</code>를 통해 일단 모든 결과를 <code class="language-plaintext highlighter-rouge">List</code>로 메모리에 가져온 다음, 메모리 상에서 그룹화 작업을 수행하는 방식이다.</p><p>결과적으로 문제가 되었던 Hibernate 구버전의 <code class="language-plaintext highlighter-rouge">ScrollableResults.get(int)</code> 메소드를 전혀 호출하지 않으므로 <code class="language-plaintext highlighter-rouge">NoSuchMethodError</code>가 발생하지 않고 코드가 정상적으로 실행된다.</p><h2 id="결론"><span class="me-2">결론</span><a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>구 버전 Hibernate에 최적화된 QueryDSL을 특정 환경에 최적화 하지 않고, 모든 환경에 안정적인 상태로 바꾸어주면서 문제를 해결할 수 있었다. 하지만 표준적인 방식으로 처리하기 때문에 Hibernate에서 얻을 수 있는 일부 성능적 이점이 사라질 가능성을 고려하여, STRING_AGG 방식을 유지하기로 결정했다.</p><p>QueryDSL이 개발 중단되어 생긴 문제라고 생각된다. <code class="language-plaintext highlighter-rouge">OpenFeign QueryDSL</code>이라는 새로운 선택지가 있는 것을 확인했고, 추후 마이그레이션을 통해 해당 문제를 해결할 수 있는지 점검할 계획이다.</p><h3 id="string-agg-방식"><span class="me-2">string agg 방식</span><a href="#string-agg-방식" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>String 타입으로 포맷을 넣어줘야 한다는 불안정성과 String 타입에 대해 리스트로 파싱이 필요하다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="n">queryFactory</span><span class="o">.</span><span class="na">select</span><span class="o">(</span><span class="nc">Projections</span><span class="o">.</span><span class="na">constructor</span><span class="o">(</span><span class="n">dto</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                <span class="o">...</span> <span class="c1">// 생략</span>
+                <span class="nc">Expressions</span><span class="o">.</span><span class="na">stringTemplate</span><span class="o">(</span><span class="s">"string_agg({0}, ',')"</span><span class="o">,</span> <span class="n">memberRole</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">role</span><span class="o">.</span><span class="na">roleType</span><span class="o">)))</span> <span class="c1">// stringTemplate 사용으로 불필요한 파싱 필요</span>
+        <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">member</span><span class="o">)</span>
+        <span class="o">...</span>
+        <span class="o">.</span><span class="na">fetchOne</span><span class="o">();</span>
+
+</pre></table></code></div></div><h3 id="transform"><span class="me-2">transform</span><a href="#transform" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>타입 안정성을 유지하면서 QueryDSL에 맞게 코드를 작성할 수 있다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="n">queryFactory</span>
+        <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">member</span><span class="o">)</span>
+        <span class="o">...</span>
+        <span class="o">.</span><span class="na">transform</span><span class="o">(</span>
+                <span class="n">groupBy</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">id</span><span class="o">).</span><span class="na">list</span><span class="o">(</span>
+                        <span class="nc">Projections</span><span class="o">.</span><span class="na">constructor</span><span class="o">(</span><span class="n">dto</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                                <span class="o">...</span> <span class="c1">// 생략</span>
+                                <span class="nc">GroupBy</span><span class="o">.</span><span class="na">list</span><span class="o">(</span><span class="n">memberRole</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">role</span><span class="o">.</span><span class="na">roleType</span><span class="o">)))</span>
+        <span class="o">).</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</pre></table></code></div></div></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spring Boot에서 카카오 소셜 로그인 적용 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2026-01-13</p>
+            <h1>Spring Boot에서 카카오 소셜 로그인 적용</h1>
+          </header>
+          <div class="article-content">
+<p>Spring Boot 환경에서 OAuth2.0을 도입해보려고 한다.</p><p>기존 회원가입이 된 사용자에 대해서만 OAuth 연동을 하도록 할 것이며, 이에 따라 OAuth로만 회원가입은 불가하다.</p><p>JWT를 사용중인 환경으로 OAuth2.0을 어떻게 적용할 것인 지에 대해 알아보자.</p><h2 id="동작-흐름"><span class="me-2">동작 흐름</span><a href="#동작-흐름" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>카카오에서 제공하는 공식 과정은 아래 사진과 같다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/kakao-official-process.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/kakao-official-process.png" alt="카카오 공식 흐름도" loading="lazy"></a></p><p>Spring Boot에서 어디까지 지원이 되는지 어떤 구조로 동작하는지 위 과정과 대조해서 알아보자.</p><h3 id="kakao-api--spring-boot의-인증-흐름"><span class="me-2">Kakao API + Spring Boot의 인증 흐름</span><a href="#kakao-api--spring-boot의-인증-흐름" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/my-process.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/my-process.png" alt="나의 흐름도" loading="lazy"></a></p><ol><li>Spring Boot는 로그인 요청을 받으면 요청 정보에 담긴 서비스의 API에 요청을 보낸다.<ul><li>여기서 로그인 요청 주소는 <code class="language-plaintext highlighter-rouge">/oauth2/authorization/{registrationId}</code> 가 Spring Boot의 oauth가 지원하는 기본 형태이다.</ul><li>서비스 API로부터 받은 로그인 페이지를 서버가 받아 사용자에게 반환<ul><li>https://kauth.kakao.com/oauth/authorize?response_type=code&amp;client_id=client_id&amp;<strong>redirect_uri=http://localhost:8080/login/oauth2/code/kakao</strong><li><code class="language-plaintext highlighter-rouge">/login/oauth2/code/kakao</code>는 Spring Boot의 oauth가 지원하는 기본 형태이다.</ul><li>사용자가 로그인 후 [확인하고 계속하기] 버튼을 클릭<li>로그인 페이지 URI의 쿼리에 존재하는 redirect_uri페이지로 요청 전송<li><code class="language-plaintext highlighter-rouge">OAuth2LoginAuthenticationFilter</code>가 요청을 가로채어 <code class="language-plaintext highlighter-rouge">DefaultOAuth2UserService</code> 호출<li><code class="language-plaintext highlighter-rouge">DefaultOAuth2UserService</code> 에서는 요청 속 소셜 계정의 식별자를 검증<li>검증 성공 시 <code class="language-plaintext highlighter-rouge">SimpleUrlAuthenticationSuccessHandler</code> 를 호출하여 후속 처리<li>검증 실패 시 <code class="language-plaintext highlighter-rouge">SimpleUrlAuthenticationFailureHandler</code> 를 호출하여 후속 처리</ol><h2 id="api-설정"><span class="me-2">API 설정</span><a href="#api-설정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>위 과정을 구현하기 전 카카오 API에 필수 정보를 등록해주어야 한다.</p><h3 id="가입"><span class="me-2">가입</span><a href="#가입" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>아래 경로 또는 카카오 디벨로퍼스 페이지에 접근하여, 회원가입을 진행한다.</p><p>https://developers.kakao.com/</p><h3 id="앱-등록"><span class="me-2">앱 등록</span><a href="#앱-등록" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>이후 상단에 [앱] 탭을 클릭하여 앱을 생성해준다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/app-create.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/app-create.png" alt="앱 생성 화면" loading="lazy"></a></p><h3 id="api-키-등록"><span class="me-2">API 키 등록</span><a href="#api-키-등록" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>앱을 생성했다면 해당 앱을 클릭하여 들어가, 좌측 메뉴바에서 플랫폼 키로 들어가준다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/kakao-navigation.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/kakao-navigation.png" alt="카카오 메뉴탭" loading="lazy"></a></p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/add-platform-key.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/add-platform-key.png" alt="플랫폼 키 생성 버튼" loading="lazy"></a></p><p>이후 REST API키 추가를 통해 키 이름을 간략히 적어주고, 리다이렉트 URI는 2개를 미리 입력해두자.</p><ul><li>https://서버주소/oauth2/authorization/kakao<li>https://서버주소/login/oauth2/code/kakao</ul><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13//platform-key-input.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13//platform-key-input.png" alt="플랫폼 키 정보 입력 화면" loading="lazy"></a></p><p>이 설정까지 끝냈다면 만들어진 <strong>클라이언트 아이디</strong>와 <strong>클라이언트 시크릿</strong>을 기억해두자.</p><h2 id="spring-boot"><span class="me-2">Spring Boot</span><a href="#spring-boot" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="의존성-설정"><span class="me-2">의존성 설정</span><a href="#의존성-설정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Gradle을 사용중이기 때문에 아래 한 줄을 <code class="language-plaintext highlighter-rouge">build.gradle</code> 에 추가해주었다.</p><div class="language-json highlighter-rouge"><div class="code-header"> <span data-label-text="JSON"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre><span class="err">implementation</span><span class="w"> </span><span class="err">'org.springframework.boot:spring-boot-starter-oauth</span><span class="mi">2</span><span class="err">-client'</span><span class="w">
+</span></pre></table></code></div></div><h3 id="application-설정"><span class="me-2">application 설정</span><a href="#application-설정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#oidc-discovery-sample-response</p><p>위 문서에 따르면 인가 코드 요청 API, 토큰 요청 API, 사용자 정보 조회 API가 존재한다.</p><p>위 API 경로를 provider.kakao에 작성해주어야 제대로 동작한다.</p><div class="language-yaml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">oauth2</span><span class="pi">:</span>
+      <span class="na">client</span><span class="pi">:</span>
+        <span class="na">registration</span><span class="pi">:</span>
+          <span class="na">kakao</span><span class="pi">:</span>
+            <span class="na">client-id</span><span class="pi">:</span> <span class="s">클라이언트 아이디</span>
+            <span class="na">client-secret</span><span class="pi">:</span> <span class="s">클라이언트 시크릿</span>
+            <span class="na">authorization-grant-type</span><span class="pi">:</span> <span class="s">authorization_code</span>
+            <span class="na">redirect-uri</span><span class="pi">:</span> <span class="s">http://localhost:8080/login/oauth2/code/kakao</span>
+            <span class="na">scope</span><span class="pi">:</span> <span class="s">email</span>
+        <span class="na">provider</span><span class="pi">:</span>
+          <span class="na">kakao</span><span class="pi">:</span>
+            <span class="na">authorization-uri</span><span class="pi">:</span> <span class="s">https://kauth.kakao.com/oauth/authorize</span>
+            <span class="na">token-uri</span><span class="pi">:</span> <span class="s">https://kauth.kakao.com/oauth/token</span>
+            <span class="na">user-info-uri</span><span class="pi">:</span> <span class="s">https://kapi.kakao.com/v2/user/me</span>
+</pre></table></code></div></div><aside> 💡 registration</aside><blockquote><p>client-id, client-secret</p></blockquote><p>Rest API 키 추가 시 받은 정보를 입력한다.</p><blockquote><p>authorization-grant-type</p></blockquote><p>https://oauth.net/2/grant-types/</p><p>토큰 교환 API에서 사용되는 속성으로 교환 방식을 정한다.</p><ul><li>authorization_code<ul><li>안전한 방식으로, 인가 코드를 통해 토큰을 발급하는 구조이다.</ul><li>client_credentials<ul><li>코드가 필요하지 않아 사용자 인증에 사용되지 않고, 서버간 통신 시 사용된다.</ul><li>refresh_token<ul><li>발급받았던 토큰을 재전송하여 새 토큰을 발급받는다. (로그인 연장)</ul><li>pkce<ul><li>CSRF 및 인증 코드 주입 공격을 방지하기 위한 인증 코드 흐름의 확장이다.<li>클라이언트 인증을 대체하는 것이 아니므로 공개 클라이언트를 기밀 클라이언트처럼 취급할 수 없다.</ul><li>device_code<ul><li>브라우저가 없거나 입력이 제한된 장치가 장치 흐름 에서 이전에 획득한 장치 코드를 액세스 토큰으로 교환하는 데 사용된다.</ul></ul><blockquote><p>redirect-uri</p></blockquote><p>Spring Boot oauth 라이브러리에서 제공되는 <code class="language-plaintext highlighter-rouge">/login/oauth2/code/kakao</code>를 사용한다.</p><p>백엔드 주소를 앞에 덧붙이면 된다.</p><blockquote><p>scope</p></blockquote><p>로그인 후 가져올 사용자 데이터 범위이다.</p><p>profile, account_email 등 다양한 데이터가 있다.</p><aside> 💡 provider</aside><blockquote><p>인가 코드 요청 API</p></blockquote><p>카카오 인증을 호출해서 사용자의 로그인 및 로그인 동의 후 인가 코드를 서비스 서버로 전송한다.</p><blockquote><p>토큰 요청 API</p></blockquote><p>인가 코드를 검증하여 토큰을 발급한다.</p><p>사용자 정보 조회 시 사용되는 토큰이다.</p><blockquote><p>사용자 정보 조회 API</p></blockquote><p>scope에 기록된 사용자 데이터를 조회하기 위한 API 이다.</p><p>사용자가 카카오로 로그인 시 email 정보 제공 동의를 한 경우 해당 API를 통해 데이터를 받아올 수 있다.</p><h3 id="서비스-구현"><span class="me-2">서비스 구현</span><a href="#서비스-구현" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>OAuth2 권한을 검증하기 위해 Service를 구현해야 한다.</p><p><code class="language-plaintext highlighter-rouge">OAuth2LoginAuthenticationFilter</code>는 <code class="language-plaintext highlighter-rouge">DefaultOAuth2UserService</code>를 호출하여 검증하기 때문에</p><p><code class="language-plaintext highlighter-rouge">DefaultOAuth2UserService</code>를 상속받아서 구현한다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+</pre><td class="rouge-code"><pre><span class="nd">@Service</span>
+<span class="nd">@Slf4j</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomOAuth2UserService</span> <span class="kd">extends</span> <span class="nc">DefaultOAuth2UserService</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">MemberSocialAccountRepository</span> <span class="n">memberSocialAccountRepository</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">ReportValidator</span> <span class="n">reportValidator</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">OAuth2UserParser</span> <span class="n">oAuth2UserParser</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">OAuth2User</span> <span class="nf">loadUser</span><span class="o">(</span><span class="nc">OAuth2UserRequest</span> <span class="n">userRequest</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">OAuth2AuthenticationException</span> <span class="o">{</span>
+        <span class="c1">// 소셜 로그인 API를 통해 사용자 정보 가져오기</span>
+        <span class="nc">OAuth2User</span> <span class="n">oAuth2User</span> <span class="o">=</span> <span class="kd">super</span><span class="o">.</span><span class="na">loadUser</span><span class="o">(</span><span class="n">userRequest</span><span class="o">);</span>
+
+        <span class="c1">// 소셜 계정에 따라 id 추출</span>
+        <span class="nc">String</span> <span class="n">registrationId</span> <span class="o">=</span> <span class="n">userRequest</span><span class="o">.</span><span class="na">getClientRegistration</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">getRegistrationId</span><span class="o">();</span>
+        <span class="nc">String</span> <span class="n">providerId</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">oAuth2UserParser</span><span class="o">.</span><span class="na">extractProviderId</span><span class="o">(</span><span class="n">oAuth2User</span><span class="o">,</span> <span class="n">registrationId</span><span class="o">);</span>
+
+        <span class="c1">// 소셜 계정과 연동된 회원이 있는지 확인</span>
+        <span class="nc">MemberSocialAccountDto</span> <span class="n">socialAccount</span> <span class="o">=</span> <span class="n">memberSocialAccountRepository</span><span class="o">.</span><span class="na">findMemberSocialAccountDTO</span><span class="o">(</span><span class="n">providerId</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">orElseThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                    <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"social account not linked: providerId={}"</span><span class="o">,</span> <span class="n">providerId</span><span class="o">);</span>
+                    <span class="k">return</span> <span class="k">new</span> <span class="nf">AccountNotLinkedException</span><span class="o">();</span>
+                <span class="o">});</span>
+
+        <span class="c1">// 소셜 계정이 회원과 매칭되지 않은 경우 예외 처리</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">socialAccount</span><span class="o">.</span><span class="na">isMemberNotMatched</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"social account not linked: providerId={}"</span><span class="o">,</span> <span class="n">providerId</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">AccountNotLinkedException</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="c1">// 소셜 계정과 연결된 계정이 탈퇴된 경우 예외 처리</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">socialAccount</span><span class="o">.</span><span class="na">isMemberDeleted</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"linked account was deleted: providerId={} memberId={}"</span><span class="o">,</span> <span class="n">providerId</span><span class="o">,</span>
+                    <span class="n">socialAccount</span><span class="o">.</span><span class="na">member</span><span class="o">().</span><span class="na">getId</span><span class="o">());</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">LinkedAccountAlreadyDeletedException</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="c1">// 신고당한 회원인지 검증</span>
+        <span class="n">reportValidator</span><span class="o">.</span><span class="na">checkMemberAccessById</span><span class="o">(</span><span class="n">socialAccount</span><span class="o">.</span><span class="na">member</span><span class="o">().</span><span class="na">getId</span><span class="o">());</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">CustomOAuth2User</span><span class="o">(</span><span class="n">oAuth2User</span><span class="o">,</span> <span class="n">socialAccount</span><span class="o">.</span><span class="na">member</span><span class="o">().</span><span class="na">getId</span><span class="o">(),</span> <span class="n">socialAccount</span><span class="o">.</span><span class="na">roleType</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</pre></table></code></div></div><p>위 코드에서는 서비스 정책에 맞게 토큰을 검증하는 과정이다.</p><p>본 서비스는 소셜 계정이 사용자와 연결되어있어야 하고, 제재를 받지 않은 상태여야 한다는 정책에 따라 검증을 진행했다.</p><p>중간에 providerId를 가져오기 위해 parser를 사용했는데, 각 공급사마다 담겨있는 속성의 이름이 다르기 때문에 parser로 분리하여 구현하였다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre>    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">extractProviderId</span><span class="o">(</span><span class="nc">OAuth2User</span> <span class="n">oAuth2User</span><span class="o">,</span> <span class="nc">String</span> <span class="n">registrationId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">attributes</span> <span class="o">=</span> <span class="n">oAuth2User</span><span class="o">.</span><span class="na">getAttributes</span><span class="o">();</span>
+
+        <span class="k">return</span> <span class="nc">String</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">attributes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="no">ATTRIBUTE_NAME</span><span class="o">));</span>
+    <span class="o">}</span>
+</pre></table></code></div></div><blockquote><p>반환 값</p></blockquote><p>마지막에 CustomOAuth2User를 반환하고 있다.</p><p>OAuth2User를 사용해도 되지만, 로그인 성공 시 memberId가 필요해서 Custom 클래스를 추가했다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomOAuth2User</span> <span class="kd">implements</span> <span class="nc">OAuth2User</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">OAuth2User</span> <span class="n">delegate</span><span class="o">;</span> <span class="c1">// 기존 OAuth2User (구글, 카카오 등에서 받은 정보)</span>
+
+    <span class="nd">@Getter</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Long</span> <span class="n">memberId</span><span class="o">;</span> <span class="c1">// 우리 DB의 PK</span>
+
+    <span class="nd">@Getter</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">RoleType</span><span class="o">&gt;</span> <span class="n">roleTypeList</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">CustomOAuth2User</span><span class="o">(</span><span class="nc">OAuth2User</span> <span class="n">delegate</span><span class="o">,</span> <span class="nc">Long</span> <span class="n">memberId</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">RoleType</span><span class="o">&gt;</span> <span class="n">roleTypeList</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">delegate</span> <span class="o">=</span> <span class="n">delegate</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">memberId</span> <span class="o">=</span> <span class="n">memberId</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">roleTypeList</span> <span class="o">=</span> <span class="n">roleTypeList</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// OAuth2User 메서드 위임</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="nf">getAttributes</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">delegate</span><span class="o">.</span><span class="na">getAttributes</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">GrantedAuthority</span><span class="o">&gt;</span> <span class="nf">getAuthorities</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">delegate</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">();</span> <span class="c1">// 혹은 role 기반으로 생성해서 반환</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">delegate</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h3 id="access-handler"><span class="me-2">Access Handler</span><a href="#access-handler" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>검증이 성공했을 때 SuccessHandler를 통해 처리해주어야 한다.</p><p>앞서 반환한 CustomOAuth2User로 Authentication 인스턴스로 만들어주었다.</p><p>Authentication 가 필요한 이유는 Authentication를 기반으로 JWT 를 발급하기 때문이다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre><td class="rouge-code"><pre><span class="nd">@Component</span>
+<span class="nd">@Slf4j</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OAuth2LoginSuccessHandler</span> <span class="kd">extends</span> <span class="nc">SimpleUrlAuthenticationSuccessHandler</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">SOCIAL_TOKEN_PARAM</span> <span class="o">=</span> <span class="s">"socialToken"</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">TokenGenerator</span> <span class="n">tokenGenerator</span><span class="o">;</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">"${oauth.authorize-uri}"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">targetUrl</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAuthenticationSuccess</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span>
+                                        <span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+
+        <span class="nc">CustomOAuth2User</span> <span class="n">oAuth2User</span> <span class="o">=</span> <span class="o">(</span><span class="nc">CustomOAuth2User</span><span class="o">)</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getPrincipal</span><span class="o">();</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">authorityList</span> <span class="o">=</span> <span class="n">oAuth2User</span><span class="o">.</span><span class="na">getRoleTypeList</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">map</span><span class="o">(</span><span class="nl">RoleType:</span><span class="o">:</span><span class="n">getAuthority</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">toList</span><span class="o">();</span>
+        <span class="nc">Authentication</span> <span class="n">auth</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">UsernamePasswordAuthenticationToken</span><span class="o">(</span><span class="n">oAuth2User</span><span class="o">.</span><span class="na">getMemberId</span><span class="o">(),</span> <span class="kc">null</span><span class="o">,</span> <span class="n">authorityList</span><span class="o">);</span>
+
+        <span class="nc">String</span> <span class="n">targetUrl</span> <span class="o">=</span> <span class="n">determineTargetUrl</span><span class="o">(</span><span class="n">auth</span><span class="o">);</span>
+        <span class="n">getRedirectStrategy</span><span class="o">().</span><span class="na">sendRedirect</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">,</span> <span class="n">targetUrl</span><span class="o">);</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"OAuth2 login success. memberId: {}, redirect to: {}"</span><span class="o">,</span>
+                <span class="n">oAuth2User</span><span class="o">.</span><span class="na">getMemberId</span><span class="o">(),</span> <span class="n">targetUrl</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="nc">String</span> <span class="nf">determineTargetUrl</span><span class="o">(</span><span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="nc">String</span> <span class="n">socialToken</span> <span class="o">=</span> <span class="n">tokenGenerator</span><span class="o">.</span><span class="na">generateSocialToken</span><span class="o">(</span><span class="n">authentication</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="nc">UriComponentsBuilder</span><span class="o">.</span><span class="na">fromUriString</span><span class="o">(</span><span class="n">targetUrl</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">queryParam</span><span class="o">(</span><span class="no">SOCIAL_TOKEN_PARAM</span><span class="o">,</span> <span class="n">socialToken</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">().</span><span class="na">toUriString</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>발급받은 JWT는 redirect 주소에 포함시켜 응답하면, 사용자는 redirect 페이지로 이동하게 된다. 이후 클라이언트에서 JWT를 포함한 재요청을 보내어 일반 로그인(소셜 로그인이 아닌)에서의 처리(알림 구독/해지)를 진행한다.</p><p>이 부분은 각 서비스 정책에 따라 커스텀하면 될 것 같다.</p><h3 id="failurehandler"><span class="me-2">FailureHandler</span><a href="#failurehandler" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>인증에 실패했을 때 redirect할 페이지를 추가해준다.</p><p>대부분 기존 회원과 관련된 문제로 로그인 페이지로 리다이렉트하고 있다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="nd">@Component</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OAuth2LoginFailureHandler</span> <span class="kd">extends</span> <span class="nc">SimpleUrlAuthenticationFailureHandler</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAuthenticationFailure</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span>
+                                        <span class="nc">AuthenticationException</span> <span class="n">exception</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="c1">// 에러 메시지와 함께 로그인 페이지로 리다이렉트</span>
+        <span class="nc">String</span> <span class="n">targetUrl</span> <span class="o">=</span> <span class="nc">UriComponentsBuilder</span><span class="o">.</span><span class="na">fromUriString</span><span class="o">(</span><span class="s">"login"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">queryParam</span><span class="o">(</span><span class="s">"error"</span><span class="o">,</span> <span class="s">"NOT_REGISTERED"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">().</span><span class="na">toUriString</span><span class="o">();</span>
+
+        <span class="n">getRedirectStrategy</span><span class="o">().</span><span class="na">sendRedirect</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">,</span> <span class="n">targetUrl</span><span class="o">);</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"OAuth2 login failed. redirect to: {}"</span><span class="o">,</span> <span class="n">targetUrl</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h3 id="security-config-등록"><span class="me-2">Security Config 등록</span><a href="#security-config-등록" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>이렇게 필수 기능들을 구현했다면 Spring Security가 인식하고 사용할 수 있도록 처리해주어야 한다.</p><p>Security Config에서 아래와 같이 인스턴스를 등록해주면, 실제 Spring Security가 기본 클래스를 사용하지 않고 내가 등록한 클래스 인스턴스를 사용하게된다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="nc">CustomOAuth2UserService</span> <span class="n">customOAuth2UserService</span><span class="o">;</span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="nc">OAuth2LoginSuccessHandler</span> <span class="n">oAuth2LoginSuccessHandler</span><span class="o">;</span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="nc">OAuth2LoginFailureHandler</span> <span class="n">oAuth2LoginFailureHandler</span><span class="o">;</span>
+
+<span class="o">...</span>
+
+<span class="kd">protected</span> <span class="nc">SecurityFilterChain</span> <span class="nf">securityFilterChain</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+    <span class="o">...</span>
+				<span class="o">.</span><span class="na">oauth2Login</span><span class="o">(</span><span class="n">oauth2</span> <span class="o">-&gt;</span> <span class="n">oauth2</span>
+				        <span class="o">.</span><span class="na">userInfoEndpoint</span><span class="o">(</span><span class="n">userInfo</span> <span class="o">-&gt;</span> <span class="n">userInfo</span><span class="o">.</span><span class="na">userService</span><span class="o">(</span><span class="n">customOAuth2UserService</span><span class="o">))</span>
+				        <span class="o">.</span><span class="na">successHandler</span><span class="o">(</span><span class="n">oAuth2LoginSuccessHandler</span><span class="o">)</span>
+				        <span class="o">.</span><span class="na">failureHandler</span><span class="o">(</span><span class="n">oAuth2LoginFailureHandler</span><span class="o">))</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h2 id="결과"><span class="me-2">결과</span><a href="#결과" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>서버 실행 후 아래 주소로 접근할 경우 로그인 동의 페이지가 띄워진다.</p><p>/oauth2/authorization/kakao</p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/login.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/login.png" alt="카카오 로그인 페이지" loading="lazy"></a></p><p>확인하고 계속하기를 진행할 경우</p><p>카카오 서버 내 인증 과정을 거치고 각 핸들러(Success, Failure)에 따른 동작이 실행된다.</p><blockquote><p>실패</p></blockquote><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/failure-log.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/failure-log.png" alt="실패 로그" loading="lazy"></a></p><blockquote><p>성공</p></blockquote><p>아래와 같이 데이터를 추가하여 재시도했을 때 정상 로그인처리 되는 것을 볼 수 있다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/save-device.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/save-device.png" alt="DB 저장 이미지" loading="lazy"></a></p><p><a href="https://rdyjun.github.io/blog/assets/img/2026-01-13/success-log.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/2026-01-13/success-log.png" alt="성공 로그" loading="lazy"></a></p><h2 id="결론"><span class="me-2">결론</span><a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>OAuth2를 적용하는 과정에서 Redirect 파트가 많이 헷갈렸다</p><p>과정 중 Redirect URL을 잘못 입력해서 실패 요청을 API서버에 계속 보내기도 했다.</p><p>한동안 429 응답 코드가 반환되어 아무것도 못했지만 의미있는 경험이었다.</p><p>계정 아이디, 비밀번호 없이 버튼 한 번에 다른 플랫폼의 계정을 연결할 수 있다는 점은 큰 메리트라고 생각한다.</p><p>위 과정을 구현하면서 Flutter를 사용할 때의 구현 구조가 다르다는 것을 알게 되었고, 프론트에서 Flutter를 사용중인 경우, 위보다 간단하게 구현할 수 있다.</p><blockquote><p>Flutter는 앱에 직접 접근해서 토큰을 받아올 수 있다. 서버에서는 토큰 검증만 진행하면 된다.</p></blockquote></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

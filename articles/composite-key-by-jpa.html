@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JPA와 복합키 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2025-03-28</p>
+            <h1>JPA와 복합키</h1>
+          </header>
+          <div class="article-content">
+<pre><code class="language-mermaid">erDiagram
+    NoticeDetail ||--|{ Notice : "1:N"
+    NoticeDetail {
+        long id PK
+        string title
+        string author
+        datetime created_at
+    }
+    Notice {
+        string id PK
+        long notice_id FK
+    }
+</code></pre><p>공지사항을 개발하던 도중 복합키를 사용하게 되었다.<br /> 단순히 @Id를 두 번 넣으면 되겠지라고 생각했던 것은 오산이었다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Notice</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="nd">@Id</span> <span class="c1">// 오류 발생</span>
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeId</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h2 id="왜-문제인가"><span class="me-2">왜 문제인가?</span><a href="#왜-문제인가" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>아래 사진을 확인하면 <code class="language-plaintext highlighter-rouge">Entity has more than one id attribute.</code>라는 문구를 출력한다.<br /> 이 의미는 한 개 보다 많은 id 속성을 가진다고 경고하는 것이다.</p><p><a href="https://private-user-images.githubusercontent.com/45596014/428844764-2f332cdd-6057-4686-b7ab-2d229c7a2074.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0NzM1NDksIm5iZiI6MTc0MzQ3MzI0OSwicGF0aCI6Ii80NTU5NjAxNC80Mjg4NDQ3NjQtMmYzMzJjZGQtNjA1Ny00Njg2LWI3YWItMmQyMjljN2EyMDc0LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA0MDElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNDAxVDAyMDcyOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWYwNTczNDE4ZTFjOGFiZjg5MjlmZjc4ZmQzNmVkZWUyYjg1ZjEzMjU5OGNlMjljYzBlMzljODZlZTdlZWViMWEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.3ERMGbxkvb5RKkHrIXSMUXfa_RcheM4IfVxeL3S5bGs" class="popup img-link shimmer"><img src="https://private-user-images.githubusercontent.com/45596014/428844764-2f332cdd-6057-4686-b7ab-2d229c7a2074.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0NzM1NDksIm5iZiI6MTc0MzQ3MzI0OSwicGF0aCI6Ii80NTU5NjAxNC80Mjg4NDQ3NjQtMmYzMzJjZGQtNjA1Ny00Njg2LWI3YWItMmQyMjljN2EyMDc0LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA0MDElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNDAxVDAyMDcyOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWYwNTczNDE4ZTFjOGFiZjg5MjlmZjc4ZmQzNmVkZWUyYjg1ZjEzMjU5OGNlMjljYzBlMzljODZlZTdlZWViMWEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.3ERMGbxkvb5RKkHrIXSMUXfa_RcheM4IfVxeL3S5bGs" alt="code error" loading="lazy"></a></p><p>@Id를 두 번 사용하는 것은 어떤 문제가 있을까?<br /> 아래 사이트를 통해 확인해봤다.</p><blockquote><p>https://www.baeldung.com/jpa-composite-primary-keys</p></blockquote><p><code class="language-plaintext highlighter-rouge">@Id</code> 어노테이션에 대한 중복 사용은 지원되지 않는 것으로 확인된다.<br /> 그렇다고 복합키를 사용할 수 없는 것은 아니며, 제공되는 방식으로 복합키를 구현해야 했다.<br /> 이는 2가지로, 아래와 같다.</p><ol><li><code class="language-plaintext highlighter-rouge">@IdClass(Key.class)</code><li><code class="language-plaintext highlighter-rouge">Embeddable</code></ol><h2 id="idclass"><span class="me-2">@IdClass</span><a href="#idclass" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>먼저 @IdClass에 대한 사용 방법을 알아보자.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+</pre><td class="rouge-code"><pre><span class="nd">@Entity</span>
+<span class="nd">@IdClass</span><span class="o">(</span><span class="nc">NoticeKey</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Notice</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="nd">@Id</span>
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeDetail</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">NoticeKey</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeDetail</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">hash</span><span class="o">(</span><span class="n">department</span><span class="o">,</span> <span class="n">noticeDetails</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>코드는 위처럼 복합키에 대한 새로운 class를 만들고,<br /> 이를 entity에 <code class="language-plaintext highlighter-rouge">@IdClass(key.class)</code> 방식으로 매핑해주는 것이다. 여기서 Key에 대한 class는 <code class="language-plaintext highlighter-rouge">Serializable</code>의 구현체여야 한다.</p><p>이는 직관적으로 entity 객체에 어떤 값이 키로 관리되는지 확인할 수 있다는 장점이 있다.</p><h2 id="embeddable"><span class="me-2">@Embeddable</span><a href="#embeddable" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>Embeddable 코드를 확인해보자.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre><td class="rouge-code"><pre><span class="nd">@Entity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Notice</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span> <span class="nd">@EmbeddedId</span>
+    <span class="kd">private</span> <span class="nc">NoticeKey</span> <span class="n">id</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="nd">@Embeddable</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">NoticeKey</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeDetail</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">hash</span><span class="o">(</span><span class="n">department</span><span class="o">,</span> <span class="n">noticeDetails</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>@IdClass와 달라진 점은 똑같은 키를 그대로 entity에 작성하는 것이 아니라,<br /> Key 클래스 자체를 id로 주는 방식이다.</p><p>이렇게 작성했을 때 NoticeKey를 한 번 더 확인해야<br /> 실제로 어떤 값이 키가 되는지 확인할 수 있다는 단점이 있다.</p><p>@IdClass 방식과 마찬가지로 <code class="language-plaintext highlighter-rouge">Serializable</code>의 구현체여야 한다.</p><h2 id="그래서-idclass와-embeddable의-차이점은"><span class="me-2">그래서 @IdClass와 @Embeddable의 차이점은?</span><a href="#그래서-idclass와-embeddable의-차이점은" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="jpql"><span class="me-2">JPQL</span><a href="#jpql" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>JPQL에서도 큰 차이를 보인다.<br /> 아래는 공지 상세 id를 가진 행들을 가져오는 예시이다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre><td class="rouge-code"><pre><span class="c1">// @Embeddable</span>
+<span class="kd">class</span> <span class="nc">interface</span> <span class="nc">NoticeRepository</span> <span class="kd">extends</span> <span class="nc">JpaRepository</span><span class="o">&lt;</span><span class="nc">Notice</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nd">@Query</span><span class="o">(</span><span class="s">"SELECT * FROM Notice n WHERE n.id.noticeDetail.id = :noticeId"</span><span class="o">)</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Notice</span><span class="o">&gt;</span> <span class="nf">findById</span><span class="o">(</span><span class="nc">Long</span> <span class="n">noticeId</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="c1">// @IdClass</span>
+<span class="kd">class</span> <span class="nc">interface</span> <span class="nc">NoticeRepository</span> <span class="kd">extends</span> <span class="nc">JpaRepository</span><span class="o">&lt;</span><span class="nc">Notice</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nd">@Query</span><span class="o">(</span><span class="s">"SELECT * FROM Notice n WHERE n.noticeDetail.id = :noticeId"</span><span class="o">)</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Notice</span><span class="o">&gt;</span> <span class="nf">findById</span><span class="o">(</span><span class="nc">Long</span> <span class="n">noticeId</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>위 코드에서 다른 점은 WHERE절에서 확인할 수 있다.<br /> Embeddable은 Key에 대한 class 자체로 관리되기 때문에<br /> <code class="language-plaintext highlighter-rouge">.id</code>로 <code class="language-plaintext highlighter-rouge">NoticeKey</code> 키 인스턴스를 가져오고, <code class="language-plaintext highlighter-rouge">noticeDetail</code>을 불러온 다음 <code class="language-plaintext highlighter-rouge">id</code>를 확인한다.</p><p>반면에 IdClass 방식은 <code class="language-plaintext highlighter-rouge">NoticeKey</code> 인스턴스를 바로 가져와서 <code class="language-plaintext highlighter-rouge">id</code>를 확인한다.<br /> 만약 속성 이름이 길어진다면 <code class="language-plaintext highlighter-rouge">n.id.noticeDetail.id</code>보다 더 길어질 수도 있다.<br /> 이러한 점에서 Embeddable이 불리하다.</p><h3 id="키-수정"><span class="me-2">키 수정</span><a href="#키-수정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>개발 과정에서 자주는 아니지만 일어날 수 있는 시나리오 중 키가 변경되는 경우가 발생할 수 있다.<br /> 이 경우 @IdClass 방식에서는 entity와 Key 클래스 모두 변경해주어야 한다는 단점이 발생한다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre><td class="rouge-code"><pre><span class="nd">@Entity</span>
+<span class="nd">@IdClass</span><span class="o">(</span><span class="nc">NoticeKey</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Notice</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="nd">@Id</span>
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeDetail</span><span class="o">;</span>
+
+    <span class="c1">// 추가</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">NoticeKey</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeDetail</span><span class="o">;</span>  <span class="c1">// 수정</span>
+
+    <span class="c1">// 추가</span>
+
+    <span class="o">...</span>
+</pre></table></code></div></div><p>반대로 @Embeddable 방식은 Key 클래스만 수정해주면 된다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="nd">@Entity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Notice</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span> <span class="nd">@EmbeddedId</span>
+    <span class="kd">private</span> <span class="nc">NoticeKey</span> <span class="n">id</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="nd">@Embeddable</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">NoticeKey</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">department</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">NoticeDetail</span> <span class="n">noticeDetail</span><span class="o">;</span> <span class="c1">// 클래스 수정</span>
+
+    <span class="c1">// 새 값 추가</span>
+
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>위와 같은 경우 Embeddable 방식이 더 낫다고 볼 수 있다.</p><h2 id="뜻밖의-serializable-이슈"><span class="me-2">뜻밖의 Serializable 이슈</span><a href="#뜻밖의-serializable-이슈" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>무작정 블로그들을 찾아보고 구현했을 때는 Key 클래스에 대해 <code class="language-plaintext highlighter-rouge">Serializable</code>를 구현하는 구조가 아닌<br /> <code class="language-plaintext highlighter-rouge">equals</code> 메서드와 <code class="language-plaintext highlighter-rouge">hashCode</code> 메서드만 구현하고 끝냈다.<br /> 아무 문제 없이 실행이 됐지만, 이 글을 쓰기 위해 자료를 찾아보면서<br /> 모든 entity가 Serializable을 구현하는 구조가 JPA 표준이라는 사실을 알았다.</p><p>이 말을 다시 얘기한다면 entity는 직렬화가 가능해야 한다는 점이다.<br /> 또한 복합키도 직렬화가 가능해야 한다.</p><blockquote><p>https://www.baeldung.com/jpa-entities-serializable</p></blockquote><p>여기서 진짜 문제는 Serializable을 구현하지 않아도 잘 작동한다는 점이다.<br /> Serializable을 쓰고 안 쓰고의 차이는 무엇일까?</p><h3 id="serializable의-역할"><span class="me-2">Serializable의 역할</span><a href="#serializable의-역할" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Java 객체를 Byte 스트림으로 변환하는 프로세스이다.<br /> JPA의 Hibernate는 이렇게 entity 객체를 직렬화한다.</p><p>그러면 직렬화는 왜 하는 것일까?<br /> entity를 프레젠테이션 계층에 직접 노출할 때 필요하다고 한다. (JVM 외부로)</p><p>이 의미는 Http Request에 대해 Response에 담을 수 있느냐 없느냐에 대한 얘기는 아니다. REST API 환경에서는 Jackson과 같은 JSON 변환 라이브러리가 객체를 직렬화하기 때문이다.</p><p>이렇게 별도 직렬화 과정이 포함되지 않으면서 서버 외부로 객체를 보내는 경우 Serializable이 필요하다고 하는 것 같다.<br /> 아래 링크의 내용을 통해 더 고민해볼 수 있다.</p><blockquote><p>https://www.baeldung.com/jpa-entities-serializable<br /> https://www.inflearn.com/community/questions/16570/%EB%B2%84%EA%B7%B8-%EB%AC%B8%EC%9D%98%EB%93%9C%EB%A0%A4%EB%B4%85%EB%8B%88%EB%8B%A4</p></blockquote><h2 id="결론"><span class="me-2">결론</span><a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>결론은 Serializable을 사용하지 않기로 했다.<br /> JPA에서 권장하지만, Rest API에 의해 JSON으로 직렬화되고,<br /> 이 외에 직렬화가 필요 없기 때문이다.</p><ul><li>@IdClass는 <strong>수정할 수 없는 복합 키 클래스</strong>를 사용하는 곳에서 매우 유용하게 사용할 수 있다.<li>복합 키의 일부에 개별적으로 액세스하려는 경우 @IdClass 를 사용할 수 있다. (n.noticeDetail.id)<li>전체 식별자를 객체로 자주 사용하는 경우 @EmbeddedId를 사용하는 것이 좋다.<ul><li>n.id.noticeDetail.id가 아닌 n.id로만 사용하는 방식</ul></ul></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

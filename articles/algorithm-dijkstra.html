@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[알고리즘] 다익스트라 알고리즘 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2024-03-18</p>
+            <h1>[알고리즘] 다익스트라 알고리즘</h1>
+          </header>
+          <div class="article-content">
+<p>다익스트라(Dijkstra)는 최단 경로 탐색 문제에서 사용되는 알고리즘으로, 특정 노드에서 다른 노드로의 최소 비용을 찾아낼 때 사용하는 알고리즘이다.</p><p>알고리즘 분류는 탐욕(Greedy) 알고리즘이라고도 하며, 이미 탐색한 결과에 대해 계산하지 않고, 기존 결과를 재사용한다는 점에서 다이나믹 프로그래밍으로도 볼 수 있다.</p><p>노드의 방향이 양방향인지 단방향인지에 상관없이 문제에 적용할 수 있다.</p><h1 id="흐름">흐름</h1><h2 id="노드간-비용-초기화"><span class="me-2">노드간 비용 초기화</span><a href="#노드간-비용-초기화" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p><a href="https://rdyjun.github.io/blog/assets/img/dijkstra-1.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-1.png" alt="img" loading="lazy"></a></p><p>위와 같은 그래프를 2차원 배열로 초기화 했을 때 아래와 같은 표가 그려진다.</p><div class="table-wrapper"><table><thead><tr><th>\<th>1<th>2<th>3<th>4<th>5<th>6<tbody><tr><td><strong>비용</strong><td>0<td>4<td>INF<td>INF<td>5<td>INF<tr><td><strong>2</strong><td>4<td>0<td>1<td>2<td>INF<td>INF<tr><td><strong>3</strong><td>INF<td>1<td>0<td>1<td>INF<td>INF<tr><td><strong>4</strong><td>INF<td>2<td>1<td>0<td>INF<td>3<tr><td><strong>5</strong><td>5<td>INF<td>INF<td>INF<td>0<td>5<tr><td><strong>6</strong><td>INF<td>INF<td>INF<td>3<td>5<td>0</table></div><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+</pre><td class="rouge-code"><pre><span class="kd">private</span> <span class="kt">int</span><span class="o">[][]</span> <span class="nf">initializeGraph</span><span class="o">(</span><span class="kt">int</span> <span class="n">nodeCount</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">nodes</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">nodesSize</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">nodeCount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">][</span><span class="n">nodeCount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">row</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">row</span> <span class="o">&lt;=</span> <span class="n">nodeCount</span><span class="o">;</span> <span class="n">row</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">column</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">column</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="o">;</span> <span class="n">column</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="c1">// 같은 위치 비용 0 처리</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">row</span> <span class="o">==</span> <span class="n">column</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">graph</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">column</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="c1">// 상수로 포장해 사용해주는 것이 좋다</span>
+            <span class="o">}</span>
+            <span class="c1">// 방문 불가 처리</span>
+            <span class="n">graph</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">column</span><span class="o">]</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span> <span class="c1">// 상수로 포장해 사용해주는 것이 좋다</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">nodeIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">nodeIndex</span> <span class="o">&lt;=</span> <span class="n">nodesSize</span><span class="o">;</span> <span class="n">nodeIndex</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">node1</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">[</span><span class="n">nodeIndex</span><span class="o">][</span><span class="mi">0</span><span class="o">];</span>
+        <span class="kt">int</span> <span class="n">node2</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">[</span><span class="n">nodeIndex</span><span class="o">][</span><span class="mi">1</span><span class="o">];</span>
+        <span class="kt">int</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">[</span><span class="n">nodeIndex</span><span class="o">][</span><span class="mi">2</span><span class="o">];</span>
+
+        <span class="n">graph</span><span class="o">[</span><span class="n">node1</span><span class="o">][</span><span class="n">node2</span><span class="o">]</span> <span class="o">=</span> <span class="n">cost</span><span class="o">;</span>
+        <span class="n">graph</span><span class="o">[</span><span class="n">node2</span><span class="o">][</span><span class="n">node1</span><span class="o">]</span> <span class="o">=</span> <span class="n">cost</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="n">graph</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h2 id="시작점-정하기"><span class="me-2">시작점 정하기</span><a href="#시작점-정하기" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>이제 시작점을 고르면 된다. 여기서는 시작 노드를 1로 하겠다. <a href="https://rdyjun.github.io/blog/assets/img/dijkstra-2.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-2.png" alt="img" loading="lazy"></a></p><p>시작 노드를 정했다면 그래프에서 해당 시작점의 행을 가져오면 된다. | \ |1|2|3|4|5|6| |–|–|–|–|–|–|–| |<strong>비용</strong>|0|4|INF|INF|5|INF|</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="kt">int</span><span class="o">[]</span> <span class="n">distance</span> <span class="o">=</span> <span class="n">graph</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="na">clone</span><span class="o">();</span>
+<span class="kt">boolean</span><span class="o">[]</span> <span class="n">visited</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">boolean</span><span class="o">[</span><span class="n">n</span><span class="o">];</span>
+</pre></table></code></div></div><h2 id="비용이-작은-노드-부터-방문하기"><span class="me-2">비용이 작은 노드 부터 방문하기</span><a href="#비용이-작은-노드-부터-방문하기" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><div class="table-wrapper"><table><thead><tr><th style="text-align: center">\<th style="text-align: center">1<th style="text-align: center">2<th style="text-align: center">3<th style="text-align: center">4<th style="text-align: center">5<th style="text-align: center">6<tbody><tr><td style="text-align: center"><strong>업데이트</strong><td style="text-align: center"> <td style="text-align: center">🌟<td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center">🌟<td style="text-align: center"> <tr><td style="text-align: center"><strong>비용</strong><td style="text-align: center">0<td style="text-align: center">4<td style="text-align: center">INF<td style="text-align: center">INF<td style="text-align: center">5<td style="text-align: center">INF<tr><td style="text-align: center"><strong>방문여부</strong><td style="text-align: center">✅<td style="text-align: center">❌<td style="text-align: center">❌<td style="text-align: center">❌<td style="text-align: center">❌<td style="text-align: center">❌</table></div><ol><li><p>방문하지 않았으면서, 비용이 <strong>가장 작은</strong> 노드를 먼저 찾는다.</p><blockquote><p>위 상황에서는 비용이 4인 2번 노드가 된다.</p></blockquote><li><p>1번에서 찾은 노드의 다음 노드를 찾는다.</p><blockquote><p>2번 노드의 다음 노드는 1, 3, 4번 노드이다.</p></blockquote><li><p>방문했던 노드를 제외한 노드들의 비용과 현재 노드의 비용을 합한다.</p><blockquote><p>2번 노드의 비용이 4이므로 3번 노드는 총 비용이 5 4번 노드는 총 비용이 6</p></blockquote><li><p>시작 노드에서 해당 노드들의 방문 비용을 비교해서 업데이트 한다.</p><blockquote><p>1번 노드에서 3번 노드로 가는 비용은 0으로 아직 방법이 없다. 1번 노드에서 4번 노드로 가는 비용은 0으로 아직 방법이 없다. 결론적으로 1번 노드에서 3번 노드와 4번노드를 가는 비용을 업데이트 한다.</p></blockquote></ol><p><a href="https://rdyjun.github.io/blog/assets/img/dijkstra-3.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-3.png" alt="img" loading="lazy"></a></p><div class="table-wrapper"><table><thead><tr><th style="text-align: center">\<th style="text-align: center">1<th style="text-align: center">2<th style="text-align: center">3<th style="text-align: center">4<th style="text-align: center">5<th style="text-align: center">6<tbody><tr><td style="text-align: center"><strong>업데이트</strong><td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center">🌟<td style="text-align: center">🌟<td style="text-align: center"> <td style="text-align: center"> <tr><td style="text-align: center"><strong>비용</strong><td style="text-align: center">0<td style="text-align: center">4<td style="text-align: center">5<td style="text-align: center">6<td style="text-align: center">5<td style="text-align: center">INF<tr><td style="text-align: center"><strong>방문여부</strong><td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">❌<td style="text-align: center">❌<td style="text-align: center">❌<td style="text-align: center">❌</table></div><h2 id="반복"><span class="me-2">반복</span><a href="#반복" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>모든 노드를 방문할 때까지 또는 원하는 노드를 방문할 때 까지 위 과정을 반복하면 된다. 여기서는 모든 노드의 경로를 찾을 때 까지 반복하겠다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+</pre><td class="rouge-code"><pre><span class="kd">private</span> <span class="kt">int</span> <span class="nf">findMinNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">,</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">distance</span><span class="o">,</span> <span class="kt">boolean</span><span class="o">[]</span> <span class="n">visited</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">minNode</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">minValue</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">visited</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">||</span>
+        <span class="n">distance</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&gt;=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">minNode</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="n">minValue</span> <span class="o">=</span> <span class="n">distance</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="n">minNode</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">dijikstra</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span><span class="o">[]</span> <span class="n">distance</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">nodeCount</span><span class="o">];</span> <span class="c1">// 시작 지점의 다음 노드별 비용 리스트</span>
+    <span class="kt">int</span> <span class="n">node</span> <span class="o">=</span> <span class="n">n</span><span class="o">;</span>
+
+    <span class="kt">boolean</span><span class="o">[]</span> <span class="n">visited</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">boolean</span><span class="o">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="n">node</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">visited</span><span class="o">[</span><span class="n">node</span><span class="o">]</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">nextNode</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">nextNode</span> <span class="o">&lt;=</span> <span class="n">nodeCount</span><span class="o">;</span> <span class="n">nextNode</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">newDistance</span> <span class="o">=</span> <span class="n">distance</span><span class="o">[</span><span class="n">node</span><span class="o">]</span> <span class="o">+</span> <span class="n">graph</span><span class="o">[</span><span class="n">node</span><span class="o">][</span><span class="n">nextNode</span><span class="o">];</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">visited</span><span class="o">[</span><span class="n">nextNode</span><span class="o">]</span> <span class="o">||</span>
+            <span class="n">distance</span><span class="o">[</span><span class="n">nextNode</span><span class="o">]</span> <span class="o">&lt;=</span> <span class="n">newDistance</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">continue</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="n">distance</span><span class="o">[</span><span class="n">nextNode</span><span class="o">]</span> <span class="o">=</span> <span class="n">newDistance</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="n">findMinNode</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">distance</span><span class="o">,</span> <span class="n">visited</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="n">distance</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p><a href="https://rdyjun.github.io/blog/assets/img/dijkstra-4.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-4.png" alt="img" loading="lazy"></a></p><div class="table-wrapper"><table><thead><tr><th style="text-align: center">\<th style="text-align: center">1<th style="text-align: center">2<th style="text-align: center">3<th style="text-align: center">4<th style="text-align: center">5<th style="text-align: center">6<tbody><tr><td style="text-align: center"><strong>업데이트</strong><td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <tr><td style="text-align: center"><strong>비용</strong><td style="text-align: center">0<td style="text-align: center">4<td style="text-align: center">5<td style="text-align: center">6<td style="text-align: center">5<td style="text-align: center">INF<tr><td style="text-align: center"><strong>방문여부</strong><td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">❌<td style="text-align: center">❌<td style="text-align: center">❌</table></div><blockquote><p>여기서 3번과 5번이 똑같이 5라는 비용인데 3번을 먼저 간 이유는 반복문을 통해 작은 수부터 검사했기 때문이다. 이 순서는 크게 중요하지 않다.</p></blockquote><p><a href="https://rdyjun.github.io/blog/assets/img/dijkstra-5.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-5.png" alt="img" loading="lazy"></a></p><div class="table-wrapper"><table><thead><tr><th style="text-align: center">\<th style="text-align: center">1<th style="text-align: center">2<th style="text-align: center">3<th style="text-align: center">4<th style="text-align: center">5<th style="text-align: center">6<tbody><tr><td style="text-align: center"><strong>업데이트</strong><td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center">🌟<tr><td style="text-align: center"><strong>비용</strong><td style="text-align: center">0<td style="text-align: center">4<td style="text-align: center">5<td style="text-align: center">6<td style="text-align: center">5<td style="text-align: center">10<tr><td style="text-align: center"><strong>방문여부</strong><td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">❌<td style="text-align: center">✅<td style="text-align: center">❌</table></div><p><a href="https://rdyjun.github.io/blog/assets/img/dijkstra-6.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-6.png" alt="img" loading="lazy"></a></p><div class="table-wrapper"><table><thead><tr><th style="text-align: center">\<th style="text-align: center">1<th style="text-align: center">2<th style="text-align: center">3<th style="text-align: center">4<th style="text-align: center">5<th style="text-align: center">6<tbody><tr><td style="text-align: center"><strong>업데이트</strong><td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center">🌟<tr><td style="text-align: center"><strong>비용</strong><td style="text-align: center">0<td style="text-align: center">4<td style="text-align: center">5<td style="text-align: center">6<td style="text-align: center">5<td style="text-align: center">9<tr><td style="text-align: center"><strong>방문여부</strong><td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">❌</table></div><p><a href="https://rdyjun.github.io/blog/assets/img/dijkstra-7.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/dijkstra-7.png" alt="img" loading="lazy"></a></p><div class="table-wrapper"><table><thead><tr><th style="text-align: center">\<th style="text-align: center">1<th style="text-align: center">2<th style="text-align: center">3<th style="text-align: center">4<th style="text-align: center">5<th style="text-align: center">6<tbody><tr><td style="text-align: center"><strong>업데이트</strong><td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <td style="text-align: center"> <tr><td style="text-align: center"><strong>비용</strong><td style="text-align: center">0<td style="text-align: center">4<td style="text-align: center">5<td style="text-align: center">6<td style="text-align: center">5<td style="text-align: center">9<tr><td style="text-align: center"><strong>방문여부</strong><td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅<td style="text-align: center">✅</table></div><blockquote><p>마지막 남은 한 개의 노드는 굳이 방문하지 않아도 된다. 마지막 노드에서 경유해서 갈 다른 노드는 이미 모두 방문했기 때문</p></blockquote><h3 id="여기서-궁금했던-점"><span class="me-2">여기서 궁금했던 점</span><a href="#여기서-궁금했던-점" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>나는 여기서 “이미 방문했던 노드의 비용을 업데이트하지 않아도 되는 것인가?” 라는 생각이 들었다. 하지만 다익스트라에선 가장 적은 비용의 노드부터 방문한다는 점에서 이러한 걱정을 할 필요가 없았다.</p><blockquote><p>가령 1번 노드에서 2번 노드와 3번 노드를 갈 수 있다고 가정했을 때, 2번 노드에 가는 비용이 3이고, 3번 노드에 가는 비용이 4라고 하자. 3번 노드로 가는 경우 어떻게 해서도 2번 노드의 비용보다 적을 수 없다.</p></blockquote><h1 id="확장성">확장성</h1><ol><li>distance 배열에서 가장 작은 값을 먼저 처리한다는 점에서 우선순위 큐(Priority Queue)를 적용하면 효율을 더 챙길 수 있을 것이다.<li>for문으로 검사중인 노드의 다음 노드들을 확인하는데, 이때 for문으로 모든 노드를 확인하지 않고 Map이나 List를 사용하여 방문 가능한 노드들만 확인할 수 있다.<li>만약 node의 수가 많다면 int[][]와 같은 배열이 아닌 List를 사용해 메모리를 줄일 수 있다.</ol><h1 id="결론">결론</h1><p>기존의 DFS, BFS 방식으로 노드 문제를 많이 해결했었는데, 노드 문제들을 만날수록 고려해야하는 노드들이 많아지고, 시간을 초과하는 일이 빈번해지기에 다익스트라를 통해 이런 문제들을 해결할 수 있었다.</p><p>처음 다익스트라 알고리즘을 접했을 때는 정말 이렇게 풀면 효율적으로 풀 수 있는 건가? 생각했다. 실제로 코드를 작성하고, 노드의 흐름을 확인해봤을 때는 이해할 수 있었다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kt">int</span> <span class="nf">getMinDistance</span><span class="o">(</span><span class="kt">int</span> <span class="n">start</span><span class="o">,</span> <span class="kt">int</span> <span class="n">end</span><span class="o">,</span> <span class="kt">int</span> <span class="n">nodeCount</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">nodes</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span> <span class="o">=</span> <span class="n">initializeGraph</span><span class="o">(</span><span class="n">nodeCount</span><span class="o">,</span> <span class="n">nodes</span><span class="o">);</span>
+    <span class="kt">int</span><span class="o">[]</span> <span class="n">distance</span> <span class="o">=</span> <span class="n">dijkstra</span><span class="o">(</span><span class="n">nodeCount</span><span class="o">,</span> <span class="n">graph</span><span class="o">);</span>
+
+    <span class="k">return</span> <span class="n">distance</span><span class="o">[</span><span class="n">end</span><span class="o">];</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kt">int</span><span class="o">[][]</span> <span class="nf">initializeGraph</span><span class="o">(</span><span class="kt">int</span> <span class="n">nodeCount</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">nodes</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">nodesSize</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">nodeCount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">][</span><span class="n">nodeCount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">row</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">row</span> <span class="o">&lt;=</span> <span class="n">nodeCount</span><span class="o">;</span> <span class="n">row</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">column</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">column</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="o">;</span> <span class="n">column</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="c1">// 같은 위치 비용 0 처리</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">row</span> <span class="o">==</span> <span class="n">column</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">graph</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">column</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="c1">// 상수로 포장해 사용해주는 것이 좋다</span>
+            <span class="o">}</span>
+            <span class="c1">// 방문 불가 처리</span>
+            <span class="n">graph</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">column</span><span class="o">]</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span> <span class="c1">// 상수로 포장해 사용해주는 것이 좋다</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">nodeIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">nodeIndex</span> <span class="o">&lt;=</span> <span class="n">nodesSize</span><span class="o">;</span> <span class="n">nodeIndex</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">node1</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">[</span><span class="n">nodeIndex</span><span class="o">][</span><span class="mi">0</span><span class="o">];</span>
+        <span class="kt">int</span> <span class="n">node2</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">[</span><span class="n">nodeIndex</span><span class="o">][</span><span class="mi">1</span><span class="o">];</span>
+        <span class="kt">int</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">[</span><span class="n">nodeIndex</span><span class="o">][</span><span class="mi">2</span><span class="o">];</span>
+
+        <span class="n">graph</span><span class="o">[</span><span class="n">node1</span><span class="o">][</span><span class="n">node2</span><span class="o">]</span> <span class="o">=</span> <span class="n">cost</span><span class="o">;</span>
+        <span class="n">graph</span><span class="o">[</span><span class="n">node2</span><span class="o">][</span><span class="n">node1</span><span class="o">]</span> <span class="o">=</span> <span class="n">cost</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="n">graph</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kt">int</span> <span class="nf">findMinNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">nodeCount</span><span class="o">,</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">distance</span><span class="o">,</span> <span class="kt">boolean</span><span class="o">[]</span> <span class="n">visited</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">minNode</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">minValue</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">nodeCount</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">visited</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">||</span>
+        <span class="n">distance</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&gt;=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">minNode</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="n">minValue</span> <span class="o">=</span> <span class="n">distance</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="n">minNode</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">dijikstra</span><span class="o">(</span><span class="kt">int</span> <span class="n">start</span><span class="o">,</span> <span class="kt">int</span> <span class="n">nodeCount</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span><span class="o">[]</span> <span class="n">distance</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">nodeCount</span><span class="o">];</span> <span class="c1">// 시작 지점의 다음 노드별 비용 리스트</span>
+    <span class="kt">int</span> <span class="n">node</span> <span class="o">=</span> <span class="n">nodeCount</span><span class="o">;</span>
+
+    <span class="kt">boolean</span><span class="o">[]</span> <span class="n">visited</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">boolean</span><span class="o">[</span><span class="n">nodeCount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="n">node</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">visited</span><span class="o">[</span><span class="n">node</span><span class="o">]</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">nextNode</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">nextNode</span> <span class="o">&lt;=</span> <span class="n">nodeCount</span><span class="o">;</span> <span class="n">nextNode</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">newDistance</span> <span class="o">=</span> <span class="n">distance</span><span class="o">[</span><span class="n">node</span><span class="o">]</span> <span class="o">+</span> <span class="n">graph</span><span class="o">[</span><span class="n">node</span><span class="o">][</span><span class="n">nextNode</span><span class="o">];</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">visited</span><span class="o">[</span><span class="n">nextNode</span><span class="o">]</span> <span class="o">||</span>
+            <span class="n">distance</span><span class="o">[</span><span class="n">nextNode</span><span class="o">]</span> <span class="o">&lt;=</span> <span class="n">newDistance</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">continue</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="n">distance</span><span class="o">[</span><span class="n">nextNode</span><span class="o">]</span> <span class="o">=</span> <span class="n">newDistance</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="n">findMinNode</span><span class="o">(</span><span class="n">nodeCount</span><span class="o">,</span> <span class="n">distance</span><span class="o">,</span> <span class="n">visited</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="n">distance</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></table></code></div></div></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

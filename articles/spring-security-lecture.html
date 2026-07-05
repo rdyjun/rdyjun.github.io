@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[스프링 시큐리티] 기본 인증 방식 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2024-05-03</p>
+            <h1>[스프링 시큐리티] 기본 인증 방식</h1>
+          </header>
+          <div class="article-content">
+<p>스프링 부트에서 제공되는 기본 인증 방식에 대해 알아볼 것이다.<br /> 웹사이트에 접근할 때, 어떤 경로에 접근하느냐에 따라 접근이 허용되는 경로와 허용되지 않는 경로가 있기 마련이다.<br /> 이러한 접근 보안에 대해 알아볼 것이다.</p><h2 id="스프링-시큐리티-기본-개념"><span class="me-2">스프링 시큐리티 기본 개념</span><a href="#스프링-시큐리티-기본-개념" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="securitybuilder"><span class="me-2">SecurityBuilder</span><a href="#securitybuilder" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>빌더 클래스로서 웹 보안을 구성하는 <code class="language-plaintext highlighter-rouge">빈 객체</code>와 <code class="language-plaintext highlighter-rouge">설정 클래스</code>들을 생성하는 역할을 한다.<br /> 대표적으로 <code class="language-plaintext highlighter-rouge">WebSecurity</code>, <code class="language-plaintext highlighter-rouge">HttpSecurity</code>가 있다.</p><h3 id="securityconfigurer"><span class="me-2">SecurityConfigurer</span><a href="#securityconfigurer" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Http 요청과 관련된 보안 처리를 담당하는 <code class="language-plaintext highlighter-rouge">필터</code>들을 생성하고 여러 초기화 설정에 관여한다.<br /> 이 <code class="language-plaintext highlighter-rouge">SecurityConfigurer</code>는 <code class="language-plaintext highlighter-rouge">SecurityBuilder</code>에 참조되며, 인증 및 인가 초기화 작업은 <code class="language-plaintext highlighter-rouge">SecurityConfigurer</code>에서 진행된다.</p><h3 id="초기화-흐름"><span class="me-2">초기화 흐름</span><a href="#초기화-흐름" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><h4 id="1-빌더-클래스-생성"><span class="me-2">1. 빌더 클래스 생성</span><a href="#1-빌더-클래스-생성" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><h5 id="흐름"><span class="me-2">흐름</span><a href="#흐름" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><p><code class="language-plaintext highlighter-rouge">AutoConfiguration</code> -&gt; <code class="language-plaintext highlighter-rouge">build()</code> -&gt; <code class="language-plaintext highlighter-rouge">SecurityBuilder</code></p><h5 id="작동"><span class="me-2">작동</span><a href="#작동" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><p><code class="language-plaintext highlighter-rouge">SecurityBuilder</code>를 통해 <code class="language-plaintext highlighter-rouge">HttpSecurity</code> 생성 후 Bean 등록</p><h4 id="2-설정-클래스-생성"><span class="me-2">2. 설정 클래스 생성</span><a href="#2-설정-클래스-생성" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><h5 id="흐름-1"><span class="me-2">흐름</span><a href="#흐름-1" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><p><code class="language-plaintext highlighter-rouge">SecurityBuilder</code> -&gt; <code class="language-plaintext highlighter-rouge">SecurityConfigurer</code></p><h5 id="작동-1"><span class="me-2">작동</span><a href="#작동-1" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><p>1번에서 <code class="language-plaintext highlighter-rouge">HttpSecurity</code>가 생성되어 빈으로 등록되면, <code class="language-plaintext highlighter-rouge">SecurityConfigurer</code> 객체들을 자동으로 생성한다.</p><blockquote><p>이렇게 생성된 SecurityConfigurer 객체는 init과 configure 메소드를 가진다. 이때, 인자는 Builder 클래스인 HttpSecurity</p></blockquote><h4 id="3-초기화-작업-진행"><span class="me-2">3. 초기화 작업 진행</span><a href="#3-초기화-작업-진행" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><h5 id="흐름-2"><span class="me-2">흐름</span><a href="#흐름-2" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><p><code class="language-plaintext highlighter-rouge">SecurityBuilder</code> -&gt; <code class="language-plaintext highlighter-rouge">init(B builder)</code> / <code class="language-plaintext highlighter-rouge">configure(B builder)</code> -&gt; <code class="language-plaintext highlighter-rouge">SecurityConfigurer</code></p><h5 id="작동-2"><span class="me-2">작동</span><a href="#작동-2" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><p>2번에서 생성한 <code class="language-plaintext highlighter-rouge">설정 클래스</code>들의 메소드(<code class="language-plaintext highlighter-rouge">init</code>, <code class="language-plaintext highlighter-rouge">configure</code>)에 빌더 클래스를 인자로 전달<br /></p><blockquote><p>이 과정에서 필터가 생성된다. 각 configurer은 하나의 필터를 가진다.</p></blockquote><h2 id="스프링-시큐리티-기본-인증"><span class="me-2">스프링 시큐리티 기본 인증</span><a href="#스프링-시큐리티-기본-인증" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>스프링 시큐리티에서는 기본적으로 제공하는 로그인 인증 방식이 존재한다.<br /> 하나의 계정을 기본적으로 제공해주며, 인증 설정에 따라 특정 페이지에 접근 시 이 로그인 과정이 필요하다.</p><h3 id="기본-제공-계정"><span class="me-2">기본 제공 계정</span><a href="#기본-제공-계정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>기본적으로 제공해주는 계정의 아이디는 <code class="language-plaintext highlighter-rouge">user</code> 이다.<br /> 암호는 랜덤으로 생성되는 UUID 인데, 서버가 실행될 때 콘솔창에 나타난다.</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre>id: user&lt;br&gt;
+pw: 랜덤 UUID
+</pre></table></code></div></div><h3 id="프로젝트-실행-암호-생성"><span class="me-2">프로젝트 실행 (암호 생성)</span><a href="#프로젝트-실행-암호-생성" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>프로젝트를 실행하면 아래 이미지와 같이 하나의 암호가 생성된 것을 볼 수 있다.<br /> 이 암호는 위에서 설명한 것과 같이 처음 제공되는 계정의 비밀번호이다.<br /></p><blockquote><p>암호는 프로젝트의 매 실행마다 바뀐다.</p></blockquote><p><a href="https://rdyjun.github.io/blog/assets/img/security-1.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/security-1.png" alt="프로젝트 실행 화면" loading="lazy"></a></p><p>서버의 컨트롤러에 정의한 특정 경로를 타고 들어가게되면, 아래와 같이 Spring Security에서 제공되는 로그인 폼이 렌더링된다.<br /></p><p><a href="https://rdyjun.github.io/blog/assets/img/security-2.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/security-2.png" alt="로그인" loading="lazy"></a></p><p><code class="language-plaintext highlighter-rouge">Username</code>에는 Spring Security에서 처음 제공해주는 <code class="language-plaintext highlighter-rouge">user</code>를 입력하고,<br /> <code class="language-plaintext highlighter-rouge">Password</code>에는 프로젝트 실행 시 제공받은 키를 입력하자.</p><blockquote><p>위 내용에 따르면 Password는 c209e61c-042c-4326-a3df-0de99945f07a 이다.</p></blockquote><p>결론적으로 인증이 성공하여 접근하려고 했던 경로의 페이지가 반환된다.</p><h2 id="기본-인증-설정"><span class="me-2">기본 인증 설정</span><a href="#기본-인증-설정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="요청-별-인증-설정"><span class="me-2">요청 별 인증 설정</span><a href="#요청-별-인증-설정" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><code class="language-plaintext highlighter-rouge">SpringBootWebSecurityConfiguration.java</code> 클래스의<br /> <code class="language-plaintext highlighter-rouge">defaultSecurityFilterChain</code> 메소드를 통해<br /> <code class="language-plaintext highlighter-rouge">SecurityFilterChain</code>이 빈으로 등록되는 것이 시작이다.<br /></p><p>간단히 얘기하면, <code class="language-plaintext highlighter-rouge">defaultSecurityFilterChain</code> 메소드는 앞에서 초기화 한 <code class="language-plaintext highlighter-rouge">HttpSecurity</code> 빈 객체를 인자로 받아와서,<br /> <code class="language-plaintext highlighter-rouge">HttpSecurity</code> 빈 객체에 보안 설정을 적용한 후, <code class="language-plaintext highlighter-rouge">SecurityFilterChain</code>으로 변환하고, 이 필터체인을 빈으로 등록하여,<br /> <u>요청이 들어왔을 때 이 `SecurityFilterChain`을 통해 각 요청에 맞는 실제 보안이 적용되도록 하는 것이다.</u></p><blockquote><p>요청이 들어왔을 때, <code class="language-plaintext highlighter-rouge">SecurityFilterChain</code>에서 해당 요청에 맞는 <code class="language-plaintext highlighter-rouge">Configurer</code> 객체를 찾아, 해당 <code class="language-plaintext highlighter-rouge">Configurer</code>에 정의된 설정대로 보안 처리가 이루어진다.</p></blockquote><p><code class="language-plaintext highlighter-rouge">http.authorizeHttpRequests((requests) -&gt; requests.anyRequest().authenticated());</code><br /> 이 코드를 예시로 보았을 때, <code class="language-plaintext highlighter-rouge">authorizeHttpRequests</code>는 <code class="language-plaintext highlighter-rouge">http</code>로 들어온 <code class="language-plaintext highlighter-rouge">요청</code>의 <code class="language-plaintext highlighter-rouge">인증</code>을 설정한다는 의미이며,<br /> <code class="language-plaintext highlighter-rouge">request.anyRequest()</code>는 들어온 모든 요청을 의미, <code class="language-plaintext highlighter-rouge">.authenticated()</code>는 인증이 필요하다는 것을 의미한다.<br /></p><p>즉 아래 코드에서는 들어온 모든 경로의 요청에 인증을 필요로 하고있다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="nd">@Configuration</span><span class="o">(</span><span class="n">proxyBeanMethods</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+<span class="nd">@ConditionalOnDefaultWebSecurity</span>
+<span class="kd">static</span> <span class="kd">class</span> <span class="nc">SecurityFilterChainConfiguration</span> <span class="o">{</span>
+
+    <span class="nd">@Bean</span>
+    <span class="nd">@Order</span><span class="o">(</span><span class="nc">SecurityProperties</span><span class="o">.</span><span class="na">BASIC_AUTH_ORDER</span><span class="o">)</span>
+    <span class="nc">SecurityFilterChain</span> <span class="nf">defaultSecurityFilterChain</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">authorizeHttpRequests</span><span class="o">((</span><span class="n">requests</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">());</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">formLogin</span><span class="o">(</span><span class="n">withDefaults</span><span class="o">());</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">httpBasic</span><span class="o">(</span><span class="n">withDefaults</span><span class="o">());</span>
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></table></code></div></div><p>하지만 <code class="language-plaintext highlighter-rouge">defaultSecurityFilterChain</code> 메소드가 실행되어 <code class="language-plaintext highlighter-rouge">SecurityFilterChain</code>을 빈으로 등록하기 위한 조건이 별도로 존재하며,<br /> 바로 <code class="language-plaintext highlighter-rouge">@ConditionalOnDefaultWebSecurity</code> 어노테이션을 통해 이 조건을 알 수 있다.<br /></p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="nd">@Target</span><span class="o">({</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">METHOD</span> <span class="o">})</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="nc">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="nd">@Documented</span>
+<span class="nd">@Conditional</span><span class="o">(</span><span class="nc">DefaultWebSecurityCondition</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="nc">ConditionalOnDefaultWebSecurity</span> <span class="o">{</span>
+
+<span class="o">}</span>
+</pre></table></code></div></div><p>이 어노테이션 안에도 <code class="language-plaintext highlighter-rouge">@Conditional</code>이라는 어노테이션이 존재하는데,<br /> 이 안의 <code class="language-plaintext highlighter-rouge">DefaultWebSecurityCondition.class</code>를 들어가서 확인해보면,<br /> 각 <code class="language-plaintext highlighter-rouge">@ConditionalOnClass</code>와 <code class="language-plaintext highlighter-rouge">@ConditionalOnMissingBean</code>를 사용하는 클래스들의 조건이 충족되어야 한다.<br /></p><h4 id="조건1"><span class="me-2">조건1</span><a href="#조건1" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p><code class="language-plaintext highlighter-rouge">SecurityFilterChain.class</code> 및 <code class="language-plaintext highlighter-rouge">HttpSecurity.class</code> 클래스가 Class Path에 존재하느냐?<br /></p><blockquote><p>스프링 시큐리티 의존성을 추가했다면 존재한다고 볼 수 있다.</p></blockquote><h4 id="조건2"><span class="me-2">조건2</span><a href="#조건2" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p><code class="language-plaintext highlighter-rouge">SecurityFilterChain.class</code> 빈이 생성되어 있지 않은가?</p><blockquote><p>별도로 SecurityFilterChain.class 빈을 생성한 코드를 작성하지 않았다면, 아직 생성되지 않은 상태이다.</p></blockquote><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">DefaultWebSecurityCondition</span> <span class="kd">extends</span> <span class="nc">AllNestedConditions</span> <span class="o">{</span>
+
+	<span class="nc">DefaultWebSecurityCondition</span><span class="o">()</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="nc">ConfigurationPhase</span><span class="o">.</span><span class="na">REGISTER_BEAN</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="nd">@ConditionalOnClass</span><span class="o">({</span> <span class="nc">SecurityFilterChain</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="nc">HttpSecurity</span><span class="o">.</span><span class="na">class</span> <span class="o">})</span> <span class="c1">// 조건 1</span>
+	<span class="kd">static</span> <span class="kd">class</span> <span class="nc">Classes</span> <span class="o">{</span>
+
+	<span class="o">}</span>
+
+	<span class="nd">@ConditionalOnMissingBean</span><span class="o">({</span> <span class="nc">SecurityFilterChain</span><span class="o">.</span><span class="na">class</span> <span class="o">})</span> <span class="c1">// 조건 2</span>
+	<span class="kd">static</span> <span class="kd">class</span> <span class="nc">Beans</span> <span class="o">{</span>
+
+	<span class="o">}</span>
+
+<span class="o">}</span>
+</pre></table></code></div></div><h3 id="인증-사용자"><span class="me-2">인증 사용자</span><a href="#인증-사용자" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><code class="language-plaintext highlighter-rouge">SecurityProperties.java</code> 클래스는 앞서 진행한 로그인과 관련된 내용을 설정하는 클래스이다.<br /> 클래스에 내장된 <code class="language-plaintext highlighter-rouge">User</code> 클래스를 확인하면,<br /> <code class="language-plaintext highlighter-rouge">name</code>은 기본적으로 제공되는 <code class="language-plaintext highlighter-rouge">user</code>이며, <code class="language-plaintext highlighter-rouge">password</code>는 랜덤한 <code class="language-plaintext highlighter-rouge">UUID</code>로 되어있는 것을 확인할 수 있다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * Default user name.
+     */</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"user"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * Password for the default user name.
+     */</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">password</span> <span class="o">=</span> <span class="no">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+
+    <span class="cm">/**
+     * Granted roles for the default user name.
+     */</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">roles</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">passwordGenerated</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">password</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="nc">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">hasLength</span><span class="o">(</span><span class="n">password</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">passwordGenerated</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getRoles</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">roles</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setRoles</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">roles</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">roles</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">roles</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isPasswordGenerated</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">passwordGenerated</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></table></code></div></div><h3 id="db-연동-없이-어떻게-비교하는가"><span class="me-2">DB 연동 없이 어떻게 비교하는가?</span><a href="#db-연동-없이-어떻게-비교하는가" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>지금까지 DB연동도 없이 어떻게 인증이 이루어지는지 궁금했다.<br /> <code class="language-plaintext highlighter-rouge">Spring Security</code>는 새로운 유저가 발생했을 때, <code class="language-plaintext highlighter-rouge">메모리</code>에 저장하는 과정을 거친다.<br /> <code class="language-plaintext highlighter-rouge">SecurityProperties</code> 클래스의 <code class="language-plaintext highlighter-rouge">User</code> 또한 프로젝트가 실행하면서 메모리에 저장되고,<br /> 로그인을 시도할 때, 메모리의 데이터와 비교하여 인증이 가능한 것이다.</p><h4 id="그렇다면-초기-계정은-어떻게-메모리에-저장되는가"><span class="me-2">그렇다면 초기 계정은 어떻게 메모리에 저장되는가?</span><a href="#그렇다면-초기-계정은-어떻게-메모리에-저장되는가" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p><code class="language-plaintext highlighter-rouge">UserDetailsServiceAutoConfiguration</code> 클래스를 확인하면 알 수 있다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="nd">@Bean</span>
+<span class="kd">public</span> <span class="nc">InMemoryUserDetailsManager</span> <span class="nf">inMemoryUserDetailsManager</span><span class="o">(</span><span class="nc">SecurityProperties</span> <span class="n">properties</span><span class="o">,</span>
+        <span class="nc">ObjectProvider</span><span class="o">&lt;</span><span class="nc">PasswordEncoder</span><span class="o">&gt;</span> <span class="n">passwordEncoder</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">SecurityProperties</span><span class="o">.</span><span class="na">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="na">getUser</span><span class="o">();</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">roles</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="na">getRoles</span><span class="o">();</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">InMemoryUserDetailsManager</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">withUsername</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getName</span><span class="o">())</span>
+        <span class="o">.</span><span class="na">password</span><span class="o">(</span><span class="n">getOrDeducePassword</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">passwordEncoder</span><span class="o">.</span><span class="na">getIfAvailable</span><span class="o">()))</span>
+        <span class="o">.</span><span class="na">roles</span><span class="o">(</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">toStringArray</span><span class="o">(</span><span class="n">roles</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">build</span><span class="o">());</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">SecurityProperties</code> 클래스에 내장된 <code class="language-plaintext highlighter-rouge">User</code> 클래스를 가져온 뒤,<br /> <code class="language-plaintext highlighter-rouge">getName()</code>과 <code class="language-plaintext highlighter-rouge">getPassword()</code> 및 <code class="language-plaintext highlighter-rouge">getRoles()</code>를 사용하여<br /> 이 <code class="language-plaintext highlighter-rouge">User</code>의 정보를 담은 <code class="language-plaintext highlighter-rouge">InMemoryUserDetailsManager</code> 클래스를 초기화하고,<br /> 이 클래스가 빈으로 등록되면서 스프링 컨테이너에 의해 관리되는 형식이다.</p><blockquote><p>추가되는 User들도 이 InMemoryUserDetailsManager에 등록된다.</p></blockquote></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

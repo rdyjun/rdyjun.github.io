@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[클라우드] 로드 밸런싱 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2024-06-16</p>
+            <h1>[클라우드] 로드 밸런싱</h1>
+          </header>
+          <div class="article-content">
+<p>로드 밸런싱은 여러 서버를 두고, 부하를 각 서버로 분산하기 위해 사용되는 기술이다.<br /> 이 로드 밸런싱의 종류와 특징을 알아볼 것이다.</p><h1 id="로드밸런싱">로드밸런싱</h1><ul><li>네트워크 트래픽을 하나 이상의 서버나 장비로 분산하기 위해 사용되는 기술<li>S/W나 H/W를 통해 로드 밸런싱을 수행할 수 있다.<li>서비스 사용자의 요청을 서버로 분산해서 전달</ul><h2 id="elbelastic-load-balancing"><span class="me-2">ELB(Elastic Load Balancing)</span><a href="#elbelastic-load-balancing" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="트래픽-증가에-따른-대응-방법"><span class="me-2">트래픽 증가에 따른 대응 방법</span><a href="#트래픽-증가에-따른-대응-방법" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><ol><li>Scale Up (로드밸런싱 X)<ul><li>CPU/RAM/Disk 성능 &amp; Network 대역폭 등 증가<li>비싸고 좋은 서버로 변경</ul><li>Scale Out (로드밸런싱 O)<ul><li>부하를 처리할 서버 대수를 늘림<li>저렴한 서버 여러 대를 이용해 더 많은 부하 감당<li>같은 그룹에 있는 Server 들에게 요청이 골고루 분배될 수 있도록 한다.<li>같은 그룹에 있는 server들은 동일한 기능을 서비스한다.</ul></ol><h3 id="로드-밸런싱-방식"><span class="me-2">로드 밸런싱 방식</span><a href="#로드-밸런싱-방식" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><ol><li>Round Robin 로드 밸런서에서 서버 선택 시, 다음 순차적으로 서버를 선택한다.<li>Hash(Sticky Session) 로드 밸런서에서 서버 선택 시, 클라이언트가 서버와 한 번 연결되면, 그 이후에는 항상 같은 서버로 연결한다.<blockquote><p>처음 연결할 때에는 클라이언트의 고유 값을 해시 함수에 입력하여 해시 값을 계산한다. 이렇게 나온 해시 값을 서버 대수로 나누어 서버를 선택한다.</p></blockquote><li>Least Connection 로드 밸런서에서 서버 선택 시, 연결 수가 가장 적은 서버를 선택한다.<blockquote><p>a 서버에 3명이 연결되어 있고, b 서버에 2명이 연결되어 있다면, b 서버로 연결된다.</p></blockquote><li>응답시간(Response Time) 로드 밸런서에서 서버 선택 시, 응답속도가 가장 빠른 서버를 선택한다.</ol><h3 id="elb-유형"><span class="me-2">ELB 유형</span><a href="#elb-유형" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><ol><li>ALB(Application Load Balancer)<ul><li>OSI 7 Layer 중 <code class="language-plaintext highlighter-rouge">Application Layer</code>에 속하는 패킷을 처리할 수 있다.<li><code class="language-plaintext highlighter-rouge">Http/Https</code> 프로토콜</ul><li>NLB(Network Load Balancer)<ul><li>OSI 7 Layer 중 <code class="language-plaintext highlighter-rouge">Transport Layer</code>에 속하는 패킷을 처리할 수 있다.<li><code class="language-plaintext highlighter-rouge">TCP</code> 프로토콜</ul><li>CLB(Classic Load Balancer)<ul><li>OSI 7 Layer 중 <code class="language-plaintext highlighter-rouge">Network</code> 및 <code class="language-plaintext highlighter-rouge">Transport Layer</code>에 속하는 패킷을 처리할 수 있다.<li>과거에 사용되던 방식으로 호환성을 위해 유지되는 상태이다.</ul></ol><h3 id="elb-옵션"><span class="me-2">ELB 옵션</span><a href="#elb-옵션" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><ol><li>인터넷 트래픽용(Internet-facing)<ul><li>인터넷을 통해 ELB에 접근하는 경우이다.<blockquote><p>즉, Public IP를 가진 클라이언트가 접근하는 경우를 의미한다.</p></blockquote><li>단, ELB가 <code class="language-plaintext highlighter-rouge">Private IP:Public IP</code> 와 같이 쌍을 가지므로, <code class="language-plaintext highlighter-rouge">Private IP 클라이언트</code>에서도 사용 가능하다.</ul><li>내부 네트워크 트래픽용(Internal)<ul><li>내부 네트워크에서 ELB에 접근하는 경우<blockquote><p>즉, Private IP를 가진 클라이언트에서 접근하는 경우</p></blockquote><li>이 경우는 주로 전용선을 통해 인터넷을 거치지 않고 VPC에 연결되는 경우나,<br /> VPN을 통해 Private IP를 이용해서 통신하는 경우에 활용된다.</ul></ol><h3 id="elb-동작-특징"><span class="me-2">ELB 동작 특징</span><a href="#elb-동작-특징" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><h4 id="상태확인health-check-서비스"><span class="me-2">상태확인(Health Check) 서비스</span><a href="#상태확인health-check-서비스" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><ul><li>ELB에서 연결할 서버들의 상태를 상시 체크한다.<li>비정상 상태의 서버로 트래픽을 전달하지 않는다.<li>ELB에서 서버 측에 요청을 전달해서 응답을 받음으로써 처리되므로,<br /> 서버의 <code class="language-plaintext highlighter-rouge">보안그룹</code>에서 해당 요청을 받을 수 있도록 <code class="language-plaintext highlighter-rouge">지정된 포트</code>에 대해 접근을 허용해야 한다.<li>고가용성(High Availabilty) 지원</ul></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

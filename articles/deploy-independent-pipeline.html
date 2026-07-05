@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>배포 시간 절반 단축을 위한 파이프라인 분리 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2024-12-13</p>
+            <h1>배포 시간 절반 단축을 위한 파이프라인 분리</h1>
+          </header>
+          <div class="article-content">
+<p><a href="https://rdyjun.github.io/posts/boostcamp-docker-updated/">게시글, 처음 사용해본 도커로 배포 리팩토링 해보기</a></p><p>지난번에 도커 자동 배포 방식을 개선했었는데, 모노레포였기 때문에 push했을 때 수정된 파일과 관계없이 클라이언트 프로젝트와 서버 프로젝트를 모두 다시 배포하는 상태였다.<br /> 하지만 커밋 변경사항에 따라 클라이언트 프로젝트와 서버 프로젝트를 독립적으로 배포할 수 있을 것 같아 개선하게 되었다.</p><h2 id="흐름"><span class="me-2">흐름</span><a href="#흐름" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>아래 코드는 수정 전 코드이다.<br /> 여기에 server 파일과 client 파일이 수정되었는 지 boolean 형태의 환경변수를 저장하는 로직을 추가하고,<br /> 해당 변수에 따라 배포되거나 배포되지 않도록 수정해보려고 한다.</p><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+</pre><td class="rouge-code"><pre><span class="na">name</span><span class="pi">:</span> <span class="s">Docker Image CD</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">dev"</span><span class="pi">]</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">build</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">Build</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="c1"># 소스 코드 체크아웃</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout code</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v3</span>
+
+      <span class="c1"># Docker Hub 로그인</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Log in to Docker Hub</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">docker/login-action@v2</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">username</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">password</span><span class="pi">:</span> <span class="s">$</span>
+
+      <span class="c1"># SSH 접속을 위한 SSH 키 설정</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up SSH</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">webfactory/ssh-agent@v0.9.0</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">ssh-private-key</span><span class="pi">:</span> <span class="s">$</span>
+
+      <span class="c1"># 원격 서버의 SSH 호스트 키를 신뢰할 수 있는 목록에 추가</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Add known hosts</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">ssh-keyscan -H $ &gt;&gt; ~/.ssh/known_hosts</span>
+
+      <span class="c1"># 서버 이미지 빌드 및 태그 지정</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build and tag Docker image</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">docker build -f server/Dockerfile -t $/inear-server:$ ./</span>
+          <span class="s">docker tag $/inear-server:$ $/inear-server:latest</span>
+      <span class="c1"># 클라이언트 및 nginx 이미지 빌드 및 태그 지정</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Build and tag client image</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">yarn --cwd ./client install</span>
+          <span class="s">echo $ &gt; ./client/.env.production</span>
+          <span class="s">echo $ &gt; ./client/.env.development</span>
+          <span class="s">yarn --cwd ./client build</span>
+          <span class="s">scp -r ./client/dist/ $@$:/$/web18-inear-test/nginx/html/</span>
+      <span class="c1"># Docker Compose로 전체 애플리케이션 빌드 및 실행 (테스트용)</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Run Docker Compose for testing</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">docker compose up --build -d</span>
+        <span class="na">continue-on-error</span><span class="pi">:</span> <span class="kc">false</span>
+
+      <span class="c1"># 서버 이미지 푸시 (Docker Hub 또는 다른 레지스트리)</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Push server image to Docker Hub</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">docker push $/inear-server:$</span>
+          <span class="s">docker push $/inear-server:latest</span>
+      <span class="c1"># 서버에서 파일을 최신화 하고, 배포 스크립트를 통해 실제 배포 진행</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Deploy with Docker Compose on server</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">ssh $@$ " \</span>
+            <span class="s">mkdir -p /$/web18-inear-test &amp;&amp; \</span>
+            <span class="s">cd /$/web18-inear-test &amp;&amp; \</span>
+            <span class="s">docker system prune -af &amp;&amp; \</span>
+            <span class="s">docker pull $/inear-server:latest &amp;&amp; \</span>
+            <span class="s">./deploy.sh</span>
+          <span class="s">"</span>
+</pre></table></code></div></div><h2 id="프로젝트-수정-여부-확인"><span class="me-2">프로젝트 수정 여부 확인</span><a href="#프로젝트-수정-여부-확인" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="어떤-방식으로-수정-여부를-확인할-것인가"><span class="me-2">어떤 방식으로 수정 여부를 확인할 것인가?</span><a href="#어떤-방식으로-수정-여부를-확인할-것인가" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>GitHub Actions에서 사용 가능한 여러 액션을 사용할지, <code class="language-plaintext highlighter-rouge">git diff</code>를 사용해서 비교할지 고민했다.</p><p>GitHub Actions에서 지원되는 액션들을 사용하면 편리는 하겠지만, 어떤 원리에서 동작하는 지 깊이 알지 못하고,<br /> 어떤 이슈들이 있을 수 있을지 모르기 때문에 git diff를 적용해보기로 결정했다.</p><h3 id="git-diff를-사용해-수정-여부-확인"><span class="me-2">git diff를 사용해 수정 여부 확인</span><a href="#git-diff를-사용해-수정-여부-확인" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>처음엔 프로젝트가 Squash merge 방식으로 운영되어왔기 때문에 단순하게 <code class="language-plaintext highlighter-rouge">git diff HEAD^ HEAD</code> 명령으로 비교하면 될 것이라고 생각했다.</p><p>하지만 간혹 dev에 바로 merge하는 일이 있어서 위 명령을 사용하지 않기로 했다.<br /> 그럼 push 전 코드와 push 후 코드를 어떻게 비교할 것인지를 고민해야 했다.</p><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout code</span>
+  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v3</span>
+</pre></table></code></div></div><p>위 방식으로 깃허브 코드를 가져오면 가장 최신 커밋만 가져오게 되어, 비교가 불가능했다.<br /> 그래서 <code class="language-plaintext highlighter-rouge">with: fetch-depth: 0</code>옵션을 추가했다.</p><blockquote><p>이 옵션을 추가했을 때 모든 커밋을 가져온다는 의미이다.</p></blockquote><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Checkout code</span>
+  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v3</span>
+  <span class="na">with</span><span class="pi">:</span>
+    <span class="na">fetch-depth</span><span class="pi">:</span> <span class="m">0</span>
+</pre></table></code></div></div><p>자 이제 모든 커밋을 가져왔다. 하지만 아직 push 전과 push 후를 확인할 방법을 모른다.<br /> 검색을 해보니, GitHub Actions에서 <code class="language-plaintext highlighter-rouge">github.event.before</code>라는 컨텍스트 변수를 지원해주는 것을 알 수 있었다.</p><blockquote><p><code class="language-plaintext highlighter-rouge">github.event.before</code>는 push하기 전 최신 커밋 해시값을 가지는 변수이다.</p></blockquote><p>이를 통해 git diff를 아래와 같이 쓸 수 있었다.</p><blockquote><p>quiet 옵션은 종료 코드를 반환하도록 하는 옵션이다.<br /> 여기서는 수정사항이 있을 때 1을 반환하고, 없을 때 0을 반환한다.</p></blockquote><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre>git diff <span class="nt">--quiet</span> <span class="nv">$ </span>HEAD client
+git diff <span class="nt">--quiet</span> <span class="nv">$ </span>HEAD server
+</pre></table></code></div></div><p>이제 이 값을 다른 job에서 쓰기 위해 변수로 저장하여야 한다.<br /> 아래와 같이 <code class="language-plaintext highlighter-rouge">$GITHUB_ENV(환경 변수파일)</code>에 저장하면 다른 job에서도 쓸 수 있다.</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="nb">echo</span> <span class="s2">"CLIENT_FILE_CHANGED=</span><span class="nv">$CLIENT_FILE_CHANGED</span><span class="s2">"</span> <span class="o">&gt;</span> <span class="nv">$GITHUB_ENV</span>
+<span class="nb">echo</span> <span class="s2">"SERVER_FILE_CHANGED=</span><span class="nv">$SERVER_FILE_CHANGED</span><span class="s2">"</span> <span class="o">&gt;&gt;</span> <span class="nv">$GITHUB_ENV</span>
+
+<span class="c"># 사용법</span>
+<span class="err">$</span>
+</pre></table></code></div></div><p>이제 기본적으로 클라이언트 파일과 서버 파일이 수정되었는 지에 대해 변수에 저장하고 관리되고 있다.<br /> 하지만 여기서 추가로 고민했던 점은 두 파일이 수정되지 않고 루트의 설정 파일만 수정되었을 때의 시나리오이다.</p><p>만약 루트의 설정 파일을 merge하지 않아 hotfix로 merge한다고 했을 때,<br /> 클라이언트와 서버 파일 중 어떤 파일을 위해 수정된 것인지 모르기 때문에 둘 다 다시 배포해주기로 결정했다.</p><p>그래서 우선 파일 수정사항을 확인한 후 로컬 변수로 저장하고,<br /> 이 로컬 변수가 둘 다 false일 때 둘 다 true로 환경 변수 파일에 저장되도록,<br /> 하나라도 true면 로컬 변수 그대로 환경 변수에 저장되도록 했다.</p><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Check file changes</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">CLIENT_FILE_CHANGED=$(git diff --quiet $ HEAD client &amp;&amp; echo 'false' || echo 'true')</span>
+    <span class="s">SERVER_FILE_CHANGED=$(git diff --quiet $ HEAD server &amp;&amp; echo 'false' || echo 'true')</span>
+
+    <span class="s">if [ "$CLIENT_FILE_CHANGED" == 'false' ] &amp;&amp; [ "$SERVER_FILE_CHANGED" == 'false' ]; then</span>
+      <span class="s">echo "CLIENT_FILE_CHANGED=true" &gt; $GITHUB_ENV</span>
+      <span class="s">echo "SERVER_FILE_CHANGED=true" &gt;&gt; $GITHUB_ENV</span>
+    <span class="s">else</span>
+      <span class="s">echo "CLIENT_FILE_CHANGED=$CLIENT_FILE_CHANGED" &gt; $GITHUB_ENV</span>
+      <span class="s">echo "SERVER_FILE_CHANGED=$SERVER_FILE_CHANGED" &gt;&gt; $GITHUB_ENV</span>
+    <span class="s">fi</span>
+</pre></table></code></div></div><h2 id="실제-배포-파이프라인-분리"><span class="me-2">실제 배포 파이프라인 분리</span><a href="#실제-배포-파이프라인-분리" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>각 프로젝트에 대해 수정 여부를 변수에 저장했다.<br /> 이제 이 변수 값을 통해 배포를 진행할지, 말지에 대한 로직을 추가해야 한다.</p><p>앞 단계에서 정의한 변수를 통해 조건문만 달아주면 되는 문제로 어렵지 않게 수행할 수 있었다.</p><p>먼저 서버 이미지 빌드 및 도커 허브에 push하는 job에 if문을 추가하여,<br /> <code class="language-plaintext highlighter-rouge">env.SERVER_FILE_CHANGED</code>가 <code class="language-plaintext highlighter-rouge">true</code>인 경우에만 빌드하구 도커 허브에 업로드하도록 했다.</p><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="c1"># 서버 이미지 빌드 및 태깅</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">if [ "$" == 'true' ]; then</span>
+      <span class="s">docker build -f server/Dockerfile -t $/inear-server:$ ./</span>
+      <span class="s">docker tag $/inear-server:$ $/inear-server:latest</span>
+    <span class="s">fi</span>
+
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="c1"># 서버 이미지 도커 허브에 push</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">if [ "$" == 'true' ]; then</span>
+      <span class="s">docker push $/inear-server:$</span>
+      <span class="s">docker push $/inear-server:latest</span>
+    <span class="s">fi</span>
+</pre></table></code></div></div><p>마찬가지로 클라이언트 프로젝트를 빌드하고 scp 명령을 수행하기 전에<br /> if문을 통해 <code class="language-plaintext highlighter-rouge">env.CLIENT_FILE_CHANGED</code>가 <code class="language-plaintext highlighter-rouge">true</code>인지 검사한 후 실행되도록 했다.</p><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="c1"># 클라이언트 프로젝트 빌드 및 scp</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">if [ "$" == 'true' ]; then</span>
+      <span class="s">yarn --cwd ./client install</span>
+      <span class="s">echo $ &gt; ./client/.env.production</span>
+      <span class="s">echo $ &gt; ./client/.env.development</span>
+      <span class="s">yarn --cwd ./client build</span>
+      <span class="s">scp -r ./client/dist/ $@$:/$/web18-inear-test/nginx/html/</span>
+    <span class="s">fi</span>
+</pre></table></code></div></div><p>앞 과정 이후 클라우드 서버에서 배포할 때, 파일 수정 여부에 대한 변수를 ssh 세션에 저장하고,<br /> 해당 변수를 통해 각 프로젝트에 대해 배포 스크립트를 실행할지 결정해주었다.</p><div class="language-yml highlighter-rouge"><div class="code-header"> <span data-label-text="YAML"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="c1"># 배포</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">ssh $@$ " \</span>
+      <span class="s">SERVER_FILE_CHANGED=$ &amp;&amp; \ # 변수 가져오기</span>
+      <span class="s">CLIENT_FILE_CHANGED=$ &amp;&amp; \ # 변수 가져오기</span>
+      <span class="s">mkdir -p /$/web18-inear-test &amp;&amp; \</span>
+      <span class="s">cd /$/web18-inear-test &amp;&amp; \</span>
+      <span class="s">docker system prune -af &amp;&amp; \</span>
+
+      <span class="s"># 서버 파일이 수정되면 Docker Hub에서 이미지 pull 및 서버 배포 스크립트 실행</span>
+      <span class="s">if [ \"\$SERVER_FILE_CHANGED\" == true ]; then</span>
+        <span class="s">docker pull $/inear-server:latest &amp;&amp; \</span>
+        <span class="s">./backend-deploy.sh</span>
+      <span class="s">fi</span>
+
+      <span class="s"># 클라이언트 파일이 수정되면 클라이언트 배포 스크립트 실행</span>
+      <span class="s">if [ \"\$CLIENT_FILE_CHANGED\" == true ]; then</span>
+        <span class="s">./frontend-deploy.sh</span>
+      <span class="s">fi</span>
+    <span class="s">"</span>
+</pre></table></code></div></div><h2 id="결과"><span class="me-2">결과</span><a href="#결과" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>이후 일정에 따라 커밋을 너무 많이 추가하기에 무리가 있다고 생각되어,<br /> 별도의 각 레포 수정 테스트는 진행되지 않았다.</p><p>다만 위 결과에서 루트의 <code class="language-plaintext highlighter-rouge">/.github/workflows</code> 디렉토리가 수정되었기 때문에<br /> 클라이언트 및 서버가 모두 다시 배포되는 것으로 끝내고자 했다.</p><p>아래는 서버 이미지 빌드 및 Docker Hub로 push한 결과 사진이다.<br /> 두 번의 job 모두 <code class="language-plaintext highlighter-rouge">env.SERVER_FILE_CHANGED</code> 변수에 <code class="language-plaintext highlighter-rouge">true</code>가 저장되어 실행되는 것을 볼 수 있다.</p><blockquote><p>서버 이미지 빌드 결과</p></blockquote><p><a href="https://github.com/user-attachments/assets/51aca995-4968-4234-b1c2-99b3c94648f8" class="popup img-link shimmer"><img src="https://github.com/user-attachments/assets/51aca995-4968-4234-b1c2-99b3c94648f8" alt="서버 이미지 빌드 결과" loading="lazy"></a></p><p><br /></p><blockquote><p>서버 이미지 업로드 결과</p></blockquote><p><a href="https://github.com/user-attachments/assets/1f9dafac-8097-47f4-a874-036bfda3cadb" class="popup img-link shimmer"><img src="https://github.com/user-attachments/assets/1f9dafac-8097-47f4-a874-036bfda3cadb" alt="서버 이미지 업로드 결과" loading="lazy"></a></p><p><br /> <br /></p><p>아래는 클라이언트 빌드 및 scp에 대한 내용이다.<br /> 마찬가지로 <code class="language-plaintext highlighter-rouge">env.CLIENT_FILE_CHANGED</code>가 <code class="language-plaintext highlighter-rouge">true</code>로 변환되어 실행되는 결과를 볼 수 있다.</p><p><a href="https://github.com/user-attachments/assets/30d43138-d8f8-4ad4-8021-a59b3a3bb45b" class="popup img-link shimmer"><img src="https://github.com/user-attachments/assets/30d43138-d8f8-4ad4-8021-a59b3a3bb45b" alt="클라이언트 이미지 빌드 결과" loading="lazy"></a></p><p>마지막으로 클라우드 서버에서의 실제 배포 결과이다.<br /> env에 <code class="language-plaintext highlighter-rouge">CLIENT_FILE_CHANGED</code>와 <code class="language-plaintext highlighter-rouge">SERVER_FILE_CHANGED</code> 변수가 잘 넘어간 것을 볼 수 있고,<br /> 바로 <code class="language-plaintext highlighter-rouge">docker pull</code> 명령을 실행하는 것을 확인할 수 있다.</p><p><a href="https://github.com/user-attachments/assets/cb01dcb6-2188-4f9f-ae52-43bd137ea30a" class="popup img-link shimmer"><img src="https://github.com/user-attachments/assets/cb01dcb6-2188-4f9f-ae52-43bd137ea30a" alt="클라우드 서버 배포 결과" loading="lazy"></a></p></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

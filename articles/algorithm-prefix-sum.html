@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[알고리즘] 누적합 알고리즘 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2024-04-17</p>
+            <h1>[알고리즘] 누적합 알고리즘</h1>
+          </header>
+          <div class="article-content">
+<p>누적합(prefix sum) 알고리즘은 작거나, 큰 배열에서<br /> 부분적으로 배열의 값을 여러 번 업데이트 할 때 효율적으로 업데이트 할 수 있는 알고리즘이다.</p><p>업데이트 요청마다 반복문을 돌지 않고,<br /> 업데이트 정보를 저장해두었다가 한 번의 반복문으로 해결한다.</p><p>카카오에서 출제한 파괴되지 않은 건물을 예시로 알아보겠다.</p><h1 id="흐름">흐름</h1><p>흐름을 간단하게 설명한다면,<br /> 누적합 배열에 각 인덱스에 더할 값을 담은 후<br /> 마지막에 이 누적합 배열의 값을 원본 배열의 값과 합치는 방식이다.</p><ol><li>누적합 배열에 업데이트 정보 저장<li>반복문으로 인덱스별 최종 업데이트 값 저장<li>누적합 배열의 값을 원본 배열에 합산</ol><h3 id="1-새로운-배열-선언"><span class="me-2">1. 새로운 배열 선언</span><a href="#1-새로운-배열-선언" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>원본 배열과 동일한 크기의 배열을 만든다.<br /> 그리고 해당 배열을 모두 0으로 초기화한다.</p><blockquote><p>이 새로운 배열을 누적합 배열이라고 하겠다.</p></blockquote><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-1.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-1.png" alt="alt text" loading="lazy"></a></p><h3 id="2-업데이트-정보를-담은-배열을-누적합-배열에-적용하기"><span class="me-2">2. 업데이트 정보를 담은 배열을 누적합 배열에 적용하기</span><a href="#2-업데이트-정보를-담은-배열을-누적합-배열에-적용하기" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><h4 id="업데이트-배열-설명"><span class="me-2">업데이트 배열 설명</span><a href="#업데이트-배열-설명" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>아래는 업데이트 정보를 담은 배열이다.<br /> 각 배열의 인덱스별 의미는 아래와 같다.</p><div class="table-wrapper"><table><thead><tr><th>인덱스<th>의미<th>설명<tbody><tr><td>0<td>type<td>1일 때 degree를 뺀다. 2일 때 degree를 더한다.<tr><td>1<td>row1<td>첫 번째 행을 의미한다.<tr><td>2<td>col1<td>첫 번째 열을 의미한다.<tr><td>3<td>row2<td>두 번째 행을 의미한다.<tr><td>4<td>col1<td>두 번째 열을 의미한다.<tr><td>5<td>degree<td>연산할 값이다.</table></div><div class="language-js highlighter-rouge"><div class="code-header"> <span data-label-text="JavaScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="c1">// [0,1]은 [row,col]를 의미</span>
+
+<span class="p">[</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="c1">// [0,0] ~ [3,4] 영역에 4를 뺀다는 의미.</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="c1">// [2,0] ~ [2,3] 영역에 2를 뺀다는 의미.</span>
+  <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="c1">// [1,0] ~ [3,1] 영역에 2를 더한다는 의미.</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1">// [0,1] ~ [3,3] 영역에 1을 뺀다는 의미.</span>
+<span class="p">];</span>
+</pre></table></code></div></div><h4 id="배열-업데이트"><span class="me-2">배열 업데이트</span><a href="#배열-업데이트" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>누적합에서 가장 중요한 부분이다.<br /> 어떻게 반복문을 사용하지 않고 영역을 업데이트할 것인가에 대한 내용이다.</p><p>먼저 누적합 배열에서 업데이트할 영역의 가장 좌측 상단의 인덱스에 업데이트 할 값을 넣는다.<br /> <code class="language-plaintext highlighter-rouge">[1, 0, 0, 3, 4, 4]</code> 이 업데이트 정보를 예시로, <code class="language-plaintext highlighter-rouge">[0, 0]</code>에 -4를 넣게된다.</p><p>이렇게 업데이트 영역 좌측 상단에 업데이트할 값을 넣어주는 이유는,<br /> 최종 단계에서 이 값이 반복문을 돌면서<br /> 인덱스가 <code class="language-plaintext highlighter-rouge">왼쪽의 값 + 위의 값 - 왼쪽 상단(대각선)</code>의 값을 가지기 떄문이다.</p><div class="language-js highlighter-rouge"><div class="code-header"> <span data-label-text="JavaScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="p">[</span><span class="nx">r</span><span class="p">,</span><span class="nx">c</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="nx">r</span><span class="p">,</span> <span class="nx">c</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nx">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span><span class="nx">c</span><span class="p">];</span>
+<span class="p">[</span><span class="nx">r</span><span class="p">,</span><span class="nx">c</span><span class="p">]</span> <span class="o">-=</span> <span class="p">[</span><span class="nx">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">c</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+</pre></table></code></div></div><p>이렇게 업데이트 영역의 시작 인덱스에 값을 넣어줬다.<br /> 여기서 끝이 아니고, 업데이트 영역 바깥쪽에서 해당 업데이트 값이 적용되지 않도록 해주어야 한다.</p><p>아까 설명한 것 처럼 누적합은 최후에 반복문을 통해 주변 값을 합산하는 구조이다.<br /> 그렇기 떄문에 그대로 사용하면 4번열 이후 및 3번 행 이후에도 -4라는 값이 입력되게 된다.</p><blockquote><p>4번 열 이후부터는 <code class="language-plaintext highlighter-rouge">-4</code>가 적용되지 않아야 하며,<br /> 3번 행 이후부터도 <code class="language-plaintext highlighter-rouge">-4</code>가 적용되지 않아야 한다.</p></blockquote><p>그러기 위해서는 아래와 같이 <code class="language-plaintext highlighter-rouge">-4</code>를 <code class="language-plaintext highlighter-rouge">0</code>으로 만들어줄 <code class="language-plaintext highlighter-rouge">4</code>를 해당 인덱스에 입력해주면 된다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-2.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-2.png" alt="alt text" loading="lazy"></a></p><p>그렇게 되면 한 행씩 계산했을 때 <code class="language-plaintext highlighter-rouge">[0, 1] += [0, 0] + [-1, 0] - [-1, -1]</code>이 된다.<br /> 이를 변환하면 <code class="language-plaintext highlighter-rouge">0 += -4 + 0 - 0</code>인 <code class="language-plaintext highlighter-rouge">-4</code>가 된다.</p><blockquote><p>-1과 같이 불가능한 인덱스는 0으로 처리한다.</p></blockquote><p>그랬을 때, 첫 번째 행은 -4가 되고,<br /> 두 번째 행 [1, 0]은 <code class="language-plaintext highlighter-rouge">0 += 0 + (-4) - 0</code>이 된다.<br /> 계속한다면 3번행까지 전부 <code class="language-plaintext highlighter-rouge">-4</code>가 된다.</p><p>이렇게 영역 안쪽은 문제 없이 잘 되는 것을 알 수 있다.<br /> 하지만 영역 바깥이라면?<br /> 우리가 4를 우측과 하단에 추가해줘서 [4, 0]을 기준으로 설명하자면,<br /> <code class="language-plaintext highlighter-rouge">4 += 0 + (-4) - 0</code>이 된다. 결론적으로 <code class="language-plaintext highlighter-rouge">0</code>이되면서 영역 밖에는 적용되지 않는 것을 알 수 있다.</p><p>그런데 사진을 보면 영역 밖 대각선 아래에 -4가 또 나와있다. 왜 그럴까?<br /> 그 이유는 아래쪽이나 오른쪽의 바깥 영역쪽은 합산 과정에서 업데이트 영역이 있지만,<br /> 대각에 위치한 인덱스는 위쪽, 왼쪽에 업데이트 영역에 대한 값이 적용되어있지 않기 때문이다.</p><div class="language-js highlighter-rouge"><div class="code-header"> <span data-label-text="JavaScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre>
+<span class="c1">// 하단은 위쪽에 업데이트 값이 존재함</span>
+<span class="o">-</span><span class="mi">4</span> <span class="o">-</span><span class="mi">4</span> <span class="o">-</span><span class="mi">4</span> <span class="o">-</span><span class="mi">4</span>
+ <span class="mi">4</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+
+<span class="c1">// 우측은 왼쪽에 업데이트 값이 존재함</span>
+<span class="o">-</span><span class="mi">4</span> <span class="mi">4</span>
+<span class="o">-</span><span class="mi">4</span> <span class="mi">0</span>
+<span class="o">-</span><span class="mi">4</span> <span class="mi">0</span>
+<span class="o">-</span><span class="mi">4</span> <span class="mi">0</span>
+
+<span class="c1">// 대각은 위쪽, 왼쪽 모두 업데이트 값이 존재하지 않음</span>
+<span class="o">-</span><span class="mi">4</span>  <span class="mi">0</span>
+ <span class="mi">0</span> <span class="o">-</span><span class="mi">4</span>
+</pre></table></code></div></div><h4 id="이게-무슨-원리인가"><span class="me-2">이게 무슨 원리인가?</span><a href="#이게-무슨-원리인가" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>가능한 적은 접근으로 누적합을 만든다고 생각해보면 이해하기 쉬울 것이다.<br /> 만약 인덱스가 위쪽 값이 아닌 왼쪽 값만을 합산한다고 생각해보자.<br /> 업데이트 영역의 모든 행에 -4를 넣어주어야 한다.<br /> 또한 업데이트 영역이 끝나는 지점의 영역의 모든 행에도 4를 넣어주어야 한다.</p><div class="table-wrapper"><table><thead><tr><th>0<th>1<th>2<th>3<th>4<th>5<tbody><tr><td>-4<td>0<td>0<td>0<td>0<td>4<tr><td>-4<td>0<td>0<td>0<td>0<td>4<tr><td>-4<td>0<td>0<td>0<td>0<td>4</table></div><p>반대로 위쪽 인덱스의 값만을 합산한다고 생각해도 마찬가지이다.<br /> 더 적은 접근을 위해 왼쪽 및 오른쪽의 값을 합산하려고 하고 있다.</p><p>그러면 왼쪽 위 인덱스를 빼주는 이유는 무엇인가?<br /> 우선은 위쪽 인덱스와 왼쪽 인덱스 값을 합산한다는 점에서<br /> 둘이 같은 값을 가지는 경우가 있다.</p><div class="table-wrapper"><table><thead><tr><th>0<th>1<tbody><tr><td>-4<td>-4<tr><td>-4<td>0</table></div><p>이런 중복 합산을 방지해주기 위해 왼쪽 대각선을 빼주는 원리이다.</p><h4 id="어떻게-동작하는-것인가"><span class="me-2">어떻게 동작하는 것인가?</span><a href="#어떻게-동작하는-것인가" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>이따 최종적으로 연산을 한 번 더 하겠지만, 간단히 설명하자면<br /> <code class="language-plaintext highlighter-rouge">[0][0]</code> 부터 위의 값과 좌측의 값을 더하고, 대각선 좌측 위의 값을 빼보자.<br /> 그렇다면 아래와 같은 배열이 나오게 된다. <a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-3.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-3.png" alt="alt text" loading="lazy"></a></p><p>아마 위 사진을 보고 다시 위 글을 읽으면 바로 이해할 것이라고 생각한다.</p><blockquote><p>물론 배열 밖의 값들은 실제로 배열에 적용되지 않지만, 설명을 위해 넣었다.</p></blockquote><p>정확히 우리가 빼고자 했던 <code class="language-plaintext highlighter-rouge">[0][0]</code> 부터 <code class="language-plaintext highlighter-rouge">[3][4]</code> 까지 -4로 적용했다.<br /> 또한 그 바깥은 0으로 다시 돌아온다.<br /> 자세한 설명은 계속해서 보자.</p><h4 id="2번째-배열-업데이트"><span class="me-2">2번째 배열 업데이트</span><a href="#2번째-배열-업데이트" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>[1,2,0,2,3,2]</p><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-4.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-4.png" alt="alt text" loading="lazy"></a></p><h4 id="3번째-배열-업데이트"><span class="me-2">3번째 배열 업데이트</span><a href="#3번째-배열-업데이트" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>[2,1,0,3,1,2]</p><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-5.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-5.png" alt="alt text" loading="lazy"></a></p><h4 id="4번째-배열-업데이트"><span class="me-2">4번째 배열 업데이트</span><a href="#4번째-배열-업데이트" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>[1,0,1,3,3,1]</p><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-6.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-6.png" alt="alt text" loading="lazy"></a></p><h3 id="부분합-계산"><span class="me-2">부분합 계산</span><a href="#부분합-계산" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>드디어 모든 부분 배열에 대한 업데이트 배열을 만들게 되었다.<br /> 이제 첫 번째 배열 업데이트 때 했던 계산을 해보자.</p><p><code class="language-plaintext highlighter-rouge">[0][0]</code>부터 배열의 끝<code class="language-plaintext highlighter-rouge">([3][4])</code>까지 아래 연산을 진행할 것이다.</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre><span class="n">arr</span><span class="o">[</span><span class="n">r</span><span class="o">][</span><span class="n">c</span><span class="o">]</span> <span class="o">+=</span> <span class="n">arr</span><span class="o">[</span><span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="o">][</span><span class="n">c</span><span class="o">]</span> <span class="o">+</span> <span class="n">arr</span><span class="o">[</span><span class="n">r</span><span class="o">][</span><span class="n">c</span> <span class="o">-</span> <span class="mi">1</span><span class="o">]</span> <span class="o">-</span> <span class="n">arr</span><span class="o">[</span><span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="o">][</span><span class="n">c</span> <span class="o">-</span> <span class="mi">1</span><span class="o">]</span>
+</pre></table></code></div></div><p>그렇다면 아래와 같은 결과가 나오게 된다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-7.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-7.png" alt="alt text" loading="lazy"></a></p><h3 id="원본-배열과-합"><span class="me-2">원본 배열과 합</span><a href="#원본-배열과-합" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>본 문제에서는 결과 값이 0보다 큰 인덱스의 수만 알아내면 되기 때문에 직접 배열에 더하진 않았다.<br /> 각 문제에 맞게 적용해서 사용하자.</p><h1 id="최종-코드">최종 코드</h1><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+</pre><td class="rouge-code"><pre><span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">Solution</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Integer</span> <span class="no">TYPE_INDEX</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Integer</span> <span class="no">R1_INDEX</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Integer</span> <span class="no">C1_INDEX</span> <span class="o">=</span> <span class="mi">2</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Integer</span> <span class="no">R2_INDEX</span> <span class="o">=</span> <span class="mi">3</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Integer</span> <span class="no">C2_INDEX</span> <span class="o">=</span> <span class="mi">4</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Integer</span> <span class="no">DEGREE_INDEX</span> <span class="o">=</span> <span class="mi">5</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">solution</span><span class="o">(</span><span class="kt">int</span><span class="o">[][]</span> <span class="n">board</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">skill</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">boardHeight</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">boardWidth</span> <span class="o">=</span> <span class="n">board</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="na">length</span><span class="o">;</span>
+
+        <span class="kt">int</span><span class="o">[][]</span> <span class="n">prefixSumArray</span> <span class="o">=</span> <span class="n">getPrefixArray</span><span class="o">(</span><span class="n">boardHeight</span><span class="o">,</span> <span class="n">boardWidth</span><span class="o">,</span> <span class="n">skill</span><span class="o">);</span>
+
+        <span class="n">calculatePrefixSum</span><span class="o">(</span><span class="n">boardHeight</span><span class="o">,</span> <span class="n">boardWidth</span><span class="o">,</span> <span class="n">prefixSumArray</span><span class="o">);</span>
+
+        <span class="kt">int</span> <span class="n">answer</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="n">boardHeight</span><span class="o">;</span> <span class="n">row</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="n">boardWidth</span><span class="o">;</span> <span class="n">col</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">prefixSumArray</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">col</span><span class="o">]</span> <span class="o">+</span> <span class="n">board</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">col</span><span class="o">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">answer</span><span class="o">++;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">answer</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">calculatePrefixSum</span><span class="o">(</span><span class="kt">int</span> <span class="n">height</span><span class="o">,</span> <span class="kt">int</span> <span class="n">width</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">prefix</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">row</span> <span class="o">&lt;=</span> <span class="n">height</span><span class="o">;</span> <span class="n">row</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">col</span> <span class="o">&lt;=</span> <span class="n">width</span><span class="o">;</span> <span class="n">col</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+                <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+                <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="n">row</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">[</span><span class="n">row</span> <span class="o">-</span> <span class="mi">1</span><span class="o">][</span><span class="n">col</span><span class="o">];</span>
+                <span class="o">}</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="n">col</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">col</span> <span class="o">-</span> <span class="mi">1</span><span class="o">];</span>
+                <span class="o">}</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="n">row</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">col</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">[</span><span class="n">row</span> <span class="o">-</span> <span class="mi">1</span><span class="o">][</span><span class="n">col</span> <span class="o">-</span> <span class="mi">1</span><span class="o">];</span>
+                <span class="o">}</span>
+
+                <span class="n">prefix</span><span class="o">[</span><span class="n">row</span><span class="o">][</span><span class="n">col</span><span class="o">]</span> <span class="o">+=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">-</span> <span class="n">c</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">int</span><span class="o">[][]</span> <span class="nf">getPrefixArray</span><span class="o">(</span><span class="kt">int</span> <span class="n">height</span><span class="o">,</span> <span class="kt">int</span> <span class="n">width</span><span class="o">,</span> <span class="kt">int</span><span class="o">[][]</span> <span class="n">skill</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span><span class="o">[][]</span> <span class="n">prefixSumArray</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">height</span> <span class="o">+</span> <span class="mi">1</span><span class="o">][</span><span class="n">width</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+
+        <span class="kt">int</span> <span class="n">type</span><span class="o">,</span> <span class="n">r1</span><span class="o">,</span> <span class="n">c1</span><span class="o">,</span> <span class="n">r2</span><span class="o">,</span> <span class="n">c2</span><span class="o">,</span> <span class="n">degree</span><span class="o">;</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">eachSkill</span> <span class="o">:</span> <span class="n">skill</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">type</span> <span class="o">=</span> <span class="n">eachSkill</span><span class="o">[</span><span class="no">TYPE_INDEX</span><span class="o">];</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="n">eachSkill</span><span class="o">[</span><span class="no">R1_INDEX</span><span class="o">];</span>
+            <span class="n">c1</span> <span class="o">=</span> <span class="n">eachSkill</span><span class="o">[</span><span class="no">C1_INDEX</span><span class="o">];</span>
+            <span class="n">r2</span> <span class="o">=</span> <span class="n">eachSkill</span><span class="o">[</span><span class="no">R2_INDEX</span><span class="o">];</span>
+            <span class="n">c2</span> <span class="o">=</span> <span class="n">eachSkill</span><span class="o">[</span><span class="no">C2_INDEX</span><span class="o">];</span>
+            <span class="n">degree</span> <span class="o">=</span> <span class="n">eachSkill</span><span class="o">[</span><span class="no">DEGREE_INDEX</span><span class="o">];</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">eachSkill</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">degree</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="n">prefixSumArray</span><span class="o">[</span><span class="n">r1</span><span class="o">][</span><span class="n">c1</span><span class="o">]</span> <span class="o">+=</span> <span class="n">degree</span><span class="o">;</span>
+            <span class="n">prefixSumArray</span><span class="o">[</span><span class="n">r2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">][</span><span class="n">c1</span><span class="o">]</span> <span class="o">-=</span> <span class="n">degree</span><span class="o">;</span>
+            <span class="n">prefixSumArray</span><span class="o">[</span><span class="n">r1</span><span class="o">][</span><span class="n">c2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">]</span> <span class="o">-=</span> <span class="n">degree</span><span class="o">;</span>
+            <span class="n">prefixSumArray</span><span class="o">[</span><span class="n">r2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">][</span><span class="n">c2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">]</span> <span class="o">+=</span> <span class="n">degree</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">prefixSumArray</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+
+</pre></table></code></div></div><h1 id="결론">결론</h1><p>처음에는 다른 블로그에서 설명해준 누적합을 통해 학습했다.<br /> 그 블로그들에서는 행 계산 따로, 열 계산 따로 하는 코드로 확인했다.<br /> 하지만 더 줄일 수 있을 것 같아 알아본 결과… 한 번에 할 수 있었다.<br /> 하지만 이로 인해 궁금증이 생겼었다.</p><h5 id="어떻게해서-앞에서와-같은-식이-적용되는-것일까"><span class="me-2">어떻게해서 앞에서와 같은 식이 적용되는 것일까?</span><a href="#어떻게해서-앞에서와-같은-식이-적용되는-것일까" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>arr[r][c] +<span class="o">=</span> arr[r - 1][c] + arr[r][c - 1] - arr[r - 1][c - 1]
+</pre></table></code></div></div><p>물론 앞에서도 설명했다. 하지만 조금더 길게 설명해보고자 한다.</p><p>우리는 <code class="language-plaintext highlighter-rouge">arr[r1][c1]</code>에 연산 해야 할 값을 넣었고, <code class="language-plaintext highlighter-rouge">arr[r2 + 1][c1]</code> 과 <code class="language-plaintext highlighter-rouge">arr[r1][c2 + 1]</code> 에 값에 -1을 곱한 값을 넣었다.</p><p>이 행동의 의미는 “해당 위치를 넘어갔을 때 다시 0으로 돌아와라” 라는 것을 의미한다.<br /> 즉, 범위를 넘어갔을 때 아무 값도 계산하지 않도록 바깥 범위에 반대의 값<code class="language-plaintext highlighter-rouge">(* -1)</code>을 넣은 것이다.</p><p>최종적으로 <code class="language-plaintext highlighter-rouge">arr[r2 + 1][c2 + 1]</code>을 들어왔을 때 바로 위와 왼쪽인 <code class="language-plaintext highlighter-rouge">arr[r2 + 1][c2]</code>와 <code class="language-plaintext highlighter-rouge">arr[r2][c2 + 1]</code>는 확실하게 0이고, <code class="language-plaintext highlighter-rouge">arr[r2][c2]</code>는 확실하게 -4기 때문에 <code class="language-plaintext highlighter-rouge">0 + 0 - (-4) + ?</code>와 같은 식에서 <code class="language-plaintext highlighter-rouge">?</code>가 <code class="language-plaintext highlighter-rouge">- (-4)</code>와 반대인 <code class="language-plaintext highlighter-rouge">-4</code>가 들어가야했던 것이다.</p><p><a href="https://rdyjun.github.io/blog/assets/img/prefix-sum-8.png" class="popup img-link shimmer"><img src="https://rdyjun.github.io/blog/assets/img/prefix-sum-8.png" alt="alt text" loading="lazy"></a></p><p>결론은 이러한 부분 업데이트 방식은 우리가 원하는 부분만 정확히 수정하지만, 더 효율적으로 수정하는 좋은 알고리즘이라고 볼 수 있다. 처음 이 알고리즘 문제를 마주했을 때, 어떻게 풀지 막막했다. 풀이법을 알아내고 생각보다 쉬워 많이 당황했다…</p></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

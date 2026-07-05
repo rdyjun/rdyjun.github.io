@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects | SungJun Joo</title>
+    <meta name="description" content="주성준(SungJun Joo) · 프로젝트 모음" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+
+      <!-- ── 사이드바 ── -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="index.html#about">
+            <span class="nav-num">01</span>About
+          </a>
+          <a class="sb-navlink" href="index.html#history">
+            <span class="nav-num">02</span>History
+          </a>
+          <a class="sb-navlink active" href="project.html">
+            <span class="nav-num">03</span>Projects
+          </a>
+          <a class="sb-navlink" href="article.html">
+            <span class="nav-num">04</span>Articles
+          </a>
+        </nav>
+
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ── 메인 콘텐츠 ── -->
+      <main class="main-content">
+        <section>
+          <h2 class="section-title"><span class="num">03</span>Projects</h2>
+
+          <div class="featured-grid" id="all-projects-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>return 할 때 await을 붙이면 어떻게 될까? | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2025-02-12</p>
+            <h1>return 할 때 await을 붙이면 어떻게 될까?</h1>
+          </header>
+          <div class="article-content">
+<p>개발하다가 간혹 비동기 함수를 직접 return할 때가 있다.</p><p>처음에는 await을 꼭 붙여줬는데 지금은 await을 붙이지 않아도 된다는 사실을 알게되었다.</p><p>왜 await을 붙이지 않아도 되는 걸까?</p><h2 id="promise-중첩"><span class="me-2">Promise 중첩</span><a href="#promise-중첩" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>아래 코드의 <code class="language-plaintext highlighter-rouge">asyncFunction()</code> 함수는 비동기 로직을 수행하고, 가져온 결과 값에 추가 로직(+ 1)을 수행하여 return하기 때문에 await이 사용 되었다.</p><p>그리고 <code class="language-plaintext highlighter-rouge">a()</code> 함수는 이런 <code class="language-plaintext highlighter-rouge">asyncFunction()</code>함수를 호출하는 상태가 예시이다.</p><div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="kd">function</span> <span class="nf">asyncFunction</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">a</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nf">asyncFunction</span><span class="p">();</span> <span class="c1">// await 제거</span>
+  <span class="k">return</span> <span class="k">await</span> <span class="nf">asyncFunction</span><span class="p">();</span> <span class="c1">// await 사용</span>
+<span class="p">}</span>
+
+<span class="nf">a</span><span class="p">();</span>
+</pre></table></code></div></div><h3 id="promise와-async-await-동작"><span class="me-2">Promise와 async, await 동작</span><a href="#promise와-async-await-동작" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>먼저 <code class="language-plaintext highlighter-rouge">Promise</code>와 <code class="language-plaintext highlighter-rouge">await</code>의 동작을 간단하게 알아보자.</p><p><strong>Promise</strong>는 비동기 처리를 위한 타입으로 비동기 함수를 실행시키면 즉시 **Promise<pending>**을 반환한다.</pending></p><p>이후 함수 실행이 끝나고 <strong>resolve(해결)</strong> 상태로 바뀌면서 비동기 함수가 종료된다.</p><p><strong>await</strong>은 비동기 처리를 기다리는 예약어이다.</p><p>비동기 로직을 실행시켜 Promise<pending> 상태일 때 다음 로직을 실행하지 않고,</pending></p><p>Promise의 상태가 pending이 아닌 다른 상태로 업데이트 되면 다음 로직을 실행한다.</p><p>만약 <code class="language-plaintext highlighter-rouge">await new Promise(...);</code> 구조라면, <code class="language-plaintext highlighter-rouge">await new Promise(...);</code> 코드 이후의 코드들이 마이크로태스크 큐에 등록된다.</p><div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="c1">// 원래 코드</span>
+<span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">await</span> <span class="nc">PromiseTask</span><span class="p">();</span>
+<span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">// 실제 동작</span>
+<span class="nc">PromiseTask</span><span class="p">().</span><span class="nf">then</span><span class="p">((</span><span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="c1">// 만약 다음 동작이 없다면</span>
+<span class="nc">PromiseTask</span><span class="p">().</span><span class="nf">then</span><span class="p">((</span><span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">);</span>
+</pre></table></code></div></div><p>async함수에서 반환한 Promise 객체는 함수 호출 시 처음 반환한 Promise와 체이닝된다.</p><p>즉, 아래 코드에서 P2와 P1이 논리적으로 연결되며,</p><p>Promise.resolve(2)가 실행되어 P2의 값이 변형되면</p><p>마찬가지로 P1의 상태도 바뀌는 구조이다.</p><div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="nf">test</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">// return 시점에 P1과 체이닝 - p2</span>
+<span class="p">}</span>
+
+<span class="nf">test</span><span class="p">()</span> <span class="c1">// 호출 즉시 Promise&lt;pending&gt; 반환 - P1</span>
+</pre></table></code></div></div><h3 id="await-사용"><span class="me-2">await 사용</span><a href="#await-사용" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>앞전의 코드를 예시로 <code class="language-plaintext highlighter-rouge">a()</code> 함수에서 <code class="language-plaintext highlighter-rouge">asyncFunction()</code> 함수를 호출할 때 <code class="language-plaintext highlighter-rouge">await</code>을 쓴 상황을 살펴보자.</p><p><a href="https://github.com/user-attachments/assets/1b71e4bc-f2ac-4210-a246-9b7a9bf01d87" class="popup img-link shimmer"><img src="https://github.com/user-attachments/assets/1b71e4bc-f2ac-4210-a246-9b7a9bf01d87" alt="await을 사용했을 때 동작흐름" loading="lazy"></a></p><div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="kd">function</span> <span class="nf">asyncFunction</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">a</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">await</span> <span class="nf">asyncFunction</span><span class="p">();</span> <span class="c1">// await 사용</span>
+<span class="p">}</span>
+
+<span class="nf">a</span><span class="p">();</span>
+</pre></table></code></div></div><ol><li>a()를 호출했을 때 a() 함수도 async 함수이기 때문에 즉시 <code class="language-plaintext highlighter-rouge">Promise&lt;pending&gt;</code> (P1)를 반환한다.<ul><li>a() = Promise<pending></pending></ul><li>a()함수의 내부에서 <code class="language-plaintext highlighter-rouge">asyncFunction()</code> 함수를 실행하는데 이 함수도 비동기 함수이기 때문에 <code class="language-plaintext highlighter-rouge">Promise&lt;pending&gt;</code> (P2)를 반환한다. - asyncFunction() = Promise<pending></pending><li>await이 포함되었기 때문에 <code class="language-plaintext highlighter-rouge">await asyncFunction();</code> 이후의 작업이 <strong>마이크로 태스크 큐</strong>에 저장된다. - <code class="language-plaintext highlighter-rouge">await asyncFunction();</code> 코드 이후에 코드가 없기 때문에 <code class="language-plaintext highlighter-rouge">return promiseResult.then(value ⇒ value);</code> 형태로 저장된다.<li>P2의 .then() 결과인 Promise 객체(P3)가 P1과 체이닝된다.<ul><li>3번에서 마이크로 태스크 큐에 저장된 P2의 .then() 작업의 결과 Promise 객체를 의미<li>P1 = P3</ul><li>asyncFunction() 함수 내부의 <code class="language-plaintext highlighter-rouge">await Promise.resolve(2);</code> (P4)이 실행된다.<ul><li>Promise.resolve는 pending이 아닌 fulfilled 상태로 즉시 반환된다.<li>이때 await을 사용했기 때문에 <code class="language-plaintext highlighter-rouge">await Promise.resolve(2);</code> 이후의 작업이 마이크로 태스크 큐에 저장된다.<li>이 작업은 await 코드 이후의 asyncFunction() 코드이다.<div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="kd">function</span> <span class="nf">asyncFunction</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nf">then</span><span class="p">((</span><span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</pre></table></code></div></div></ul><li>마이크로 태스크 큐에 저장된 P4의 .then() 작업은 P5이다.<ul><li>P5는 P2와 체이닝 된다.<li>.then()은 언제나 독립적이고 새로운 Promise를 반환한다는 것을 명심하자.</ul><li>P5 로직 즉, <code class="language-plaintext highlighter-rouge">asyncFunction()</code>의 나머지 코드들이 추가되고 실행된다.<ul><li>P5의 값이 업데이트됨 3</ul><li>P5 결과 3이 체이닝된 P2에도 업데이트된다.<li>P2의 상태 변경에 따라 P2.then() = P3을 실행한다.<li>P3이 업데이트 됨에 따라 P1도 업데이트 된다.<li>종료</ol><p>위 흐름대로라면 P1은 P3과 연결되고, P3은 P2의 종료를 기다리는 구조가 된다.</p><p>또한 8번에서 <code class="language-plaintext highlighter-rouge">asyncFunction()</code>함수의 결과 값을</p><p>불필요하게 <code class="language-plaintext highlighter-rouge">.then(value ⇒ value);</code> 형태로 실행하는 과정이 추가된다.</p><h3 id="await-미사용"><span class="me-2">await 미사용</span><a href="#await-미사용" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>반대로 await을 쓰지 않는 상황을 보자.</p><p><a href="https://github.com/user-attachments/assets/cbecd6e7-88ca-486c-b89b-2dd5103f0c59" class="popup img-link shimmer"><img src="https://github.com/user-attachments/assets/cbecd6e7-88ca-486c-b89b-2dd5103f0c59" alt="await을 사용하지 않았을 때 동작흐름" loading="lazy"></a></p><div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="kd">function</span> <span class="nf">asyncFunction</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">a</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nf">asyncFunction</span><span class="p">();</span> <span class="c1">// await 미사용</span>
+<span class="p">}</span>
+
+<span class="nf">a</span><span class="p">();</span>
+</pre></table></code></div></div><ol><li>a()를 호출했을 때 a() 함수도 async 함수이기 때문에 즉시 <code class="language-plaintext highlighter-rouge">Promise&lt;pending&gt;</code> (P1)를 반환한다.<ul><li>a() = Promise<pending></pending></ul><li>a()함수의 내부에서 <code class="language-plaintext highlighter-rouge">asyncFunction()</code> 함수를 실행하는데 이 함수도 비동기 함수이기 때문에 <code class="language-plaintext highlighter-rouge">Promise&lt;pending&gt;</code> (P2)를 반환한다. - asyncFunction() = Promise<pending></pending><li>await이 없기 때문에 P2는 P1과 체이닝된다.<li>asyncFunction() 함수 내부의 <code class="language-plaintext highlighter-rouge">await Promise.resolve(2);</code> (P3)이 실행된다.<ul><li>이때 await을 사용했기 때문에 <code class="language-plaintext highlighter-rouge">await Promise.resolve(2);</code> 이후의 작업이 마이크로 태스크 큐에 저장된다.<li>이 작업은 await 코드 이후의 asyncFunction() 코드이다.<div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="kd">function</span> <span class="nf">asyncFunction</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nf">then</span><span class="p">((</span><span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</pre></table></code></div></div></ul><li>마이크로 태스크 큐에 저장된 P3의 .then() 작업은 P4이다.<ul><li>.then()은 언제나 독립적이고 새로운 Promise를 반환한다는 것을 명심하자.</ul><li>P4 로직 즉, <code class="language-plaintext highlighter-rouge">asyncFunction()</code>의 나머지 코드들이 추가되고 실행된다.<ul><li>실행된 결과는 P4에 업데이트 되었다.</ul><li>6번의 P4 결과 3이 체이닝된 P2, P1에도 업데이트된다.<li>종료</ol><p>위 과정에서 P4 값이 업데이트 되면 체이닝 된 P1, P2 값도 업데이트 되어 불필요하게 각 Promise에 값을 기다리지 않고,</p><p>await을 사용했을 때 추가되는 마이크로태스크 큐 작업이 제거되어 더 효율적이다.</p><h2 id="내용을-작성하면서-궁금했던-점"><span class="me-2">내용을 작성하면서 궁금했던 점</span><a href="#내용을-작성하면서-궁금했던-점" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>async 함수에 Promise를 return하는 것과, 일반 값(number, string 등)을 직접 반환하는 것은 무슨 차이가 있을까?</p><div class="language-jsx highlighter-rouge"><div class="code-header"> <span data-label-text="Jsx"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="k">async</span> <span class="nf">test</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="nf">test</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>두 코드의 공통점은 호출 즉시 Promise<pending>을 반환한다는 점이다.</pending></p><p><code class="language-plaintext highlighter-rouge">return 1</code>부터 동작을 살펴보니, 호출 시점에서 반환된 Promise 객체에 1이라는 값을 저장하여 상태를 업데이트한다.</p><p><code class="language-plaintext highlighter-rouge">return Promise.resolve(1);</code>의 동작을 살펴보니, Promise 객체를 생성하고, 호출 시점에서 반환 된 Promise 객체와 체이닝된다.</p><p>즉, 서로 다른 객체지만 논리적으로 값이 연동된 상태이다.</p><h2 id="결론"><span class="me-2">결론</span><a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>비동기 로직 호출 즉시 return하는 경우 await을 사용하지 않고 바로 return 하는 것이</p><p><code class="language-plaintext highlighter-rouge">promiseResult.then(value ⇒ value)</code>와 같은 불필요한 작업을 줄이고,</p><p>실행 후 반환한 Promise 객체(P1)와 호출 즉시 반환한 Promise 객체(P2)가</p><p>직접 체이닝하여 더 자연스럽게 동작하게 된다.</p><p>만약 return한 Promise 데이터를 써야 한다면 가장 상위에서 await을 사용하는 것이 적합해 보인다.</p></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

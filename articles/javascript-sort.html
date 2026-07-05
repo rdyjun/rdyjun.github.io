@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>자바스크립트의 sort | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar">
+      <a class="sb-logo" href="../index.html">rdyjun</a>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <a class="sb-logo" href="../index.html">rdyjun</a>
+          <p class="sb-name">SungJun Joo</p>
+          <p class="sb-role">Backend Developer</p>
+        </div>
+        <nav class="sb-nav">
+          <a class="sb-navlink" href="../index.html#about"><span class="nav-num">01</span>About</a>
+          <a class="sb-navlink" href="../index.html#history"><span class="nav-num">02</span>History</a>
+          <a class="sb-navlink" href="../index.html#projects"><span class="nav-num">03</span>Projects</a>
+          <a class="sb-navlink active" href="../article.html"><span class="nav-num">04</span>Articles</a>
+        </nav>
+        <div class="sb-links">
+          <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2025-01-26</p>
+            <h1>자바스크립트의 sort</h1>
+          </header>
+          <div class="article-content">
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">MDN 참조 링크</a></p><p>코딩테스트 문제 풀이 중 계속 실패하여 엣지 케이스를 찾으려 했으나, 아무리 찾아도 엣지 케이스가 나오지 않는 문제가 발생했다.<br /> AI의 도움을 받아 <code class="language-plaintext highlighter-rouge">array.sort()</code> 부분이 문제라는 것을 알아냈다.</p><h2 id="이-sort는-타입을-고려하지-않는다"><span class="me-2">이 sort는 타입을 고려하지 않는다</span><a href="#이-sort는-타입을-고려하지-않는다" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>자바스크립트에서 <code class="language-plaintext highlighter-rouge">array.sort()</code>는 배열의 요소를 <code class="language-plaintext highlighter-rouge">문자열</code>로 변환한 다음 UTF-16 코드 값 시퀀스를 비교한다고 한다.<br /> 이 말은 즉, 배열에 숫자가 들어있을 때 문자열로써 비교된다는 의미이다.</p><div class="language-js highlighter-rouge"><div class="code-header"> <span data-label-text="JavaScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="kd">const</span> <span class="nx">array1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">100000</span><span class="p">];</span>
+<span class="nx">array1</span><span class="p">.</span><span class="nf">sort</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">array1</span><span class="p">);</span>
+<span class="c1">// Expected output: Array [1, 100000, 21, 30, 4]</span>
+</pre></table></code></div></div><h2 id="해결-방법"><span class="me-2">해결 방법</span><a href="#해결-방법" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>단순히 파라미터에 콜백함수를 추가하면 된다.<br /> 이 콜백함수는 비교할 두 값에 대해 어떻게 정렬할 것인지에 대한 콜백함수이다.</p><div class="language-js highlighter-rouge"><div class="code-header"> <span data-label-text="JavaScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="복사되었습니다!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">100000</span><span class="p">];</span>
+<span class="nx">array</span><span class="p">.</span><span class="nf">sort</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">);</span> <span class="c1">// 콜백함수 추가</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">array</span><span class="p">);</span>
+<span class="c1">// Expected output: Array [1, 4, 21, 30, 100000]</span>
+</pre></table></code></div></div></div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+      <p class="footer-copy">© <span id="year"></span> rdyjun</p>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>
