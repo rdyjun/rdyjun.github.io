@@ -5,7 +5,7 @@
 }
 
 .back-link {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--muted);
   transition: color 0.15s;
 }
@@ -21,8 +21,8 @@
 }
 
 .article-date {
-  font-family: 'Consolas', monospace;
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
   color: var(--accent);
   margin-bottom: 0.6rem;
 }
@@ -58,7 +58,7 @@
 }
 
 .article-content h2 { font-size: 1.35rem; }
-.article-content h3 { font-size: 1.15rem; }
+.article-content h3 { font-size: 1.2rem; }
 .article-content h4 { font-size: 1rem; color: var(--muted); }
 
 .article-content p { margin: 0.9rem 0; }
@@ -82,15 +82,20 @@
 
 .article-content blockquote {
   border-left: 3px solid var(--accent);
-  padding: 0.5rem 0 0.5rem 1.25rem;
+  padding: 0 0 0 1rem;
   margin: 1.25rem 0;
   color: var(--muted);
   font-style: italic;
+  line-height: 1.5;
+}
+
+.article-content blockquote p {
+  margin: 0;
 }
 
 /* 인라인 코드 */
 .article-content code {
-  font-family: 'Consolas', 'Fira Code', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85em;
   background: var(--card);
   border: 1px solid var(--border);
@@ -99,20 +104,64 @@
   color: var(--accent);
 }
 
-/* 코드 블록 */
-.article-content pre {
+/* 코드 블록 (Jekyll rouge 마크업 단순화: 헤더 바 · 줄번호 컬럼 숨김) */
+.article-content .code-header {
+  display: none;
+}
+
+.article-content div[class*="highlighter-rouge"] {
+  margin: 1.25rem 0;
+}
+
+.article-content .highlight {
   background: #0a0a0a;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1.25rem;
   overflow-x: auto;
-  margin: 1.25rem 0;
-  font-size: 0.85rem;
-  line-height: 1.6;
 }
 
-[data-theme="light"] .article-content pre {
+[data-theme="light"] .article-content .highlight {
   background: #1e1e1e;
+}
+
+/* rouge-table을 감싸는 바깥쪽 <code>가 인라인 코드 박스 스타일을 물려받는 것 방지 */
+.article-content .highlight > code {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #d4d4d4;
+}
+
+.article-content .rouge-table {
+  display: block;
+  border: none;
+}
+.article-content .rouge-table tbody,
+.article-content .rouge-table tr {
+  display: flex;
+}
+.article-content .rouge-table td {
+  border: none;
+  padding: 0;
+}
+.article-content .rouge-table td.rouge-gutter {
+  display: none;
+}
+.article-content .rouge-table td.rouge-code {
+  flex: 1;
+  min-width: 0;
+}
+
+.article-content pre {
+  padding: 1.25rem;
+  margin: 0;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: none;
+  border: none;
+  color: inherit;
 }
 
 .article-content pre code {
@@ -122,6 +171,69 @@
   color: #d4d4d4;
   font-size: inherit;
 }
+
+/* ── 문법 강조 (GitHub Dark 코드 테마 색상) ─────────────────────── */
+.article-content .highlight .c,
+.article-content .highlight .c1,
+.article-content .highlight .cm,
+.article-content .highlight .cp,
+.article-content .highlight .cs { color: #8b949e; font-style: italic; }
+
+.article-content .highlight .k,
+.article-content .highlight .kd,
+.article-content .highlight .kn,
+.article-content .highlight .kp,
+.article-content .highlight .kr,
+.article-content .highlight .kt,
+.article-content .highlight .kc,
+.article-content .highlight .ow { color: #ff7b72; }
+
+.article-content .highlight .s,
+.article-content .highlight .s1,
+.article-content .highlight .s2,
+.article-content .highlight .sa,
+.article-content .highlight .sb,
+.article-content .highlight .sc,
+.article-content .highlight .sd,
+.article-content .highlight .se,
+.article-content .highlight .sh,
+.article-content .highlight .si,
+.article-content .highlight .sx,
+.article-content .highlight .sr,
+.article-content .highlight .ss,
+.article-content .highlight .dl { color: #a5d6ff; }
+
+.article-content .highlight .m,
+.article-content .highlight .mi,
+.article-content .highlight .mf,
+.article-content .highlight .mh,
+.article-content .highlight .mo,
+.article-content .highlight .il { color: #79c0ff; }
+
+.article-content .highlight .nf,
+.article-content .highlight .nd { color: #d2a8ff; }
+
+.article-content .highlight .nc { color: #ffa657; }
+
+.article-content .highlight .nb,
+.article-content .highlight .bp { color: #79c0ff; }
+
+.article-content .highlight .na,
+.article-content .highlight .nv,
+.article-content .highlight .vc,
+.article-content .highlight .vg,
+.article-content .highlight .vi,
+.article-content .highlight .vm { color: #79c0ff; }
+
+.article-content .highlight .nt { color: #7ee787; }
+.article-content .highlight .nn { color: #ffa657; }
+.article-content .highlight .no { color: #79c0ff; }
+
+.article-content .highlight .o { color: #c9d1d9; }
+.article-content .highlight .p { color: #c9d1d9; }
+
+.article-content .highlight .err,
+.article-content .highlight .gr { color: #f85149; }
 
 .article-content img {
   max-width: 100%;
@@ -139,7 +251,7 @@
 .article-content table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   margin: 1.25rem 0;
 }
 

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -16,6 +18,8 @@
   --muted2: #444;
   --border: #1f1f1f;
   --sidebar-w: 240px;
+  --font-sans: 'Noto Sans KR', 'Noto Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Consolas', 'Fira Code', monospace;
 
   /* 글래스모피즘 */
   --glass-bg: rgba(255, 255, 255, 0.04);
@@ -42,12 +46,25 @@
   --glass-hover-border: rgba(227, 84, 0, 0.35);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+  scrollbar-color: var(--muted2) var(--bg);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--muted2);
+  border-radius: 6px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.65;
   display: flex;
   flex-direction: column;
@@ -91,17 +108,17 @@ strong { color: var(--fg); font-weight: 600; }
   position: absolute;
   left: 0;
   color: var(--accent);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   top: 0.15em;
 }
 
 /* ─── 섹션 구분 헤더 유틸리티 ───────────── */
 .group-title {
-  font-size: 0.72rem;
+  font-size: 0.825rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted2);
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-sans);
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
 }
@@ -143,11 +160,11 @@ strong { color: var(--fg); font-weight: 600; }
 .sb-logo:hover { text-decoration: none; }
 
 .sb-name {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   margin-top: 0.6rem;
 }
-.sb-role { color: var(--muted); font-size: 0.875rem; }
+.sb-role { color: var(--muted); font-size: 0.9375rem; }
 
 .sb-nav {
   display: flex;
@@ -160,7 +177,7 @@ strong { color: var(--fg); font-weight: 600; }
   align-items: center;
   gap: 0.6rem;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 1rem;
   padding: 0.45rem 0.75rem;
   border-radius: 8px;
   transition: background 0.15s, color 0.15s;
@@ -171,12 +188,35 @@ strong { color: var(--fg); font-weight: 600; }
   text-decoration: none;
 }
 .nav-num {
-  font-family: 'Consolas', monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
   color: var(--muted2);
   min-width: 1.6rem;
 }
 .sb-navlink.active .nav-num { color: var(--accent); }
+
+.sb-nav-group { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.sb-subnav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-left: 1.6rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--border);
+}
+.sb-sublink {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+.sb-sublink:hover, .sb-sublink.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  text-decoration: none;
+}
 
 .sb-links {
   display: flex;
@@ -187,7 +227,7 @@ strong { color: var(--fg); font-weight: 600; }
 }
 .sb-links a {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   transition: color 0.15s;
 }
 .sb-links a:hover { color: var(--accent); text-decoration: none; }
@@ -214,7 +254,7 @@ section {
 }
 
 .section-title {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   font-weight: 700;
   margin-bottom: 2rem;
   display: flex;
@@ -223,14 +263,14 @@ section {
   color: var(--fg);
 }
 .section-title .num {
-  font-family: 'Consolas', monospace;
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
   color: var(--accent);
 }
 
 /* ─── About ──────────────────────────────── */
 .about-lead {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--fg-secondary);
   max-width: 58ch;
   margin-bottom: 1rem;
@@ -255,8 +295,8 @@ section {
   font-size: 1rem;
 }
 .skill-label {
-  font-family: 'Consolas', monospace;
-  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -267,11 +307,11 @@ section {
 .history-group { margin-bottom: 2.5rem; }
 
 .history-group-title {
-  font-size: 0.72rem;
+  font-size: 0.825rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted2);
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-sans);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
@@ -292,8 +332,8 @@ section {
   padding-top: 0.1rem;
 }
 .hi-period {
-  font-family: 'Consolas', monospace;
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -323,9 +363,9 @@ section {
 }
 .cert-name { font-size: 1rem; font-weight: 600; color: var(--fg); }
 .cert-sub {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--muted);
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-sans);
 }
 
 /* ─── Projects ───────────────────────────── */
@@ -338,7 +378,7 @@ section {
 .section-title-row .section-title { margin-bottom: 0; }
 
 .more-link {
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   color: var(--muted);
   white-space: nowrap;
   transition: color 0.15s;
@@ -358,11 +398,11 @@ section {
 }
 
 .sub-heading {
-  font-size: 0.72rem;
+  font-size: 0.825rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted2);
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-sans);
   margin-bottom: 1.25rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
@@ -383,21 +423,21 @@ section {
   margin-bottom: 0.75rem;
 }
 .featured-context {
-  font-family: 'Consolas', monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   color: var(--accent);
   display: block;
   margin-bottom: 0.2rem;
 }
-.featured-head h4 { font-size: 1.15rem; font-weight: 700; }
-.featured-subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 0.1rem; }
+.featured-head h4 { font-size: 1.2rem; font-weight: 700; }
+.featured-subtitle { font-size: 0.9rem; color: var(--muted); margin-top: 0.1rem; }
 
 .btn {
   display: inline-block;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   transition: transform 0.15s, opacity 0.15s;
   white-space: nowrap;
 }
@@ -416,17 +456,17 @@ section {
 
 .featured-desc { font-size: 1rem; color: var(--fg-secondary); margin-bottom: 1rem; }
 
-.featured-highlights { font-size: 0.9rem; margin-bottom: 1.1rem; }
+.featured-highlights { font-size: 0.95rem; margin-bottom: 1.1rem; }
 
 .tech-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .tech-chip {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--accent);
   border: 1px solid rgba(255, 106, 0, 0.25);
   background: var(--accent-dim);
   padding: 0.2rem 0.6rem;
   border-radius: 5px;
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-mono);
 }
 
 .featured-actions {
@@ -437,7 +477,7 @@ section {
   flex-wrap: wrap;
 }
 
-.extra-link { font-size: 0.85rem; color: var(--muted); }
+.extra-link { font-size: 0.9rem; color: var(--muted); }
 .extra-link:hover { color: var(--accent); text-decoration: none; }
 
 .btn-icon {
@@ -472,7 +512,7 @@ section {
   color: var(--muted);
   padding: 0.35rem 0.9rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.15s;
   font-family: inherit;
@@ -503,19 +543,19 @@ section {
 .card-top { display: flex; justify-content: space-between; align-items: center; }
 .project-card h3 { font-size: 1rem; font-weight: 600; }
 .project-card:hover h3 { color: var(--accent); }
-.card-arrow { color: var(--muted); font-size: 0.9rem; transition: transform 0.18s; }
+.card-arrow { color: var(--muted); font-size: 0.95rem; transition: transform 0.18s; }
 .project-card:hover .card-arrow { transform: translate(2px, -2px); color: var(--accent); }
-.project-card p { color: var(--muted); font-size: 0.875rem; flex-grow: 1; }
+.project-card p { color: var(--muted); font-size: 0.9375rem; flex-grow: 1; }
 .card-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
-.lang-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; color: var(--muted); }
+.lang-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; color: var(--muted); }
 .lang-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
 .card-tag {
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   color: var(--accent);
   background: var(--accent-dim);
   padding: 0.12rem 0.45rem;
   border-radius: 10px;
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-mono);
 }
 
 /* ─── Theme toggle ───────────────────────── */
@@ -525,7 +565,7 @@ section {
   border-radius: 8px;
   padding: 0.35rem 0.6rem;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   margin-top: 0.25rem;
   transition: border-color 0.15s;
   width: fit-content;
@@ -536,7 +576,7 @@ section {
 .more-btn {
   display: inline-block;
   margin-top: 1.25rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 
 /* ─── Blog post list ─────────────────────── */
@@ -554,20 +594,23 @@ section {
 }
 .blog-row:hover { background: var(--accent-dim); text-decoration: none; }
 .blog-date {
-  font-family: 'Consolas', monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
   color: var(--muted);
   white-space: nowrap;
 }
 .blog-title { font-size: 1rem; color: var(--fg); }
 .blog-row:hover .blog-title { color: var(--accent); }
 .blog-arrow {
-  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--muted);
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.18s;
 }
-.blog-row:hover .blog-arrow { opacity: 1; color: var(--accent); }
+.blog-arrow svg { width: 14px; height: 14px; }
+.blog-row:hover .blog-arrow { opacity: 1; color: var(--accent); transform: translate(2px, -2px); }
 
 /* ─── Reveal animation ───────────────────── */
 .reveal {
@@ -585,7 +628,7 @@ footer {
   padding: 2rem;
   border-top: 1px solid var(--border);
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   display: flex;
   flex-direction: column;
   align-items: center;

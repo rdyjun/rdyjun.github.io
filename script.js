@@ -72,6 +72,7 @@ const blogPosts = [
 
 // ── 아이콘 SVG ─────────────────────────────────────────────────
 const ICONS = {
+  arrow: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="8 6 18 6 18 16"/></svg>`,
   pin: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 2a1 1 0 0 1 .707.293l5 5A1 1 0 0 1 21 9h-1v1a5.002 5.002 0 0 1-4 4.9V17l2 2v2H6v-2l2-2v-3.1A5.002 5.002 0 0 1 4 10V9H3a1 1 0 0 1-.707-1.707l5-5A1 1 0 0 1 8 2h8zm-4 16.5L10.5 21h3L12 18.5zM15 4H9L5.414 7.586A3.006 3.006 0 0 0 8 10a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3 3.006 3.006 0 0 0 2.586-2.414L15 4z"/></svg>`,
   github: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>`,
   notion: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>`,
@@ -85,7 +86,7 @@ function blogRowHTML(p) {
   <a class="blog-row reveal" href="${p.url}">
     <span class="blog-date">${p.date.slice(0, 7)}</span>
     <span class="blog-title">${p.title}</span>
-    <span class="blog-arrow">↗</span>
+    <span class="blog-arrow">${ICONS.arrow}</span>
   </a>`;
 }
 
@@ -246,16 +247,114 @@ function observeReveals() {
   document.querySelectorAll('.reveal:not(.visible)').forEach((el) => io.observe(el));
 }
 
+// ── 사이드바 (공유 컴포넌트) ─────────────────────────────────────
+function sidebarHTML(mode) {
+  const base = mode === 'detail' ? '../' : '';
+  const idx = `${base}index.html`;
+  const isIndex = mode === 'index';
+
+  const aboutHref    = isIndex ? '#about' : `${idx}#about`;
+  const historyHref  = isIndex ? '#history' : `${idx}#history`;
+  const projectsHref = isIndex ? '#projects' : mode === 'projects' ? `${base}project.html` : `${idx}#projects`;
+  const articlesHref = `${base}article.html`;
+
+  const mainActive     = mode === 'index' || mode === 'projects';
+  const articlesActive = mode === 'articles' || mode === 'detail';
+  const projectsSubActive = mode === 'projects';
+
+  const ds = (name) => (isIndex ? ` data-section="${name}"` : '');
+
+  return `
+    <div class="sb-top">
+      <a class="sb-logo" href="${isIndex ? '#about' : idx}">rdyjun</a>
+      <p class="sb-name">SungJun Joo</p>
+      <p class="sb-role">Backend Developer</p>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-nav-group">
+        <a class="sb-navlink sb-navlink-main${mainActive ? ' active' : ''}" href="${aboutHref}"${ds('main')}>
+          <span class="nav-num">01</span>Main
+        </a>
+        <div class="sb-subnav">
+          <a class="sb-sublink${isIndex ? ' active' : ''}" href="${aboutHref}"${ds('about')}>About</a>
+          <a class="sb-sublink" href="${historyHref}"${ds('history')}>History</a>
+          <a class="sb-sublink${projectsSubActive ? ' active' : ''}" href="${projectsHref}"${ds('projects')}>Projects</a>
+        </div>
+      </div>
+      <a class="sb-navlink${articlesActive ? ' active' : ''}" href="${articlesHref}">
+        <span class="nav-num">02</span>Articles
+      </a>
+    </nav>
+
+    <div class="sb-links">
+      <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+        <span class="theme-icon">☀️</span>
+      </button>
+    </div>`;
+}
+
+function pageMode() {
+  const path = location.pathname.replace(/\\/g, '/');
+  if (path.includes('/articles/')) return 'detail';
+  if (/article\.html$/.test(path)) return 'articles';
+  if (/project\.html$/.test(path)) return 'projects';
+  return 'index';
+}
+
+function initSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+  sidebar.innerHTML = sidebarHTML(pageMode());
+}
+
+// ── 모바일 상단 바 (공유 컴포넌트) ────────────────────────────────
+function mobileBarHTML(mode) {
+  const logoHref = mode === 'index' ? '#about' : mode === 'detail' ? '../index.html' : 'index.html';
+  return `
+    <a class="sb-logo" href="${logoHref}">rdyjun</a>
+    <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+      <span></span><span></span><span></span>
+    </button>`;
+}
+
+function initMobileBar() {
+  const bar = document.querySelector('.mobile-bar');
+  if (!bar) return;
+  bar.innerHTML = mobileBarHTML(pageMode());
+}
+
+// ── 푸터 (공유 컴포넌트) ─────────────────────────────────────────
+function footerHTML() {
+  return `
+    <p>SungJun Joo · <a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com</a></p>
+    <p class="footer-copy">© <span id="year">${new Date().getFullYear()}</span> rdyjun</p>`;
+}
+
+function initFooter() {
+  const footer = document.querySelector('footer');
+  if (!footer) return;
+  footer.innerHTML = footerHTML();
+}
+
 // ── 사이드바 active 링크 ────────────────────────────────────────
+const MAIN_SUB_SECTIONS = ['about', 'history', 'projects'];
+
 function initActiveNav() {
   const sections = document.querySelectorAll('section[id]');
-  const links    = document.querySelectorAll('.sb-navlink[data-section]');
+  const links    = document.querySelectorAll('.sb-navlink[data-section], .sb-sublink[data-section]');
+  const mainLink = document.querySelector('.sb-navlink-main');
   const obs = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         links.forEach((l) => l.classList.remove('active'));
-        const active = document.querySelector(`.sb-navlink[data-section="${entry.target.id}"]`);
+        const active = document.querySelector(`[data-section="${entry.target.id}"]`);
         if (active) active.classList.add('active');
+        if (mainLink) {
+          mainLink.classList.toggle('active', MAIN_SUB_SECTIONS.includes(entry.target.id));
+        }
       }
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
@@ -323,6 +422,9 @@ function initThemeToggle() {
 
 // ── 초기화 ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileBar();
+  initSidebar();
+  initFooter();
   initTheme();
   initThemeToggle();
   if (document.getElementById('all-projects-grid')) {
@@ -336,6 +438,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initActiveNav();
   initHamburger();
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
 });
