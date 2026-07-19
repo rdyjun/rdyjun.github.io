@@ -179,6 +179,71 @@
   이 3개 락은 구조상 서로 겹칠 이유가 없다. 세션 A와 세션 B는 애초에 다른 락 객체를 쓰기 때문에, 세션이 여러 개 동시에
   돌아가도 서로 기다릴 필요가 없다.
 </p>
+<p>입장 처리 하나를 기준으로, 실제로 락을 언제 잡고 언제 놓는지를 순서대로 그리면 다음과 같다.</p>
+
+<figure class="diagram-figure">
+  <div class="diagram-box">
+    <svg viewBox="0 0 380 410" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)" />
+        </marker>
+      </defs>
+
+      <text x="0" y="14" class="diagram-scenario-label">처리 단계</text>
+      <text x="230" y="14" class="diagram-scenario-label">이 시점의 락</text>
+
+      <!-- Row 1 -->
+      <rect x="0" y="30" width="210" height="50" rx="8" class="diagram-node-box" />
+      <text x="105" y="52" class="diagram-card-title">소켓 연결 · 이벤트 수신</text>
+      <text x="105" y="70" class="diagram-card-sub">회원 ID / 소켓 ID 확인</text>
+      <rect x="230" y="30" width="150" height="50" rx="8" class="diagram-node-box old" />
+      <text x="305" y="60" class="diagram-card-sub">락 없음</text>
+      <path d="M105,80 V94" class="diagram-arrow" marker-end="url(#arrowhead3)" />
+
+      <!-- Row 2 -->
+      <rect x="0" y="94" width="210" height="50" rx="8" class="diagram-node-box" />
+      <text x="105" y="116" class="diagram-card-title">재접속 여부 확인</text>
+      <text x="105" y="134" class="diagram-card-sub">같은 회원이면 소켓만 추가</text>
+      <rect x="230" y="94" width="150" height="50" rx="8" class="diagram-node-box accent" />
+      <text x="305" y="124" class="diagram-card-title">member lock</text>
+      <path d="M105,144 V158" class="diagram-arrow" marker-end="url(#arrowhead3)" />
+
+      <!-- Row 3 -->
+      <rect x="0" y="158" width="210" height="50" rx="8" class="diagram-node-box" />
+      <text x="105" y="180" class="diagram-card-title">세션 배정 + 참가자 등록</text>
+      <text x="105" y="198" class="diagram-card-sub">신규 입장인 경우</text>
+      <rect x="230" y="158" width="150" height="50" rx="8" class="diagram-node-box accent" />
+      <text x="305" y="188" class="diagram-card-title">matching lock</text>
+      <path d="M105,208 V222" class="diagram-arrow" marker-end="url(#arrowhead3)" />
+
+      <!-- Row 4 -->
+      <rect x="0" y="222" width="210" height="50" rx="8" class="diagram-node-box" />
+      <text x="105" y="244" class="diagram-card-title">입장 이벤트 전송</text>
+      <text x="105" y="262" class="diagram-card-sub">소켓으로 결과 알림</text>
+      <rect x="230" y="222" width="150" height="50" rx="8" class="diagram-node-box old" />
+      <text x="305" y="252" class="diagram-card-sub">락 없음</text>
+      <path d="M105,272 V286" class="diagram-arrow" marker-end="url(#arrowhead3)" />
+
+      <!-- Row 5 -->
+      <rect x="0" y="286" width="210" height="50" rx="8" class="diagram-node-box" />
+      <text x="105" y="308" class="diagram-card-title">정원 확인 + 세션 시작</text>
+      <text x="105" y="326" class="diagram-card-sub">마지막 참가자인 경우</text>
+      <rect x="230" y="286" width="150" height="50" rx="8" class="diagram-node-box accent" />
+      <text x="305" y="316" class="diagram-card-title">session lock</text>
+      <path d="M105,336 V350" class="diagram-arrow" marker-end="url(#arrowhead3)" />
+
+      <!-- Row 6 -->
+      <rect x="0" y="350" width="210" height="50" rx="8" class="diagram-node-box" />
+      <text x="105" y="372" class="diagram-card-title">인원수 브로드캐스트</text>
+      <text x="105" y="390" class="diagram-card-sub">정원이 안 찬 경우</text>
+      <rect x="230" y="350" width="150" height="50" rx="8" class="diagram-node-box old" />
+      <text x="305" y="380" class="diagram-card-sub">락 없음</text>
+    </svg>
+  </div>
+  <figcaption class="diagram-caption">입장 처리 흐름과 각 단계에서 실제로 잡고 있는 락 — 두 락이 동시에 걸리는 지점은 없다</figcaption>
+</figure>
+
 <p>이 구조로 옮기면서 시나리오별로 실제로 있었던 문제와 개선은 다음과 같다.</p>
 <table>
   <thead>
