@@ -46,7 +46,6 @@ const projects = [
 
 // ── 블로그 글 ───────────────────────────────────────────────────
 const blogPosts = [
-  { title: '단일 인스턴스 환경에서 Redis MQ를 걷어내고 로컬 락으로 전환하기', date: '2026-07-19', url: 'articles/dongsoop-matching-lock.html' },
   { title: 'Spring Boot에서 카카오 소셜 로그인 적용', date: '2026-01-13', url: 'articles/oauth-spring-boot.html' },
   { title: '[구버전] 실시간 매칭 구조 리팩터링: 낙관적 락에서 MQ로 전환하기까지', date: '2025-12-11', url: 'articles/dongsoop-matching-queue.html' },
   { title: '개인 도메인으로 무료 메일 보내기', date: '2025-07-30', url: 'articles/email-smtp-by-domain.html' },
