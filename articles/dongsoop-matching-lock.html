@@ -10,20 +10,24 @@
       .diagram-figure { margin: 1.5rem 0 2rem; }
       .diagram-box {
         border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 1rem 1.1rem 1.2rem;
+        border-radius: 10px;
+        padding: 1.4rem 1.4rem 1.6rem;
         overflow-x: auto;
       }
-      .diagram-box svg { display: block; width: 100%; height: auto; min-width: 560px; }
-      .diagram-row-label { font-family: var(--font-mono); font-size: 0.78rem; fill: var(--muted); }
-      .diagram-node-box { fill: var(--card); stroke: var(--border); stroke-width: 1; }
-      .diagram-node-box.accent { stroke: var(--accent); }
-      .diagram-node-text { font-size: 0.82rem; fill: var(--fg); font-weight: 600; text-anchor: middle; }
-      .diagram-edge-label { font-family: var(--font-mono); font-size: 0.7rem; fill: var(--muted); text-anchor: middle; }
-      .diagram-arrow { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+      .diagram-box svg { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto; }
+      .diagram-row-label { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; fill: var(--fg); }
+      .diagram-row-sub { font-size: 0.85rem; fill: var(--muted); }
+      .diagram-node-box { fill: var(--card); stroke: var(--border); stroke-width: 1.5; }
+      .diagram-node-box.accent { stroke: var(--accent); stroke-width: 2; }
+      .diagram-node-text { font-size: 1.05rem; fill: var(--fg); font-weight: 700; text-anchor: middle; }
+      .diagram-node-sub { font-size: 0.8rem; fill: var(--muted); text-anchor: middle; }
+      .diagram-edge-label { font-family: var(--font-mono); font-size: 0.85rem; fill: var(--muted); text-anchor: middle; }
+      .diagram-arrow { stroke: var(--muted); stroke-width: 2; fill: none; }
+      .diagram-network-zone { fill: var(--card); opacity: 0.5; stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 5 4; }
+      .diagram-outer { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4; }
       figcaption.diagram-caption {
-        margin-top: 0.6rem;
-        font-size: 0.82rem;
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
         color: var(--muted);
         text-align: center;
       }
@@ -63,62 +67,44 @@
 
 <figure class="diagram-figure">
   <div class="diagram-box">
-    <svg viewBox="0 0 760 250" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 360 316" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)" />
+        <marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--muted)" />
         </marker>
       </defs>
 
-      <text x="10" y="24" class="diagram-row-label">이전 · Redis MQ 기반</text>
-      <rect x="10" y="35" width="100" height="46" rx="6" class="diagram-node-box" />
-      <text x="60" y="63" class="diagram-node-text">클라이언트</text>
+      <text x="0" y="22" class="diagram-row-label">이전 · Redis MQ</text>
 
-      <path d="M110,58 H160" class="diagram-arrow" marker-end="url(#arrowhead)" />
-      <text x="135" y="50" class="diagram-edge-label">lPush</text>
+      <rect x="0" y="42" width="140" height="72" rx="10" class="diagram-node-box" />
+      <text x="70" y="84" class="diagram-node-text">서버</text>
 
-      <rect x="160" y="35" width="130" height="46" rx="6" class="diagram-node-box" />
-      <text x="225" y="63" class="diagram-node-text">Redis List</text>
+      <rect x="140" y="42" width="80" height="72" rx="8" class="diagram-network-zone" />
 
-      <path d="M290,58 H340" class="diagram-arrow" marker-end="url(#arrowhead)" />
-      <text x="315" y="50" class="diagram-edge-label">publish</text>
+      <rect x="220" y="42" width="140" height="72" rx="10" class="diagram-node-box" />
+      <text x="290" y="84" class="diagram-node-text">Redis</text>
 
-      <rect x="340" y="35" width="140" height="46" rx="6" class="diagram-node-box" />
-      <text x="410" y="57" class="diagram-node-text">Subscriber</text>
-      <text x="410" y="72" class="diagram-node-text" style="font-weight:400;font-size:0.7rem">(brPop 대기)</text>
+      <path d="M140,64 H220" class="diagram-arrow" marker-end="url(#arrowhead)" />
+      <path d="M220,92 H140" class="diagram-arrow" marker-end="url(#arrowhead)" />
 
-      <path d="M480,58 H530" class="diagram-arrow" marker-end="url(#arrowhead)" />
+      <text x="180" y="150" class="diagram-edge-label" text-anchor="middle">요청마다 네트워크를 2회 이상 왕복</text>
 
-      <rect x="530" y="35" width="100" height="46" rx="6" class="diagram-node-box" />
-      <text x="580" y="63" class="diagram-node-text">이벤트 처리</text>
+      <line x1="0" y1="180" x2="360" y2="180" stroke="var(--border)" stroke-dasharray="4 4" />
 
-      <text x="10" y="107" class="diagram-edge-label" style="text-anchor:start">⇢ 매 이벤트마다 Redis 왕복 2회 이상, 큐 컨슈머 별도 관리 필요</text>
+      <text x="0" y="204" class="diagram-row-label">이후 · 로컬 락</text>
 
-      <line x1="0" y1="130" x2="760" y2="130" stroke="var(--border)" stroke-dasharray="4 4" />
+      <rect x="0" y="214" width="360" height="74" rx="12" class="diagram-outer" />
+      <text x="14" y="230" class="diagram-node-sub" text-anchor="start">서버 프로세스(JVM) 안에서 전부 처리</text>
 
-      <text x="10" y="154" class="diagram-row-label">이후 · 로컬 락 기반</text>
-      <rect x="10" y="165" width="100" height="46" rx="6" class="diagram-node-box" />
-      <text x="60" y="193" class="diagram-node-text">클라이언트</text>
+      <rect x="20" y="246" width="140" height="34" rx="7" class="diagram-node-box" />
+      <text x="90" y="268" class="diagram-node-text" style="font-size:0.9rem">락 획득</text>
 
-      <path d="M110,188 H160" class="diagram-arrow" marker-end="url(#arrowhead)" />
-      <text x="135" y="180" class="diagram-edge-label">요청</text>
+      <path d="M160,263 H210" class="diagram-arrow" marker-end="url(#arrowhead)" />
 
-      <rect x="160" y="165" width="170" height="46" rx="6" class="diagram-node-box accent" />
-      <text x="245" y="187" class="diagram-node-text">세션/회원 락 획득</text>
-      <text x="245" y="202" class="diagram-node-text" style="font-weight:400;font-size:0.7rem">(같은 JVM 내부)</text>
+      <rect x="210" y="246" width="140" height="34" rx="7" class="diagram-node-box" />
+      <text x="280" y="268" class="diagram-node-text" style="font-size:0.9rem">이벤트 처리</text>
 
-      <path d="M330,188 H380" class="diagram-arrow" marker-end="url(#arrowhead)" />
-
-      <rect x="380" y="165" width="190" height="46" rx="6" class="diagram-node-box accent" />
-      <text x="475" y="187" class="diagram-node-text">ConcurrentHashMap</text>
-      <text x="475" y="202" class="diagram-node-text" style="font-weight:400;font-size:0.7rem">compute / putIfAbsent</text>
-
-      <path d="M570,188 H620" class="diagram-arrow" marker-end="url(#arrowhead)" />
-
-      <rect x="620" y="165" width="100" height="46" rx="6" class="diagram-node-box" />
-      <text x="670" y="193" class="diagram-node-text">이벤트 처리</text>
-
-      <text x="10" y="237" class="diagram-edge-label" style="text-anchor:start">⇢ 네트워크 왕복 없음, 프로세스 메모리 안에서 원자적으로 처리</text>
+      <text x="180" y="308" class="diagram-edge-label" text-anchor="middle">네트워크 왕복 없음 — 즉시 처리</text>
     </svg>
   </div>
   <figcaption class="diagram-caption">이전(Redis MQ) vs 이후(로컬 락) 입장/퇴장 이벤트 처리 흐름 비교</figcaption>
@@ -157,6 +143,66 @@
   같은 프로세스 메모리 안에서 락을 쓰는 순간 아예 발생하지 않는 종류의 문제였다. 그 문제들 자체가
   <strong>여러 프로세스가 공유 상태를 원격으로 조율해야 해서</strong> 생긴 문제였기 때문이다.
 </p>
+
+<h2 id="무엇이-어떻게-바뀌었나">
+  <span class="me-2">무엇이, 어떻게 바뀌었나</span>
+  <a href="#무엇이-어떻게-바뀌었나" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>실제로 쓴 락은 3개다. 각각 보호하는 대상이 다르다.</p>
+<table>
+  <thead>
+    <tr><th>락</th><th>보호 대상</th><th>없으면 생기는 문제</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>matching lock<br /><span class="text-muted">(전역, 1개)</span></td>
+      <td>세션 포인터 확인 → 정원 판단 → 참가자 등록</td>
+      <td>동시 입장 시 정원 초과 배정, 세션 중복 생성</td>
+    </tr>
+    <tr>
+      <td>member lock<br /><span class="text-muted">(회원 ID별)</span></td>
+      <td>같은 회원의 재접속·소켓 추가/제거</td>
+      <td>한 회원이 여러 기기로 동시 접속할 때 소켓 목록이 덮어써짐</td>
+    </tr>
+    <tr>
+      <td>session lock<br /><span class="text-muted">(세션 ID별)</span></td>
+      <td>세션 시작·종료·퇴장 처리</td>
+      <td>같은 세션에 동시 접속·퇴장이 겹치며 상태가 꼬임</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  이 3개 락은 구조상 서로 겹칠 이유가 없다. 세션 A와 세션 B는 애초에 다른 락 객체를 쓰기 때문에, 세션이 여러 개 동시에
+  돌아가도 서로 기다릴 필요가 없다.
+</p>
+<p>이 구조로 옮기면서 시나리오별로 실제로 있었던 문제와 개선은 다음과 같다.</p>
+<table>
+  <thead>
+    <tr><th>시나리오</th><th>이전(문제)</th><th>이후(개선)</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>같은 회원이 여러 기기로 동시 접속</td>
+      <td>참가자 조회 후 저장하는 두 단계가 분리돼 있어, 동시에 들어오면 한쪽 소켓 정보가 덮어써질 수 있었음</td>
+      <td><code class="language-plaintext highlighter-rouge">ConcurrentHashMap#compute</code>로 조회~저장을 하나의 원자적 연산으로 묶음</td>
+    </tr>
+    <tr>
+      <td>세션이 여러 개 동시에 정원을 채움</td>
+      <td>세션별 락이 있는데도 처리 메서드에 인스턴스 전역 락이 걸려 있어, 무관한 세션끼리 순서를 기다림</td>
+      <td>세션별 락이 이미 원자성을 보장하므로 전역 락 제거</td>
+    </tr>
+    <tr>
+      <td>접속을 끊은 소켓 조회</td>
+      <td>매번 전체 참가자를 순회하며 소켓 ID를 찾아 O(n)</td>
+      <td><code class="language-plaintext highlighter-rouge">socketId → memberId</code> 역인덱스로 O(1) 조회</td>
+    </tr>
+    <tr>
+      <td>매칭 라운드가 반복됨</td>
+      <td>세션 종료 시 참가자·세션 데이터는 초기화하지만 회원별·세션별 락 맵은 비우지 않아 계속 쌓임</td>
+      <td>세션 종료 처리에 락 맵 초기화 코드 추가</td>
+    </tr>
+  </tbody>
+</table>
 
 <h2 id="결론">
   <span class="me-2">결론</span>

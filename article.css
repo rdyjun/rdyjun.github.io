@@ -14,6 +14,11 @@
   text-decoration: none;
 }
 
+.article-body {
+  width: 100%;
+  max-width: 780px;
+}
+
 .article-header {
   margin-bottom: 2.5rem;
   padding-bottom: 1.5rem;
@@ -36,7 +41,7 @@
 
 /* ── 본문 콘텐츠 ─────────────────────────────────────────────── */
 .article-content {
-  max-width: 68ch;
+  max-width: 100%;
   font-size: 0.97rem;
   line-height: 1.8;
   color: #ccc;
