@@ -183,157 +183,13 @@
   이 3개 락은 구조상 서로 겹칠 이유가 없다. 세션 A와 세션 B는 애초에 다른 락 객체를 쓰기 때문에, 세션이 여러 개 동시에
   돌아가도 서로 기다릴 필요가 없다.
 </p>
-<p>입장 처리 하나를 기준으로, 실제로 락을 언제 잡고 언제 놓는지를 순서대로 그리면 다음과 같다.</p>
-
-<figure class="diagram-figure">
-  <div class="diagram-box">
-    <svg viewBox="0 0 380 450" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="arrowhead3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)" />
-        </marker>
-      </defs>
-
-      <text x="0" y="14" class="diagram-scenario-label">처리 단계</text>
-      <text x="230" y="14" class="diagram-scenario-label">이 시점의 락</text>
-
-      <!-- Row 1 -->
-      <rect x="0" y="30" width="210" height="50" rx="8" class="diagram-node-box" />
-      <text x="105" y="52" class="diagram-card-title">소켓 연결 · 이벤트 수신</text>
-      <text x="105" y="70" class="diagram-card-sub">회원 ID / 소켓 ID 확인</text>
-      <rect x="230" y="30" width="150" height="50" rx="8" class="diagram-node-box old" />
-      <text x="305" y="60" class="diagram-card-sub">락 없음</text>
-      <path d="M105,80 V102" class="diagram-arrow" marker-end="url(#arrowhead3)" />
-      <text x="118" y="94" class="diagram-lock-transition">🔒 member lock 획득</text>
-
-      <!-- Row 2 -->
-      <rect x="0" y="102" width="210" height="50" rx="8" class="diagram-node-box" />
-      <text x="105" y="124" class="diagram-card-title">재접속 여부 확인</text>
-      <text x="105" y="142" class="diagram-card-sub">같은 회원이면 소켓만 추가</text>
-      <rect x="230" y="102" width="150" height="50" rx="8" class="diagram-node-box accent" />
-      <text x="305" y="132" class="diagram-card-title">member lock</text>
-      <path d="M105,152 V174" class="diagram-arrow" marker-end="url(#arrowhead3)" />
-      <text x="118" y="166" class="diagram-lock-transition">🔓 반납 → 🔒 matching 획득</text>
-
-      <!-- Row 3 -->
-      <rect x="0" y="174" width="210" height="50" rx="8" class="diagram-node-box" />
-      <text x="105" y="196" class="diagram-card-title">세션 배정 + 참가자 등록</text>
-      <text x="105" y="214" class="diagram-card-sub">신규 입장인 경우</text>
-      <rect x="230" y="174" width="150" height="50" rx="8" class="diagram-node-box accent" />
-      <text x="305" y="204" class="diagram-card-title">matching lock</text>
-      <path d="M105,224 V246" class="diagram-arrow" marker-end="url(#arrowhead3)" />
-      <text x="118" y="238" class="diagram-lock-transition">🔓 matching lock 반납</text>
-
-      <!-- Row 4 -->
-      <rect x="0" y="246" width="210" height="50" rx="8" class="diagram-node-box" />
-      <text x="105" y="268" class="diagram-card-title">입장 이벤트 전송</text>
-      <text x="105" y="286" class="diagram-card-sub">소켓으로 결과 알림</text>
-      <rect x="230" y="246" width="150" height="50" rx="8" class="diagram-node-box old" />
-      <text x="305" y="276" class="diagram-card-sub">락 없음</text>
-      <path d="M105,296 V318" class="diagram-arrow" marker-end="url(#arrowhead3)" />
-      <text x="118" y="310" class="diagram-lock-transition">🔒 session lock 획득</text>
-
-      <!-- Row 5 -->
-      <rect x="0" y="318" width="210" height="50" rx="8" class="diagram-node-box" />
-      <text x="105" y="340" class="diagram-card-title">정원 확인 + 세션 시작</text>
-      <text x="105" y="358" class="diagram-card-sub">마지막 참가자인 경우</text>
-      <rect x="230" y="318" width="150" height="50" rx="8" class="diagram-node-box accent" />
-      <text x="305" y="348" class="diagram-card-title">session lock</text>
-      <path d="M105,368 V390" class="diagram-arrow" marker-end="url(#arrowhead3)" />
-      <text x="118" y="382" class="diagram-lock-transition">🔓 session lock 반납</text>
-
-      <!-- Row 6 -->
-      <rect x="0" y="390" width="210" height="50" rx="8" class="diagram-node-box" />
-      <text x="105" y="412" class="diagram-card-title">인원수 브로드캐스트</text>
-      <text x="105" y="430" class="diagram-card-sub">정원이 안 찬 경우</text>
-      <rect x="230" y="390" width="150" height="50" rx="8" class="diagram-node-box old" />
-      <text x="305" y="420" class="diagram-card-sub">락 없음</text>
-    </svg>
-  </div>
-  <figcaption class="diagram-caption">입장 처리 흐름과 각 단계에서 실제로 잡고 있는 락 — 두 락이 동시에 걸리는 지점은 없다</figcaption>
-</figure>
-
-<p>이 구조로 옮기면서 시나리오별로 실제로 있었던 문제와 개선은 다음과 같다.</p>
-<table>
-  <thead>
-    <tr><th>시나리오</th><th>이전(문제)</th><th>이후(개선)</th></tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>같은 회원이 여러 기기로 동시 접속</td>
-      <td>참가자 조회 후 저장하는 두 단계가 분리돼 있어, 동시에 들어오면 한쪽 소켓 정보가 덮어써질 수 있었음</td>
-      <td><code class="language-plaintext highlighter-rouge">ConcurrentHashMap#compute</code>로 조회~저장을 하나의 원자적 연산으로 묶음</td>
-    </tr>
-    <tr>
-      <td>세션이 여러 개 동시에 정원을 채움</td>
-      <td>세션별 락이 있는데도 처리 메서드에 인스턴스 전역 락이 걸려 있어, 무관한 세션끼리 순서를 기다림</td>
-      <td>세션별 락이 이미 원자성을 보장하므로 전역 락 제거</td>
-    </tr>
-    <tr>
-      <td>접속을 끊은 소켓 조회</td>
-      <td>매번 전체 참가자를 순회하며 소켓 ID를 찾아 O(n)</td>
-      <td><code class="language-plaintext highlighter-rouge">socketId → memberId</code> 역인덱스로 O(1) 조회</td>
-    </tr>
-    <tr>
-      <td>매칭 라운드가 반복됨</td>
-      <td>세션 종료 시 참가자·세션 데이터는 초기화하지만 회원별·세션별 락 맵은 비우지 않아 계속 쌓임</td>
-      <td>세션 종료 처리에 락 맵 초기화 코드 추가</td>
-    </tr>
-  </tbody>
-</table>
-
-<figure class="diagram-figure">
-  <div class="diagram-box">
-    <svg viewBox="0 0 360 376" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="arrowhead2" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--muted)" />
-        </marker>
-      </defs>
-
-      <!-- 1 -->
-      <text x="0" y="18" class="diagram-scenario-label">① 같은 회원이 여러 기기로 동시 접속</text>
-      <rect x="0" y="26" width="160" height="62" rx="8" class="diagram-node-box old" />
-      <text x="80" y="51" class="diagram-card-title">조회 → 저장 분리</text>
-      <text x="80" y="70" class="diagram-card-sub">❌ 소켓 정보 덮어씀</text>
-      <path d="M160,57 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
-      <rect x="200" y="26" width="160" height="62" rx="8" class="diagram-node-box accent" />
-      <text x="280" y="51" class="diagram-card-title">compute() 원자 처리</text>
-      <text x="280" y="70" class="diagram-card-sub">✅ 절대 안 덮어씀</text>
-
-      <!-- 2 -->
-      <text x="0" y="112" class="diagram-scenario-label">② 세션 여러 개가 동시에 꽉 참</text>
-      <rect x="0" y="120" width="160" height="62" rx="8" class="diagram-node-box old" />
-      <text x="80" y="145" class="diagram-card-title">세션 락 + 전역 락 이중</text>
-      <text x="80" y="164" class="diagram-card-sub">❌ 무관한 세션도 대기</text>
-      <path d="M160,151 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
-      <rect x="200" y="120" width="160" height="62" rx="8" class="diagram-node-box accent" />
-      <text x="280" y="145" class="diagram-card-title">세션 락만 사용</text>
-      <text x="280" y="164" class="diagram-card-sub">✅ 세션끼리 병렬 처리</text>
-
-      <!-- 3 -->
-      <text x="0" y="206" class="diagram-scenario-label">③ 접속 끊긴 소켓 조회</text>
-      <rect x="0" y="214" width="160" height="62" rx="8" class="diagram-node-box old" />
-      <text x="80" y="239" class="diagram-card-title">참가자 전체 순회</text>
-      <text x="80" y="258" class="diagram-card-sub">❌ O(n)</text>
-      <path d="M160,245 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
-      <rect x="200" y="214" width="160" height="62" rx="8" class="diagram-node-box accent" />
-      <text x="280" y="239" class="diagram-card-title">socketId 역인덱스</text>
-      <text x="280" y="258" class="diagram-card-sub">✅ O(1)</text>
-
-      <!-- 4 -->
-      <text x="0" y="300" class="diagram-scenario-label">④ 매칭 라운드 반복</text>
-      <rect x="0" y="308" width="160" height="62" rx="8" class="diagram-node-box old" />
-      <text x="80" y="333" class="diagram-card-title">락 맵 정리 코드 없음</text>
-      <text x="80" y="352" class="diagram-card-sub">❌ 라운드마다 계속 누적</text>
-      <path d="M160,339 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
-      <rect x="200" y="308" width="160" height="62" rx="8" class="diagram-node-box accent" />
-      <text x="280" y="333" class="diagram-card-title">종료 시 락 맵 clear()</text>
-      <text x="280" y="352" class="diagram-card-sub">✅ 라운드마다 리셋</text>
-    </svg>
-  </div>
-  <figcaption class="diagram-caption">시나리오별 이전(점선) → 이후(강조 테두리)</figcaption>
-</figure>
+<p>
+  이 락 3개짜리 구조는 지금은 코드에 남아있지 않다. 그래서 락을 언제 잡고 언제 놓는지 세세하게 그리는 대신,
+  이 단계에서 고친 문제만 요약해서 남긴다: 참가자 조회~저장을 <code class="language-plaintext highlighter-rouge">ConcurrentHashMap#compute</code> 한 번으로
+  묶어 원자성을 확보했고, 세션별 락이 있는데도 걸려 있던 인스턴스 전역 락을 제거해 무관한 세션끼리 기다리지 않게 했고,
+  <code class="language-plaintext highlighter-rouge">socketId → memberId</code> 역인덱스를 추가해 O(n) 조회를 O(1)로 줄였다.
+  구체적인 실수 하나하나는 아래 <a href="#실수-축제">실수 축제</a>에 정리해뒀다.
+</p>
 
 <h2 id="락-3개로-정리한-뒤의-중간-결론">
   <span class="me-2">중간 결론 — MQ보다는 낫지만, 이게 끝은 아니었다</span>
@@ -362,8 +218,46 @@
   락 자체가 잘못된 도구는 아니었지만, <strong>"이 락이 어디서부터 어디까지를 지키는지, 다른 락과 순서가 안 뒤집히는지를
   사람이 매번 정확히 맞춰야 하는 구조"</strong>가 계속 새로운 버그를 만들어내고 있다는 게 문제였다. 그래서 락 3개를
   전부 없애고, 참가자·세션 상태를 건드리는 처리(입장, 재접속, 세션 시작 판단, 퇴장) 전부를 <strong>단일 스레드 큐 하나</strong>에서
-  순서대로 처리하는 구조로 다시 바꿨다.
+  순서대로 처리하는 구조로 다시 바꿨다. 지금 코드에 실제로 남아 있는 건 이 구조뿐이다.
 </p>
+
+<figure class="diagram-figure">
+  <div class="diagram-box">
+    <svg viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)" />
+        </marker>
+      </defs>
+
+      <rect x="0" y="0" width="150" height="42" rx="8" class="diagram-node-box" />
+      <text x="75" y="26" class="diagram-card-title">입장(connect)</text>
+
+      <rect x="0" y="58" width="150" height="42" rx="8" class="diagram-node-box" />
+      <text x="75" y="84" class="diagram-card-title">퇴장(disconnect)</text>
+
+      <rect x="0" y="116" width="150" height="42" rx="8" class="diagram-node-box" />
+      <text x="75" y="142" class="diagram-card-title">세션 종료(scheduler)</text>
+
+      <path d="M150,21 H190 V140" class="diagram-arrow" marker-end="url(#arrowhead4)" />
+      <path d="M150,79 H175 V140" class="diagram-arrow" marker-end="url(#arrowhead4)" />
+      <path d="M150,137 H190" class="diagram-arrow" marker-end="url(#arrowhead4)" />
+      <text x="160" y="112" class="diagram-edge-label" text-anchor="start" style="font-size:0.72rem">submit(task)</text>
+
+      <rect x="190" y="116" width="190" height="52" rx="10" class="diagram-node-box accent" />
+      <text x="285" y="140" class="diagram-node-text" style="font-size:0.9rem">단일 스레드 큐</text>
+      <text x="285" y="158" class="diagram-node-sub">한 번에 하나씩, FIFO로 처리</text>
+
+      <path d="M285,168 V212" class="diagram-arrow" marker-end="url(#arrowhead4)" />
+
+      <rect x="140" y="212" width="290" height="52" rx="10" class="diagram-node-box old" />
+      <text x="285" y="236" class="diagram-node-text" style="font-size:0.9rem">참가자 / 세션 상태(Map)</text>
+      <text x="285" y="254" class="diagram-node-sub">항상 큐 스레드 하나만 접근 → 락 불필요</text>
+    </svg>
+  </div>
+  <figcaption class="diagram-caption">지금 구조 — 입장·퇴장·세션 종료 모두 같은 큐에 작업을 넣고, 큐를 처리하는 스레드는 항상 하나뿐이다</figcaption>
+</figure>
+
 <p>
   이러면 애초에 "동시에 두 스레드가 같은 상태를 건드릴 수 있는가"라는 질문 자체가 사라진다. 처리하는 스레드가
   하나뿐이니 락으로 지킬 것도 없어지는 셈이다. 세션 A, B가 더 이상 병렬로 처리되지 않는다는 트레이드오프가 있지만,
