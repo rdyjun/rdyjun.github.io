@@ -188,7 +188,7 @@
   이 단계에서 고친 문제만 요약해서 남긴다: 참가자 조회~저장을 <code class="language-plaintext highlighter-rouge">ConcurrentHashMap#compute</code> 한 번으로
   묶어 원자성을 확보했고, 세션별 락이 있는데도 걸려 있던 인스턴스 전역 락을 제거해 무관한 세션끼리 기다리지 않게 했고,
   <code class="language-plaintext highlighter-rouge">socketId → memberId</code> 역인덱스를 추가해 O(n) 조회를 O(1)로 줄였다.
-  구체적인 실수 하나하나는 아래 <a href="#실수-축제">실수 축제</a>에 정리해뒀다.
+  구체적인 실수 하나하나는 아래 <a href="#실수-축제">🎪 실수 축제</a>에 정리해뒀다.
 </p>
 
 <h2 id="락-3개로-정리한-뒤의-중간-결론">
@@ -269,7 +269,7 @@
 </p>
 
 <h2 id="실수-축제">
-  <span class="me-2">실수 축제</span>
+  <span class="me-2">🎪 실수 축제</span>
   <a href="#실수-축제" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
 </h2>
 <p>부스트캠프에서부터 이어온 습관인데, 내가 한 실수를 스스로 정리해두면 다음에 똑같이 넘어지지 않는다고 믿는다. 그래서 이번에 겪은 실수들도 여기 남겨둔다.</p>
