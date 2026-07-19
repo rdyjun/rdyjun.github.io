@@ -6,6 +6,28 @@
     <title>단일 인스턴스 환경에서 Redis MQ를 걷어내고 로컬 락으로 전환하기 | rdyjun</title>
     <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="../article.css" />
+    <style>
+      .diagram-figure { margin: 1.5rem 0 2rem; }
+      .diagram-box {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem 1.1rem 1.2rem;
+        overflow-x: auto;
+      }
+      .diagram-box svg { display: block; width: 100%; height: auto; min-width: 560px; }
+      .diagram-row-label { font-family: var(--font-mono); font-size: 0.78rem; fill: var(--muted); }
+      .diagram-node-box { fill: var(--card); stroke: var(--border); stroke-width: 1; }
+      .diagram-node-box.accent { stroke: var(--accent); }
+      .diagram-node-text { font-size: 0.82rem; fill: var(--fg); font-weight: 600; text-anchor: middle; }
+      .diagram-edge-label { font-family: var(--font-mono); font-size: 0.7rem; fill: var(--muted); text-anchor: middle; }
+      .diagram-arrow { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+      figcaption.diagram-caption {
+        margin-top: 0.6rem;
+        font-size: 0.82rem;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
 
@@ -38,6 +60,69 @@
   이후 이 기능을 Java/Spring으로 다시 구현하면서, 그 대기열 구조를 걷어내고 다시 로컬 락(자바 <code class="language-plaintext highlighter-rouge">synchronized</code> / <code class="language-plaintext highlighter-rouge">Lock</code>)
   기반으로 되돌렸다. 이 글은 그 이유와, 그 과정에서 실제로 겪은 락 관련 문제들을 정리한 글이다.
 </p>
+
+<figure class="diagram-figure">
+  <div class="diagram-box">
+    <svg viewBox="0 0 760 250" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)" />
+        </marker>
+      </defs>
+
+      <text x="10" y="24" class="diagram-row-label">이전 · Redis MQ 기반</text>
+      <rect x="10" y="35" width="100" height="46" rx="6" class="diagram-node-box" />
+      <text x="60" y="63" class="diagram-node-text">클라이언트</text>
+
+      <path d="M110,58 H160" class="diagram-arrow" marker-end="url(#arrowhead)" />
+      <text x="135" y="50" class="diagram-edge-label">lPush</text>
+
+      <rect x="160" y="35" width="130" height="46" rx="6" class="diagram-node-box" />
+      <text x="225" y="63" class="diagram-node-text">Redis List</text>
+
+      <path d="M290,58 H340" class="diagram-arrow" marker-end="url(#arrowhead)" />
+      <text x="315" y="50" class="diagram-edge-label">publish</text>
+
+      <rect x="340" y="35" width="140" height="46" rx="6" class="diagram-node-box" />
+      <text x="410" y="57" class="diagram-node-text">Subscriber</text>
+      <text x="410" y="72" class="diagram-node-text" style="font-weight:400;font-size:0.7rem">(brPop 대기)</text>
+
+      <path d="M480,58 H530" class="diagram-arrow" marker-end="url(#arrowhead)" />
+
+      <rect x="530" y="35" width="100" height="46" rx="6" class="diagram-node-box" />
+      <text x="580" y="63" class="diagram-node-text">이벤트 처리</text>
+
+      <text x="10" y="107" class="diagram-edge-label" style="text-anchor:start">⇢ 매 이벤트마다 Redis 왕복 2회 이상, 큐 컨슈머 별도 관리 필요</text>
+
+      <line x1="0" y1="130" x2="760" y2="130" stroke="var(--border)" stroke-dasharray="4 4" />
+
+      <text x="10" y="154" class="diagram-row-label">이후 · 로컬 락 기반</text>
+      <rect x="10" y="165" width="100" height="46" rx="6" class="diagram-node-box" />
+      <text x="60" y="193" class="diagram-node-text">클라이언트</text>
+
+      <path d="M110,188 H160" class="diagram-arrow" marker-end="url(#arrowhead)" />
+      <text x="135" y="180" class="diagram-edge-label">요청</text>
+
+      <rect x="160" y="165" width="170" height="46" rx="6" class="diagram-node-box accent" />
+      <text x="245" y="187" class="diagram-node-text">세션/회원 락 획득</text>
+      <text x="245" y="202" class="diagram-node-text" style="font-weight:400;font-size:0.7rem">(같은 JVM 내부)</text>
+
+      <path d="M330,188 H380" class="diagram-arrow" marker-end="url(#arrowhead)" />
+
+      <rect x="380" y="165" width="190" height="46" rx="6" class="diagram-node-box accent" />
+      <text x="475" y="187" class="diagram-node-text">ConcurrentHashMap</text>
+      <text x="475" y="202" class="diagram-node-text" style="font-weight:400;font-size:0.7rem">compute / putIfAbsent</text>
+
+      <path d="M570,188 H620" class="diagram-arrow" marker-end="url(#arrowhead)" />
+
+      <rect x="620" y="165" width="100" height="46" rx="6" class="diagram-node-box" />
+      <text x="670" y="193" class="diagram-node-text">이벤트 처리</text>
+
+      <text x="10" y="237" class="diagram-edge-label" style="text-anchor:start">⇢ 네트워크 왕복 없음, 프로세스 메모리 안에서 원자적으로 처리</text>
+    </svg>
+  </div>
+  <figcaption class="diagram-caption">이전(Redis MQ) vs 이후(로컬 락) 입장/퇴장 이벤트 처리 흐름 비교</figcaption>
+</figure>
 
 <h2 id="mq-구조의-숨은-비용">
   <span class="me-2">MQ 구조의 숨은 비용</span>
@@ -73,11 +158,26 @@
   <strong>여러 프로세스가 공유 상태를 원격으로 조율해야 해서</strong> 생긴 문제였기 때문이다.
 </p>
 
-<h2 id="다시-락으로-옮기면서-만난-문제들">
-  <span class="me-2">다시 락으로 옮기면서 만난 문제들</span>
-  <a href="#다시-락으로-옮기면서-만난-문제들" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+<h2 id="결론">
+  <span class="me-2">결론</span>
+  <a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
 </h2>
-<p>구조를 되돌리는 과정에서, MQ와는 또 다른 종류의 실수들이 나왔다.</p>
+<p>
+  MQ는 여러 인스턴스, 여러 프로세스가 상태를 공유해야 하는 상황에서는 여전히 좋은 선택이다. 하지만 단일 인스턴스로만
+  운영되고 확장 계획도 없는 서비스에 MQ를 그대로 유지하는 건, 해결하지 않아도 될 문제(다중 프로세스 조율)를 위한
+  비용을 계속 지불하는 것이었다.
+</p>
+<p>
+  지금은 그 비용을 걷어내고, 락의 범위를 필요한 만큼만 좁히고, 조회-반영 사이의 공백을 원자적 연산으로 없애는 방향으로
+  구조를 다시 정리했다. 대기열이든 락이든, 결국 지금 서비스가 실제로 떠 있는 환경(인스턴스 몇 대, 트래픽 규모)에
+  맞는 도구를 쓰는 게 먼저라는 걸 다시 확인한 경험이었다.
+</p>
+
+<h2 id="실수-축제">
+  <span class="me-2">실수 축제</span>
+  <a href="#실수-축제" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>구조를 되돌리는 과정에서, MQ와는 또 다른 종류의 실수들이 나왔다. 기록 차원에서 남겨둔다.</p>
 
 <h3 id="락-맵-정리-누락">
   <span class="me-2">락 맵 정리 누락</span>
@@ -122,21 +222,6 @@
 <p>
   소켓 ID로 참가자를 찾는 로직이 매번 전체 참가자를 순회하고 있었다. 세션이 끝나 여러 명이 한꺼번에 접속을 끊을 때
   체감되는 지연이었다. <code class="language-plaintext highlighter-rouge">socketId -&gt; memberId</code> 역인덱스를 하나 추가해서 O(1) 조회로 바꿨다.
-</p>
-
-<h2 id="결론">
-  <span class="me-2">결론</span>
-  <a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
-</h2>
-<p>
-  MQ는 여러 인스턴스, 여러 프로세스가 상태를 공유해야 하는 상황에서는 여전히 좋은 선택이다. 하지만 단일 인스턴스로만
-  운영되고 확장 계획도 없는 서비스에 MQ를 그대로 유지하는 건, 해결하지 않아도 될 문제(다중 프로세스 조율)를 위한
-  비용을 계속 지불하는 것이었다.
-</p>
-<p>
-  지금은 그 비용을 걷어내고, 락의 범위를 필요한 만큼만 좁히고, 조회-반영 사이의 공백을 원자적 연산으로 없애는 방향으로
-  구조를 다시 정리했다. 대기열이든 락이든, 결국 지금 서비스가 실제로 떠 있는 환경(인스턴스 몇 대, 트래픽 규모)에
-  맞는 도구를 쓰는 게 먼저라는 걸 다시 확인한 경험이었다.
 </p>
           </div>
         </article>
