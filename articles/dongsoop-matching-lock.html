@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>단일 인스턴스 환경에서 Redis MQ를 걷어내고 로컬 락으로 전환하기 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+  </head>
+  <body>
+
+    <div class="mobile-bar"></div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar"></aside>
+
+      <main class="main-content">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2026-07-19</p>
+            <h1>단일 인스턴스 환경에서 Redis MQ를 걷어내고 로컬 락으로 전환하기</h1>
+          </header>
+          <div class="article-content">
+<h2 id="이전-글">
+  <span class="me-2">이전 글</span>
+  <a href="#이전-글" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  이전에는 <a href="dongsoop-matching-queue.html">실시간 매칭 구조 리팩터링: 낙관적 락에서 MQ로 전환하기까지</a>에서
+  다룬 것처럼, Node.js + Redis MQ로 입장/퇴장 이벤트를 큐에 넣고 순서대로 처리하는 구조를 썼다.
+  당시엔 동시 입장으로 세션 정원이 초과되거나 세션이 중복 생성되는 문제를 락(WATCH) 재시도로 풀려다가,
+  결국 이벤트를 한 줄로 세우는 대기열 구조로 정리했었다.
+</p>
+<p>
+  이후 이 기능을 Java/Spring으로 다시 구현하면서, 그 대기열 구조를 걷어내고 다시 로컬 락(자바 <code class="language-plaintext highlighter-rouge">synchronized</code> / <code class="language-plaintext highlighter-rouge">Lock</code>)
+  기반으로 되돌렸다. 이 글은 그 이유와, 그 과정에서 실제로 겪은 락 관련 문제들을 정리한 글이다.
+</p>
+
+<h2 id="mq-구조의-숨은-비용">
+  <span class="me-2">MQ 구조의 숨은 비용</span>
+  <a href="#mq-구조의-숨은-비용" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  Redis MQ 구조는 "여러 서버 인스턴스가 동시에 떠 있어도 이벤트 순서를 보장한다"는 장점이 있다.
+  그런데 실제 운영 환경을 다시 보니 이 서비스는 <strong>단일 인스턴스로만</strong> 떠 있고, 앞으로도 확장할 계획이 없었다.
+</p>
+<p>
+  단일 인스턴스라는 전제에서는 MQ가 해결해주는 문제(여러 프로세스 사이의 순서 보장, 상태 공유)가 애초에 발생하지 않는다.
+  입장/퇴장 이벤트 하나 처리할 때마다 Redis에 <code class="language-plaintext highlighter-rouge">lPush</code>/<code class="language-plaintext highlighter-rouge">brPop</code>으로 왕복하는 비용,
+  큐 컨슈머의 구독/차단 로직, signal 기반 제어 같은 복잡도를 계속 끌고 가는 게
+  <strong>필요 없는 네트워크 홉과 유지보수 비용만 남기는 선택</strong>이라고 판단했다.
+</p>
+
+<h2 id="같은-jvm-안에서는-락으로-충분하다">
+  <span class="me-2">같은 JVM 안에서는 락으로 충분하다</span>
+  <a href="#같은-jvm-안에서는-락으로-충분하다" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  MQ가 실제로 보장해주던 건 "동시에 들어온 이벤트를 한 줄로 세워서 순서대로, 그리고 원자적으로 처리한다"는 것이었다.
+  단일 인스턴스라면 이 두 가지는 자바의 <code class="language-plaintext highlighter-rouge">ConcurrentHashMap</code>과 명시적 락만으로도 충분히 만족시킬 수 있다.
+</p>
+<ul>
+  <li>세션 배정 시점의 원자성 → 전역 락(matching lock) 하나로 "포인터 확인 → 정원 판단 → 등록"을 하나의 임계구역으로 묶음</li>
+  <li>회원/세션 단위의 동시 접근 방지 → 키 단위로 나뉜 락(member lock, session lock)</li>
+  <li>맵 안에서의 조회-반영 원자성 → <code class="language-plaintext highlighter-rouge">ConcurrentHashMap#compute</code>, <code class="language-plaintext highlighter-rouge">putIfAbsent</code> 같은 원자적 연산</li>
+</ul>
+<p>
+  Redis WATCH 시절 겪었던 "감시할 키가 많아서 재시도가 잦다", "충돌 재시도는 순서를 보장하지 않는다" 같은 문제는
+  같은 프로세스 메모리 안에서 락을 쓰는 순간 아예 발생하지 않는 종류의 문제였다. 그 문제들 자체가
+  <strong>여러 프로세스가 공유 상태를 원격으로 조율해야 해서</strong> 생긴 문제였기 때문이다.
+</p>
+
+<h2 id="다시-락으로-옮기면서-만난-문제들">
+  <span class="me-2">다시 락으로 옮기면서 만난 문제들</span>
+  <a href="#다시-락으로-옮기면서-만난-문제들" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>구조를 되돌리는 과정에서, MQ와는 또 다른 종류의 실수들이 나왔다.</p>
+
+<h3 id="락-맵-정리-누락">
+  <span class="me-2">락 맵 정리 누락</span>
+  <a href="#락-맵-정리-누락" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h3>
+<p>
+  회원/세션별 락을 <code class="language-plaintext highlighter-rouge">Map&lt;Long, Lock&gt;</code>, <code class="language-plaintext highlighter-rouge">Map&lt;String, Lock&gt;</code>으로 관리했는데,
+  세션 종료 시 참가자·세션 데이터는 초기화하면서 이 락 맵을 비우는 코드가 빠져 있었다. 매칭 라운드가 반복될수록
+  락 맵이 계속 쌓이는 누수였다.
+</p>
+
+<h3 id="이중-락">
+  <span class="me-2">이미 락이 있는데 안쪽에서 또 잠금</span>
+  <a href="#이중-락" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h3>
+<p>
+  전역 락을 잡은 상태에서 호출하는 메서드에 <code class="language-plaintext highlighter-rouge">synchronized</code>가 또 걸려 있는 경우가 있었다.
+  바깥 락이 이미 원자성을 보장하고 있어서 안쪽 락은 실질적으로 하는 일이 없었고, 오히려 "이 메서드는 혼자서도 안전하다"는
+  잘못된 신호를 주고 있었다. 실제로는 내부 로직이 조회-반영으로 쪼개진 상태(check-then-act)라 바깥 락 없이 혼자 호출되면
+  레이스가 그대로 드러나는 상태였다.
+</p>
+<p>
+  이건 <code class="language-plaintext highlighter-rouge">get</code> 후 <code class="language-plaintext highlighter-rouge">put</code>하던 로직을
+  <code class="language-plaintext highlighter-rouge">ConcurrentHashMap#compute</code> 한 번으로 묶어서 조회와 반영 사이의 공백을 없애는 방식으로 정리했다.
+  공백이 없어지니 굳이 락을 겹쳐 걸 필요도 없어졌다.
+</p>
+
+<h3 id="무관한-대상끼리-줄서기">
+  <span class="me-2">서로 무관한 세션끼리 줄을 서게 만든 전역 락</span>
+  <a href="#무관한-대상끼리-줄서기" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h3>
+<p>
+  세션별로 락을 이미 나눠뒀는데, 그 안에서 다시 인스턴스 전역 <code class="language-plaintext highlighter-rouge">synchronized</code>를 건 메서드가 있었다.
+  세션 A와 세션 B는 서로 관계가 없는데도, 두 세션이 동시에 정원을 채우는 순간 전역 락 때문에 한 세션씩 순서를 기다리게 됐다.
+  세션 단위 락이 이미 필요한 원자성을 다 지켜주고 있었기 때문에, 이 전역 락은 그냥 지웠다.
+</p>
+
+<h3 id="on-스캔">
+  <span class="me-2">O(n) 스캔</span>
+  <a href="#on-스캔" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h3>
+<p>
+  소켓 ID로 참가자를 찾는 로직이 매번 전체 참가자를 순회하고 있었다. 세션이 끝나 여러 명이 한꺼번에 접속을 끊을 때
+  체감되는 지연이었다. <code class="language-plaintext highlighter-rouge">socketId -&gt; memberId</code> 역인덱스를 하나 추가해서 O(1) 조회로 바꿨다.
+</p>
+
+<h2 id="결론">
+  <span class="me-2">결론</span>
+  <a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  MQ는 여러 인스턴스, 여러 프로세스가 상태를 공유해야 하는 상황에서는 여전히 좋은 선택이다. 하지만 단일 인스턴스로만
+  운영되고 확장 계획도 없는 서비스에 MQ를 그대로 유지하는 건, 해결하지 않아도 될 문제(다중 프로세스 조율)를 위한
+  비용을 계속 지불하는 것이었다.
+</p>
+<p>
+  지금은 그 비용을 걷어내고, 락의 범위를 필요한 만큼만 좁히고, 조회-반영 사이의 공백을 원자적 연산으로 없애는 방향으로
+  구조를 다시 정리했다. 대기열이든 락이든, 결국 지금 서비스가 실제로 떠 있는 환경(인스턴스 몇 대, 트래픽 규모)에
+  맞는 도구를 쓰는 게 먼저라는 걸 다시 확인한 경험이었다.
+</p>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer></footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>
