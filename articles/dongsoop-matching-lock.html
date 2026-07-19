@@ -67,7 +67,9 @@
 </p>
 <p>
   이후 이 기능을 Java/Spring으로 다시 구현하면서, 그 대기열 구조를 걷어내고 다시 로컬 락(자바 <code class="language-plaintext highlighter-rouge">synchronized</code> / <code class="language-plaintext highlighter-rouge">Lock</code>)
-  기반으로 되돌렸다. 이 글은 그 이유와, 그 과정에서 실제로 겪은 락 관련 문제들을 정리한 글이다.
+  기반으로 되돌렸다. 그런데 락 3개로 정리한 뒤에도 비슷한 유형의 버그가 계속 나와서, 결국 그 락들도 전부 걷어내고
+  <strong>단일 스레드 큐 하나</strong>로 다시 바꿨다. 이 글은 MQ → 락 → 단일 큐로 이어진 두 번의 전환과, 그 과정에서
+  실제로 겪은 문제들을 정리한 글이다.
 </p>
 
 <figure class="diagram-figure">
@@ -96,23 +98,23 @@
 
       <line x1="0" y1="180" x2="360" y2="180" stroke="var(--border)" stroke-dasharray="4 4" />
 
-      <text x="0" y="204" class="diagram-row-label">이후 · 로컬 락</text>
+      <text x="0" y="204" class="diagram-row-label">최종 · 단일 큐(로컬)</text>
 
       <rect x="0" y="214" width="360" height="74" rx="12" class="diagram-outer" />
       <text x="14" y="230" class="diagram-node-sub" text-anchor="start">서버 프로세스(JVM) 안에서 전부 처리</text>
 
       <rect x="20" y="246" width="140" height="34" rx="7" class="diagram-node-box" />
-      <text x="90" y="268" class="diagram-node-text" style="font-size:0.9rem">락 획득</text>
+      <text x="90" y="268" class="diagram-node-text" style="font-size:0.9rem">큐에 적재</text>
 
       <path d="M160,263 H210" class="diagram-arrow" marker-end="url(#arrowhead)" />
 
       <rect x="210" y="246" width="140" height="34" rx="7" class="diagram-node-box" />
-      <text x="280" y="268" class="diagram-node-text" style="font-size:0.9rem">이벤트 처리</text>
+      <text x="280" y="268" class="diagram-node-text" style="font-size:0.9rem">단일 스레드가 순서대로 처리</text>
 
-      <text x="180" y="308" class="diagram-edge-label" text-anchor="middle">네트워크 왕복 없음 — 즉시 처리</text>
+      <text x="180" y="308" class="diagram-edge-label" text-anchor="middle">네트워크 왕복 없음 — 락도 없이 순서대로 처리</text>
     </svg>
   </div>
-  <figcaption class="diagram-caption">이전(Redis MQ) vs 이후(로컬 락) 입장/퇴장 이벤트 처리 흐름 비교</figcaption>
+  <figcaption class="diagram-caption">이전(Redis MQ) vs 최종(단일 큐) 입장/퇴장 이벤트 처리 흐름 비교 — 중간에 락 3개를 썼다가 다시 큐로 정리했다</figcaption>
 </figure>
 
 <h2 id="mq-구조의-숨은-비용">
@@ -131,12 +133,13 @@
 </p>
 
 <h2 id="같은-jvm-안에서는-락으로-충분하다">
-  <span class="me-2">같은 JVM 안에서는 락으로 충분하다</span>
+  <span class="me-2">첫 번째 시도 — 같은 JVM 안에서는 락으로 충분하다</span>
   <a href="#같은-jvm-안에서는-락으로-충분하다" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
 </h2>
 <p>
   MQ가 실제로 보장해주던 건 "동시에 들어온 이벤트를 한 줄로 세워서 순서대로, 그리고 원자적으로 처리한다"는 것이었다.
-  단일 인스턴스라면 이 두 가지는 자바의 <code class="language-plaintext highlighter-rouge">ConcurrentHashMap</code>과 명시적 락만으로도 충분히 만족시킬 수 있다.
+  단일 인스턴스라면 이 두 가지는 자바의 <code class="language-plaintext highlighter-rouge">ConcurrentHashMap</code>과 명시적 락만으로도 충분히 만족시킬 수 있다고
+  판단해서, 가장 먼저 락 3개로 구조를 정리했다. (다만 이 락 3개는 최종 구조가 아니다 — 뒤에서 다시 걷어낸다.)
 </p>
 <ul>
   <li>세션 배정 시점의 원자성 → 전역 락(matching lock) 하나로 "포인터 확인 → 정원 판단 → 등록"을 하나의 임계구역으로 묶음</li>
@@ -153,7 +156,7 @@
   <span class="me-2">무엇이, 어떻게 바뀌었나</span>
   <a href="#무엇이-어떻게-바뀌었나" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
 </h2>
-<p>실제로 쓴 락은 3개다. 각각 보호하는 대상이 다르다.</p>
+<p>이 첫 번째 시도에서 실제로 쓴 락은 3개다. 각각 보호하는 대상이 다르다.</p>
 <table>
   <thead>
     <tr><th>락</th><th>보호 대상</th><th>없으면 생기는 문제</th></tr>
@@ -332,24 +335,23 @@
   <figcaption class="diagram-caption">시나리오별 이전(점선) → 이후(강조 테두리)</figcaption>
 </figure>
 
-<h2 id="결론">
-  <span class="me-2">결론</span>
-  <a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+<h2 id="락-3개로-정리한-뒤의-중간-결론">
+  <span class="me-2">중간 결론 — MQ보다는 낫지만, 이게 끝은 아니었다</span>
+  <a href="#락-3개로-정리한-뒤의-중간-결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
 </h2>
 <p>
   MQ는 여러 인스턴스, 여러 프로세스가 상태를 공유해야 하는 상황에서는 여전히 좋은 선택이다. 하지만 단일 인스턴스로만
   운영되고 확장 계획도 없는 서비스에 MQ를 그대로 유지하는 건, 해결하지 않아도 될 문제(다중 프로세스 조율)를 위한
-  비용을 계속 지불하는 것이었다.
+  비용을 계속 지불하는 것이었다. 그래서 일단 그 비용을 걷어내고, 락의 범위를 필요한 만큼만 좁히고, 조회-반영 사이의
+  공백을 원자적 연산으로 없애는 방향으로 구조를 정리했다.
 </p>
 <p>
-  지금은 그 비용을 걷어내고, 락의 범위를 필요한 만큼만 좁히고, 조회-반영 사이의 공백을 원자적 연산으로 없애는 방향으로
-  구조를 다시 정리했다. 대기열이든 락이든, 결국 지금 서비스가 실제로 떠 있는 환경(인스턴스 몇 대, 트래픽 규모)에
-  맞는 도구를 쓰는 게 먼저라는 걸 다시 확인한 경험이었다.
+  여기서 끝났다면 좋았겠지만, 실제로는 이 락 3개짜리 구조도 최종 답이 아니었다.
 </p>
 
-<h2 id="추가로-락도-결국-걷어냄">
-  <span class="me-2">추가로: 락도 결국 걷어내고 단일 큐로 갔다</span>
-  <a href="#추가로-락도-결국-걷어냄" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+<h2 id="두-번째-전환-락에서-단일-큐로">
+  <span class="me-2">두 번째 전환 — 락 3개도 결국 걷어내고 단일 큐로</span>
+  <a href="#두-번째-전환-락에서-단일-큐로" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
 </h2>
 <p>
   위 내용대로 락 3개를 정리한 뒤에도, 코드를 다시 들여다볼 때마다 비슷한 유형의 버그가 계속 나왔다.
