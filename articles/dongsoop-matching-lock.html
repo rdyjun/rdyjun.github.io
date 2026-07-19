@@ -19,8 +19,12 @@
       .diagram-row-sub { font-size: 0.85rem; fill: var(--muted); }
       .diagram-node-box { fill: var(--card); stroke: var(--border); stroke-width: 1.5; }
       .diagram-node-box.accent { stroke: var(--accent); stroke-width: 2; }
+      .diagram-node-box.old { stroke-dasharray: 5 4; }
       .diagram-node-text { font-size: 1.05rem; fill: var(--fg); font-weight: 700; text-anchor: middle; }
       .diagram-node-sub { font-size: 0.8rem; fill: var(--muted); text-anchor: middle; }
+      .diagram-card-title { font-size: 0.82rem; fill: var(--fg); font-weight: 700; text-anchor: middle; }
+      .diagram-card-sub { font-size: 0.76rem; fill: var(--muted); text-anchor: middle; }
+      .diagram-scenario-label { font-size: 0.88rem; font-weight: 700; fill: var(--fg); }
       .diagram-edge-label { font-family: var(--font-mono); font-size: 0.85rem; fill: var(--muted); text-anchor: middle; }
       .diagram-arrow { stroke: var(--muted); stroke-width: 2; fill: none; }
       .diagram-network-zone { fill: var(--card); opacity: 0.5; stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 5 4; }
@@ -203,6 +207,59 @@
     </tr>
   </tbody>
 </table>
+
+<figure class="diagram-figure">
+  <div class="diagram-box">
+    <svg viewBox="0 0 360 376" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead2" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--muted)" />
+        </marker>
+      </defs>
+
+      <!-- 1 -->
+      <text x="0" y="18" class="diagram-scenario-label">① 같은 회원이 여러 기기로 동시 접속</text>
+      <rect x="0" y="26" width="160" height="62" rx="8" class="diagram-node-box old" />
+      <text x="80" y="51" class="diagram-card-title">조회 → 저장 분리</text>
+      <text x="80" y="70" class="diagram-card-sub">❌ 소켓 정보 덮어씀</text>
+      <path d="M160,57 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
+      <rect x="200" y="26" width="160" height="62" rx="8" class="diagram-node-box accent" />
+      <text x="280" y="51" class="diagram-card-title">compute() 원자 처리</text>
+      <text x="280" y="70" class="diagram-card-sub">✅ 절대 안 덮어씀</text>
+
+      <!-- 2 -->
+      <text x="0" y="112" class="diagram-scenario-label">② 세션 여러 개가 동시에 꽉 참</text>
+      <rect x="0" y="120" width="160" height="62" rx="8" class="diagram-node-box old" />
+      <text x="80" y="145" class="diagram-card-title">세션 락 + 전역 락 이중</text>
+      <text x="80" y="164" class="diagram-card-sub">❌ 무관한 세션도 대기</text>
+      <path d="M160,151 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
+      <rect x="200" y="120" width="160" height="62" rx="8" class="diagram-node-box accent" />
+      <text x="280" y="145" class="diagram-card-title">세션 락만 사용</text>
+      <text x="280" y="164" class="diagram-card-sub">✅ 세션끼리 병렬 처리</text>
+
+      <!-- 3 -->
+      <text x="0" y="206" class="diagram-scenario-label">③ 접속 끊긴 소켓 조회</text>
+      <rect x="0" y="214" width="160" height="62" rx="8" class="diagram-node-box old" />
+      <text x="80" y="239" class="diagram-card-title">참가자 전체 순회</text>
+      <text x="80" y="258" class="diagram-card-sub">❌ O(n)</text>
+      <path d="M160,245 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
+      <rect x="200" y="214" width="160" height="62" rx="8" class="diagram-node-box accent" />
+      <text x="280" y="239" class="diagram-card-title">socketId 역인덱스</text>
+      <text x="280" y="258" class="diagram-card-sub">✅ O(1)</text>
+
+      <!-- 4 -->
+      <text x="0" y="300" class="diagram-scenario-label">④ 매칭 라운드 반복</text>
+      <rect x="0" y="308" width="160" height="62" rx="8" class="diagram-node-box old" />
+      <text x="80" y="333" class="diagram-card-title">락 맵 정리 코드 없음</text>
+      <text x="80" y="352" class="diagram-card-sub">❌ 라운드마다 계속 누적</text>
+      <path d="M160,339 H200" class="diagram-arrow" marker-end="url(#arrowhead2)" />
+      <rect x="200" y="308" width="160" height="62" rx="8" class="diagram-node-box accent" />
+      <text x="280" y="333" class="diagram-card-title">종료 시 락 맵 clear()</text>
+      <text x="280" y="352" class="diagram-card-sub">✅ 라운드마다 리셋</text>
+    </svg>
+  </div>
+  <figcaption class="diagram-caption">시나리오별 이전(점선) → 이후(강조 테두리)</figcaption>
+</figure>
 
 <h2 id="결론">
   <span class="me-2">결론</span>
