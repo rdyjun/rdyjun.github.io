@@ -41,17 +41,18 @@ const projects = [
     url: 'https://github.com/boostcampwm-2024/web18-inear',
     extraLinks: [{ label: 'Notion', url: 'https://m.site.naver.com/1WNGQ' }],
     image: 'assets/projects/inear.png',
+    images: ['assets/projects/inear-home.png', 'assets/projects/inear-player.png'],
     icon: 'music',
     featured: true,
   },
   {
     id: 'movie-review',
-    name: 'web-assignment-movie-review',
+    name: 'Talk Film',
     desc: '영화 리뷰 서비스.',
     tag: 'Backend',
     lang: 'Java',
-    url: 'https://github.com/rdyjun/web-assignment-movie-review',
-    gradient: 'grad-orange',
+    url: 'https://github.com/rdyjun/talkfilm',
+    image: 'assets/projects/movie-review.gif',
     icon: 'film',
   },
   {
@@ -146,6 +147,8 @@ const ICONS = {
   qr: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h3v3h-3v-3zm5 0h3v3h-3v-3zm-5 5h3v3h-3v-3zm5 0h3v3h-3v-3z"/></svg>`,
   brain: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a4 4 0 0 0-4 4v.35A3.5 3.5 0 0 0 5.5 13 3.5 3.5 0 0 0 8 16.32V18a4 4 0 0 0 8 0v-1.68A3.5 3.5 0 0 0 18.5 13 3.5 3.5 0 0 0 16 6.35V6a4 4 0 0 0-4-4zm-1 5h2v10h-2V7z"/></svg>`,
   game: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 6h10a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5 3 3 0 0 1-2.4-1.2L13 15h-2l-1.6 1.8A3 3 0 0 1 7 18a5 5 0 0 1-5-5v-2a5 5 0 0 1 5-5zm-1 4v1H5v2h1v1h2v-1h1v-2H8v-1H6zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm2 3a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>`,
+  layers: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2 2 7l10 5 10-5-10-5zM2 12l10 5 10-5M2 17l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chevron: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`,
 };
 
 const ICON_LABELS = { github: 'GitHub', notion: 'Notion' };
@@ -192,9 +195,12 @@ function renderArticleGrid(elementId, limit) {
 // ── 프로젝트 카드 그리드 ────────────────────────────────────────
 function cardVisualHTML(p) {
   if (p.image) {
+    const count = p.images ? p.images.length : 1;
+    const badge = count > 1 ? `<span class="pcard-gallery-badge">${ICONS.layers} ${count}</span>` : '';
     return `
       <div class="pcard-visual ${p.gradient || 'grad-orange'}">
         <img src="${basePath()}${p.image}" alt="${p.name} 스크린샷" loading="lazy" />
+        ${badge}
       </div>`;
   }
   return `
@@ -204,7 +210,7 @@ function cardVisualHTML(p) {
 }
 
 function roleBadgeHTML(p) {
-  return `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '개인'}</span>`;
+  return `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '1인'}</span>`;
 }
 
 // compact: 부가 작업용 — 상단 비주얼 없이 텍스트만
@@ -237,7 +243,7 @@ function renderProjectGrid(elementId, { minor = false } = {}) {
   // 개수는 목록에서 직접 센다 (분류를 바꿔도 라벨이 틀어지지 않도록)
   if (minor) {
     const summary = grid.closest('details')?.querySelector('summary');
-    if (summary) summary.textContent = `그 외 학습·과제용 작업 ${list.length}개 더 보기`;
+    if (summary) summary.textContent = '그 외 학습·과제용 작업 더 보기';
   }
   grid.addEventListener('click', (e) => {
     const card = e.target.closest('.pcard');
@@ -251,11 +257,21 @@ function renderProjectGrid(elementId, { minor = false } = {}) {
 let lastFocused = null;
 
 function modalContentHTML(p) {
-  const visual = p.image
+  const visual = p.images
+    ? `<div class="modal-gallery">
+        <div class="modal-gallery-track">
+          ${p.images.map((src) => `<img src="${basePath()}${src}" alt="${p.name} 스크린샷" loading="lazy" draggable="false" />`).join('')}
+        </div>
+        ${p.images.length > 1 ? `
+        <button class="modal-gallery-nav modal-gallery-prev" type="button" aria-label="이전 이미지">${ICONS.chevron}</button>
+        <button class="modal-gallery-nav modal-gallery-next" type="button" aria-label="다음 이미지">${ICONS.chevron}</button>
+        <div class="modal-gallery-dots">${p.images.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>` : ''}
+      </div>`
+    : p.image
     ? `<div class="modal-visual ${p.gradient || 'grad-orange'}"><img src="${basePath()}${p.image}" alt="${p.name} 스크린샷" /></div>`
     : `<div class="modal-visual ${p.gradient || 'grad-purple'}"><span class="pcard-lang">${p.lang || ''}</span></div>`;
 
-  const role = `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '개인'}</span>`;
+  const role = `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '1인'}</span>`;
   const meta = p.featured
     ? `<span class="modal-context"><span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period} ${role}</span>`
     : `<span class="modal-context">${[p.lang, p.tag].filter(Boolean).join(' · ')} ${role}</span>`;
@@ -299,10 +315,25 @@ function modalContentHTML(p) {
     </div>`;
 }
 
+let currentProjectImages = [];
+let modalGalleryIndex = 0;
+
+function setModalGalleryIndex(index) {
+  const track = document.querySelector('#project-modal .modal-gallery-track');
+  if (!track || !track.children.length) return;
+  modalGalleryIndex = (index + track.children.length) % track.children.length;
+  track.style.transform = `translateX(-${modalGalleryIndex * 100}%)`;
+  document.querySelectorAll('#project-modal .modal-gallery-dots .dot').forEach((d, i) => {
+    d.classList.toggle('active', i === modalGalleryIndex);
+  });
+}
+
 function openModal(p) {
   const backdrop = document.getElementById('project-modal');
   if (!backdrop || !p) return;
   lastFocused = document.activeElement;
+  currentProjectImages = p.images || (p.image ? [p.image] : []);
+  modalGalleryIndex = 0;
   backdrop.innerHTML = modalContentHTML(p);
   backdrop.classList.add('open');
   document.body.classList.add('modal-open');
@@ -325,11 +356,134 @@ function closeModal() {
   lastFocused?.focus();
 }
 
+// ── 이미지 라이트박스 (확대 + 좌우 슬라이드) ─────────────────────
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function ensureLightbox() {
+  let backdrop = document.getElementById('lightbox-backdrop');
+  if (backdrop) return backdrop;
+
+  backdrop = document.createElement('div');
+  backdrop.id = 'lightbox-backdrop';
+  backdrop.className = 'lightbox-backdrop';
+  backdrop.innerHTML = `
+    <button class="lightbox-close" type="button" aria-label="닫기">✕</button>
+    <button class="lightbox-nav lightbox-prev" type="button" aria-label="이전 이미지">${ICONS.chevron}</button>
+    <img class="lightbox-img" src="" alt="" />
+    <button class="lightbox-nav lightbox-next" type="button" aria-label="다음 이미지">${ICONS.chevron}</button>`;
+  document.body.appendChild(backdrop);
+
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop || e.target.closest('.lightbox-close')) closeLightbox();
+    else if (e.target.closest('.lightbox-prev')) showLightbox(lightboxIndex - 1);
+    else if (e.target.closest('.lightbox-next')) showLightbox(lightboxIndex + 1);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!backdrop.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') showLightbox(lightboxIndex - 1);
+    if (e.key === 'ArrowRight') showLightbox(lightboxIndex + 1);
+  });
+  return backdrop;
+}
+
+function showLightbox(index) {
+  const backdrop = ensureLightbox();
+  lightboxIndex = (index + lightboxImages.length) % lightboxImages.length;
+  backdrop.querySelector('.lightbox-img').src = `${basePath()}${lightboxImages[lightboxIndex]}`;
+  const multi = lightboxImages.length > 1;
+  backdrop.querySelectorAll('.lightbox-nav').forEach((btn) => { btn.style.display = multi ? '' : 'none'; });
+}
+
+function openLightbox(images, startIndex) {
+  if (!images || !images.length) return;
+  lightboxImages = images;
+  const backdrop = ensureLightbox();
+  showLightbox(startIndex || 0);
+  backdrop.classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+function closeLightbox() {
+  const backdrop = document.getElementById('lightbox-backdrop');
+  if (!backdrop) return;
+  backdrop.classList.remove('open');
+  const modalBackdrop = document.getElementById('project-modal');
+  if (!modalBackdrop || !modalBackdrop.classList.contains('open')) {
+    document.body.classList.remove('modal-open');
+  }
+}
+
+// 모달 갤러리 드래그(마우스·터치 공용) 슬라이드
+let galleryDragTrack = null;
+let galleryDragStartX = 0;
+let galleryDragDeltaX = 0;
+let galleryDragWidth = 0;
+let galleryWasDragged = false;
+
+function initModalGalleryDrag(backdrop) {
+  backdrop.addEventListener('pointerdown', (e) => {
+    const track = e.target.closest('.modal-gallery-track');
+    if (!track || track.children.length < 2) return;
+    galleryDragTrack = track;
+    galleryDragStartX = e.clientX;
+    galleryDragDeltaX = 0;
+    galleryDragWidth = track.parentElement.offsetWidth;
+    galleryWasDragged = false;
+    track.style.transition = 'none';
+    track.setPointerCapture(e.pointerId);
+  });
+
+  backdrop.addEventListener('pointermove', (e) => {
+    if (!galleryDragTrack) return;
+    galleryDragDeltaX = e.clientX - galleryDragStartX;
+    const base = -modalGalleryIndex * galleryDragWidth;
+    galleryDragTrack.style.transform = `translateX(${base + galleryDragDeltaX}px)`;
+  });
+
+  const endDrag = () => {
+    if (!galleryDragTrack) return;
+    const track = galleryDragTrack;
+    galleryDragTrack = null;
+    track.style.transition = '';
+    // 실제로 의미 있게 움직였을 때만 드래그로 취급 — 클릭 시 손 떨림 정도의
+    // 미세한 이동까지 드래그로 오인해 클릭(확대)이 씹히는 걸 방지
+    galleryWasDragged = Math.abs(galleryDragDeltaX) > 10;
+    const threshold = galleryDragWidth * 0.18;
+    if (galleryDragDeltaX < -threshold) setModalGalleryIndex(modalGalleryIndex + 1);
+    else if (galleryDragDeltaX > threshold) setModalGalleryIndex(modalGalleryIndex - 1);
+    else setModalGalleryIndex(modalGalleryIndex);
+  };
+  backdrop.addEventListener('pointerup', endDrag);
+  backdrop.addEventListener('pointercancel', endDrag);
+}
+
 function initModal() {
   const backdrop = document.getElementById('project-modal');
   if (!backdrop) return;
+  initModalGalleryDrag(backdrop);
   backdrop.addEventListener('click', (e) => {
-    if (e.target === backdrop || e.target.closest('.modal-close')) closeModal();
+    if (galleryWasDragged) {
+      galleryWasDragged = false;
+      return;
+    }
+    if (e.target === backdrop || e.target.closest('.modal-close')) {
+      closeModal();
+      return;
+    }
+    if (e.target.closest('.modal-gallery-prev')) {
+      setModalGalleryIndex(modalGalleryIndex - 1);
+      return;
+    }
+    if (e.target.closest('.modal-gallery-next')) {
+      setModalGalleryIndex(modalGalleryIndex + 1);
+      return;
+    }
+    const img = e.target.closest('.modal-visual img, .modal-gallery-track img');
+    if (img) {
+      openLightbox(currentProjectImages, modalGalleryIndex);
+    }
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();

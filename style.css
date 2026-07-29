@@ -58,6 +58,7 @@ html {
   background: var(--bg);
   scroll-behavior: smooth;
   scrollbar-color: var(--muted2) var(--bg);
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -70,6 +71,8 @@ html {
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 body {
+  position: relative;
+  z-index: 0;
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
@@ -79,6 +82,28 @@ body {
   align-items: center;
   min-height: 100vh;
 }
+
+/* 다크 테마 상단 은은한 원형 그라데이션 글로우 */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(1400px, 170vw);
+  height: 1000px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 800px 680px at 50% 460px,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.05) 22%,
+    rgba(255, 255, 255, 0.02) 45%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+[data-theme="light"] body::before { display: none; }
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -288,18 +313,6 @@ section {
   position: relative;
   text-align: center;
 }
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -10%;
-  left: 15%;
-  width: 70%;
-  height: 120%;
-  background: radial-gradient(circle at 50% 40%, rgba(255, 106, 0, 0.13), transparent 62%);
-  pointer-events: none;
-  z-index: -1;
-}
-
 .hero-eyebrow {
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -422,7 +435,7 @@ section {
   flex-direction: column;
   gap: 0.3rem;
 }
-.cert-name { font-size: 1rem; font-weight: 600; color: var(--fg); }
+.cert-name { font-size: 1.15rem; font-weight: 700; color: var(--fg); }
 .cert-sub {
   font-size: 0.85rem;
   color: var(--muted);
@@ -471,8 +484,8 @@ section {
   min-width: 150px;
 }
 .cert-row-sub .cert-name {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--fg-secondary);
 }
 .cert-row-sub .cert-sub { font-size: 0.775rem; color: var(--muted2); }
@@ -527,9 +540,10 @@ section {
 .btn-primary:hover { opacity: 0.85; }
 .btn-ghost {
   border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--fg);
 }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
 
 .btn-icon {
   display: inline-flex;
@@ -790,7 +804,7 @@ section {
 .modal-close:hover { border-color: var(--accent); color: var(--accent); }
 
 .modal-visual {
-  aspect-ratio: 16 / 8;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -801,6 +815,7 @@ section {
   height: 100%;
   object-fit: cover;
   object-position: top center;
+  cursor: zoom-in;
 }
 .modal-visual .pcard-lang {
   font-family: var(--font-mono);
@@ -808,6 +823,143 @@ section {
   font-weight: 700;
   color: rgba(255, 255, 255, 0.92);
 }
+
+.modal-gallery {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.modal-gallery-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+.modal-gallery-track:active { cursor: grabbing; }
+.modal-gallery-track img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  cursor: zoom-in;
+}
+
+.modal-gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.modal-gallery-nav:hover { border-color: var(--accent); color: var(--accent); }
+.modal-gallery-nav svg { width: 16px; height: 16px; }
+.modal-gallery-prev { left: 0.75rem; }
+.modal-gallery-next { right: 0.75rem; transform: translateY(-50%) rotate(180deg); }
+
+.modal-gallery-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.4rem;
+}
+.modal-gallery-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.15s, width 0.15s;
+}
+.modal-gallery-dots .dot.active { background: #fff; width: 16px; }
+
+/* ─── 카드 썸네일 다중 이미지 배지 ─────────── */
+.pcard-gallery-badge {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.pcard-gallery-badge svg { width: 13px; height: 13px; }
+
+/* ─── 이미지 라이트박스 ─────────────────────── */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.lightbox-backdrop.open { opacity: 1; pointer-events: auto; }
+.lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.lightbox-close,
+.lightbox-nav {
+  position: fixed;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.lightbox-close:hover,
+.lightbox-nav:hover { border-color: var(--accent); color: var(--accent); }
+.lightbox-close {
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+}
+.lightbox-nav {
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  transform: translateY(-50%);
+}
+.lightbox-nav svg { width: 20px; height: 20px; }
+.lightbox-prev { left: 1.25rem; }
+.lightbox-next { right: 1.25rem; transform: translateY(-50%) rotate(180deg); }
 
 .modal-body { padding: 1.75rem; }
 
