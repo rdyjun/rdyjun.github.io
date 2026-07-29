@@ -9,133 +9,162 @@
   </head>
   <body>
 
-    <!-- 모바일 상단 바 -->
-    <div class="mobile-bar"></div>
+    <header class="site-header" id="site-header"></header>
 
-    <div class="layout">
+    <div class="page">
 
-      <!-- ── 사이드바 (네비게이션) ── -->
-      <aside class="sidebar" id="sidebar"></aside>
+      <!-- ── Hero ── -->
+      <section class="hero section-wide" id="top">
+        <p class="hero-eyebrow">Backend Developer</p>
+        <h1>
+          주성준
+          <span class="hero-en">SungJun Joo</span>
+        </h1>
+        <p class="hero-lead">
+          실시간 처리, 무중단 배포 등 운영·성능·확장성 중심의
+          백엔드 아키텍처를 설계하고 운영합니다.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#projects">프로젝트 보기</a>
+          <a class="btn btn-ghost" href="https://github.com/rdyjun" target="_blank" rel="noopener">
+            <svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <a class="btn btn-ghost" href="mailto:rdyjun00@gmail.com">
+            <svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5zm2.4.8L12 11.6l7.6-5.8H4.4zM20 8.1l-7.4 5.6a1 1 0 0 1-1.2 0L4 8.1V19h16V8.1z"/></svg>
+            Email
+          </a>
+        </div>
+      </section>
 
-      <!-- ── 메인 콘텐츠 ── -->
-      <main class="main-content">
+      <!-- About -->
+      <section id="about">
+        <h2 class="about-headline">
+          운영에서 마주친 문제를 <strong>구조로 바꿔</strong> 해결하는 백엔드 개발자입니다.
+        </h2>
+        <p class="about-body">
+          문제를 깊게 고민하고 스스로 해결책을 찾되, 필요할 때는 생산성을 위해 주저 없이 질문합니다.
+          다양한 관점을 가진 팀원들과 협력하며 더 나은 솔루션을 만들어가는 과정을 중요하게 생각합니다.
+        </p>
+        <ul class="skill-grid">
+          <li><span class="skill-label">Language</span><span>Java · TypeScript · Python</span></li>
+          <li><span class="skill-label">Framework</span><span>Spring Boot · Nest.js</span></li>
+          <li><span class="skill-label">Infra</span><span>Docker · Nginx · AWS · NCP · OCI</span></li>
+          <li><span class="skill-label">Database</span><span>PostgreSQL · MySQL · Redis</span></li>
+        </ul>
+      </section>
 
-        <!-- 01 About -->
-        <section id="about">
-          <h2 class="section-title"><span class="num">01</span>About</h2>
-          <p class="about-lead">
-            실시간 처리, 무중단 배포 등 <strong>운영·성능·확장성</strong> 중심의 백엔드 아키텍처 개선 경험을 보유하고 있습니다.
-          </p>
-          <p class="about-body">
-            문제를 깊게 고민하고 스스로 해결책을 찾되, 필요할 때는 생산성을 위해 주저 없이 질문합니다.
-            다양한 관점을 가진 팀원들과 협력하며 더 나은 솔루션을 만들어가는 과정을 중요하게 생각합니다.
-          </p>
-          <ul class="skill-grid">
-            <li><span class="skill-label">Language</span><span>Java · TypeScript · Python</span></li>
-            <li><span class="skill-label">Framework</span><span>Spring Boot · Nest.js</span></li>
-            <li><span class="skill-label">Infra</span><span>Docker · Nginx · AWS · NCP · OCI</span></li>
-            <li><span class="skill-label">Database</span><span>PostgreSQL · MySQL · Redis</span></li>
-          </ul>
-        </section>
+      <!-- History -->
+      <section id="history">
+        <h2 class="section-title">History</h2>
 
-        <!-- 02 History -->
-        <section id="history">
-          <h2 class="section-title"><span class="num">02</span>History</h2>
+        <div class="history-group">
+          <h3 class="history-group-title">경력</h3>
+          <article class="history-item">
+            <div class="hi-left">
+              <span class="hi-period">2026.03 ~</span>
+            </div>
+            <div class="hi-body">
+              <h4>주식회사 앤유코퍼레이션</h4>
+              <ul>
+                <li>AWS Step Functions + SAGA 패턴으로 결제 흐름 멱등성·동시성 보장</li>
+                <li>R2·SQS·Lambda 기반 비동기 영상 인코딩 파이프라인 구축</li>
+              </ul>
+            </div>
+          </article>
+        </div>
 
-          <div class="history-group">
-            <h3 class="history-group-title">경력</h3>
-            <article class="history-item">
-              <div class="hi-left">
-                <span class="hi-period">2026.03 ~</span>
-              </div>
-              <div class="hi-body">
-                <h4>주식회사 앤유코퍼레이션</h4>
-                <ul>
-                  <li>AWS Step Functions + SAGA 패턴으로 결제 흐름 멱등성·동시성 보장</li>
-                  <li>R2·SQS·Lambda 기반 비동기 영상 인코딩 파이프라인 구축</li>
-                </ul>
-              </div>
-            </article>
-          </div>
+        <div class="history-group">
+          <h3 class="history-group-title">교육</h3>
+          <article class="history-item">
+            <div class="hi-left">
+              <span class="hi-period">2024.06 – 12</span>
+            </div>
+            <div class="hi-body">
+              <h4>네이버 부스트캠프 9기</h4>
+              <ul>
+                <li>웹 프론트엔드·백엔드 미션 기반 구현, 페어프로그래밍</li>
+                <li>현직자 멘토링을 통한 아키텍처 설계·코드 품질 향상</li>
+                <li>팀 내 개발일지·트러블슈팅 문서화 시스템 구축</li>
+              </ul>
+            </div>
+          </article>
+        </div>
 
-          <div class="history-group">
-            <h3 class="history-group-title">교육</h3>
-            <article class="history-item">
-              <div class="hi-left">
-                <span class="hi-period">2024.06 – 12</span>
-              </div>
-              <div class="hi-body">
-                <h4>네이버 부스트캠프 9기</h4>
-                <ul>
-                  <li>웹 프론트엔드·백엔드 미션 기반 구현, 페어프로그래밍</li>
-                  <li>현직자 멘토링을 통한 아키텍처 설계·코드 품질 향상</li>
-                  <li>팀 내 개발일지·트러블슈팅 문서화 시스템 구축</li>
-                </ul>
-              </div>
-            </article>
-          </div>
+        <div class="history-group">
+          <h3 class="history-group-title">학력</h3>
+          <article class="history-item">
+            <div class="hi-left">
+              <span class="hi-period">2022 – 2026</span>
+            </div>
+            <div class="hi-body">
+              <h4>동양미래대학교 컴퓨터소프트웨어공학과</h4>
+              <ul>
+                <li>전문학사 조기졸업 2024.08 · GPA 4.46 / 4.5 · 성적우수 장학금 4회</li>
+                <li>전공심화 과정(야간) 졸업예정 · GPA 4.36 / 4.5 · 교내 스마트 프로젝트 경진대회 입상</li>
+              </ul>
+            </div>
+          </article>
+        </div>
 
-          <div class="history-group">
-            <h3 class="history-group-title">학력</h3>
-            <article class="history-item">
-              <div class="hi-left">
-                <span class="hi-period">2022 – 2026</span>
-              </div>
-              <div class="hi-body">
-                <h4>동양미래대학교 컴퓨터소프트웨어공학과</h4>
-                <ul>
-                  <li>전문학사 조기졸업 2024.08 · GPA 4.46 / 4.5 · 성적우수 장학금 4회</li>
-                  <li>전공심화 과정(야간) 졸업예정 · GPA 4.36 / 4.5 · 교내 스마트 프로젝트 경진대회 입상</li>
-                </ul>
-              </div>
-            </article>
-          </div>
-
-          <div class="history-group">
-            <h3 class="history-group-title">자격증</h3>
-            <div class="cert-row">
-              <div class="cert-item glass">
-                <p class="cert-name">정보처리기사</p>
-                <p class="cert-sub">한국산업인력공단 · 2025.12</p>
-              </div>
-              <div class="cert-item glass">
-                <p class="cert-name">PCCE Lv.4</p>
-                <p class="cert-sub">(주) 그렙 · 2025.06</p>
-              </div>
-              <div class="cert-item glass">
-                <p class="cert-name">SQLD</p>
-                <p class="cert-sub">한국데이터산업진흥원 · 2026.03</p>
-              </div>
+        <div class="history-group">
+          <h3 class="history-group-title">자격증</h3>
+          <div class="cert-row">
+            <div class="cert-item glass">
+              <p class="cert-name">정보처리기사</p>
+              <p class="cert-sub">한국산업인력공단 · 2025.12</p>
+            </div>
+            <div class="cert-item glass">
+              <p class="cert-name">PCCE Lv.4</p>
+              <p class="cert-sub">(주) 그렙 · 2025.06</p>
+            </div>
+            <div class="cert-item glass">
+              <p class="cert-name">SQLD</p>
+              <p class="cert-sub">한국데이터산업진흥원 · 2026.03</p>
             </div>
           </div>
-        </section>
 
-        <!-- 03 Projects -->
-        <section id="projects">
-          <div class="section-title-row">
-            <h2 class="section-title"><span class="num">03</span>Projects</h2>
-            <a class="more-link" href="project.html">전체보기 →</a>
-          </div>
+          <details class="cert-more">
+            <summary>비개발 자격증 2개 더 보기</summary>
+            <div class="cert-row cert-row-sub">
+              <div class="cert-item">
+                <p class="cert-name">웹디자인개발기능사</p>
+                <p class="cert-sub">2017.08</p>
+              </div>
+              <div class="cert-item">
+                <p class="cert-name">컴퓨터그래픽기능사</p>
+                <p class="cert-sub">2017.07</p>
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
 
-          <h3 class="sub-heading">대표 프로젝트</h3>
-          <div class="featured-grid" id="featured-grid"></div>
+      <!-- Projects -->
+      <section id="projects" class="section-wide">
+        <h2 class="section-title">Projects</h2>
+        <div class="project-grid" id="project-grid"></div>
 
-          <h3 class="sub-heading" style="margin-top:3rem;">그 외 작업들</h3>
-          <div class="project-grid" id="project-grid"></div>
-        </section>
+        <details class="group-more">
+          <summary>그 외 작업 더 보기</summary>
+          <div class="project-grid project-grid-sub" id="minor-grid"></div>
+        </details>
+      </section>
 
-        <!-- 04 Articles -->
-        <section id="articles">
-          <h2 class="section-title"><span class="num">04</span>Articles</h2>
-          <div class="blog-list" id="blog-preview"></div>
-          <a class="btn btn-ghost more-btn" href="article.html">더보기 →</a>
-        </section>
+      <!-- Articles -->
+      <section id="articles" class="section-wide">
+        <h2 class="section-title">Articles</h2>
+        <div class="article-grid" id="blog-preview"></div>
+        <a class="btn btn-ghost more-btn" href="article.html">더보기 →</a>
+      </section>
 
-      </main>
     </div>
 
     <footer></footer>
 
+    <div class="modal-backdrop" id="project-modal"></div>
+
+    <script src="articles-data.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

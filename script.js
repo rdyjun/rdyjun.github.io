@@ -1,6 +1,10 @@
-// ── 대표 프로젝트 ───────────────────────────────────────────────
-const featured = [
+// ── 프로젝트 ───────────────────────────────────────────────────
+// featured: 상세 모달에 highlights·기술스택·링크가 모두 노출되는 대표 프로젝트
+// image 가 없으면 gradient 클래스 + lang 라벨로 카드 상단을 채운다
+const projects = [
   {
+    id: 'dongsoop',
+    team: true,
     name: '동숲 (Dongsooop)',
     subtitle: '동양미래대학교 편의 앱 서비스',
     period: '2025.03 ~',
@@ -14,14 +18,20 @@ const featured = [
     tech: ['Spring Boot', 'JPA', 'PostgreSQL', 'Redis', 'Docker', 'Nginx', 'AWS', 'OCI'],
     siteUrl: 'https://dongsoop.site',
     url: 'https://github.com/dongsooop/backend',
+    image: 'assets/projects/dongsoop.png',
+    icon: 'server',
+    featured: true,
   },
   {
+    id: 'inear',
+    team: true,
     name: 'Inear',
     subtitle: '실시간 신규 앨범 스트리밍 & 소통 서비스',
     period: '2024.10 – 2024.12',
     context: '네이버 부스트캠프 9기',
     desc: '다중 인스턴스 기반 실시간 스트리밍 환경에서 부하·배포·동기화 문제를 해결하며 실시간 서비스 운영 기반을 구축.',
     highlights: [
+      'HLS 기반 음원 실시간 제공: 오디오를 .ts 세그먼트로 분할하고 m3u8 재생목록 제공 시 현재 재생 구간 이전 세그먼트를 제외해 전달',
       'Redis Adapter 도입으로 다중 인스턴스 소켓 동기화 문제 해결',
       'git diff 기반 배포 파이프라인 분리 → 배포 시간 37.5% 단축',
       'Docker 빌드·런타임 스테이지 분리 → 이미지 33% 경량화',
@@ -30,46 +40,94 @@ const featured = [
     siteUrl: 'https://inear.live',
     url: 'https://github.com/boostcampwm-2024/web18-inear',
     extraLinks: [{ label: 'Notion', url: 'https://m.site.naver.com/1WNGQ' }],
+    image: 'assets/projects/inear.png',
+    icon: 'music',
+    featured: true,
+  },
+  {
+    id: 'movie-review',
+    name: 'web-assignment-movie-review',
+    desc: '영화 리뷰 서비스.',
+    tag: 'Backend',
+    lang: 'Java',
+    url: 'https://github.com/rdyjun/web-assignment-movie-review',
+    gradient: 'grad-orange',
+    icon: 'film',
+  },
+  {
+    id: 'coding-test',
+    minor: true,
+    name: 'coding-test',
+    desc: '문제 해결 경험을 위한 코딩 테스트 기록.',
+    tag: 'Algorithm',
+    lang: 'Java',
+    url: 'https://github.com/rdyjun/coding-test',
+    gradient: 'grad-purple',
+    icon: 'code',
+  },
+  {
+    id: 'work-log',
+    minor: true,
+    name: 'college-work-log-writer',
+    desc: '대학 근로 일지 작성기.',
+    tag: 'Tool',
+    lang: 'JavaScript',
+    url: 'https://github.com/rdyjun/college-work-log-writer',
+    gradient: 'grad-yellow',
+    icon: 'file',
+  },
+  {
+    id: 'vue-web-asgm',
+    minor: true,
+    name: 'vue-web-asgm',
+    desc: 'Vue를 활용한 정적 웹사이트 프로젝트.',
+    tag: 'Frontend',
+    lang: 'Vue',
+    url: 'https://github.com/rdyjun/vue-web-asgm',
+    gradient: 'grad-green',
+    icon: 'layout',
+  },
+  {
+    id: 'attendance',
+    minor: true,
+    name: 'attendance_check',
+    desc: 'QR코드를 통한 출석체크 프로그램.',
+    tag: 'Tool',
+    lang: 'JavaScript',
+    url: 'https://github.com/rdyjun/attendance_check',
+    gradient: 'grad-teal',
+    icon: 'qr',
+  },
+  {
+    id: 'cnn-tutorial',
+    minor: true,
+    name: 'cnn-model-design-tutorial',
+    desc: 'CNN 모델 설계를 위한 튜토리얼.',
+    tag: 'ML',
+    lang: 'Jupyter',
+    url: 'https://github.com/rdyjun/cnn-model-design-tutorial',
+    gradient: 'grad-blue',
+    icon: 'brain',
+  },
+  {
+    id: 'pygame-spaceship',
+    minor: true,
+    name: 'pygame-spaceship',
+    desc: '파이게임을 활용한 우주선 게임.',
+    tag: 'Game',
+    lang: 'Python',
+    url: 'https://github.com/rdyjun/pygame-spaceship',
+    gradient: 'grad-pink',
+    icon: 'game',
   },
 ];
 
-// ── 그 외 프로젝트 ──────────────────────────────────────────────
-const projects = [
-  { name: 'web-assignment-movie-review', desc: '영화 리뷰 서비스.', tag: 'Backend', lang: 'Java', url: 'https://github.com/rdyjun/web-assignment-movie-review' },
-  { name: 'coding-test', desc: '문제 해결 경험을 위한 코딩 테스트 기록.', tag: 'Algorithm', lang: 'Java', url: 'https://github.com/rdyjun/coding-test' },
-  { name: 'college-work-log-writer', desc: '대학 근로 일지 작성기.', tag: 'Tool', lang: 'JavaScript', url: 'https://github.com/rdyjun/college-work-log-writer' },
-  { name: 'vue-web-asgm', desc: 'Vue를 활용한 정적 웹사이트 프로젝트.', tag: 'Frontend', lang: 'Vue', url: 'https://github.com/rdyjun/vue-web-asgm' },
-  { name: 'attendance_check', desc: 'QR코드를 통한 출석체크 프로그램.', tag: 'Tool', lang: 'JavaScript', url: 'https://github.com/rdyjun/attendance_check' },
-  { name: 'cnn-model-design-tutorial', desc: 'CNN 모델 설계를 위한 튜토리얼.', tag: 'ML', lang: 'Jupyter', url: 'https://github.com/rdyjun/cnn-model-design-tutorial' },
-  { name: 'pygame-spaceship', desc: '파이게임을 활용한 우주선 게임.', tag: 'Game', lang: 'Python', url: 'https://github.com/rdyjun/pygame-spaceship' },
-];
-
 // ── 블로그 글 ───────────────────────────────────────────────────
-const blogPosts = [
-  { title: '단일 인스턴스 환경에서 Redis MQ를 걷어내고 단일 큐로 전환하기', date: '2026-07-19', url: 'articles/dongsoop-matching-lock.html' },
-  { title: 'Spring Boot에서 카카오 소셜 로그인 적용', date: '2026-01-13', url: 'articles/oauth-spring-boot.html' },
-  { title: '[구버전] 실시간 매칭 구조 리팩터링: 낙관적 락에서 MQ로 전환하기까지', date: '2025-12-11', url: 'articles/dongsoop-matching-queue.html' },
-  { title: '개인 도메인으로 무료 메일 보내기', date: '2025-07-30', url: 'articles/email-smtp-by-domain.html' },
-  { title: 'QueryDSL 충돌', date: '2025-07-15', url: 'articles/querydsl-crash.html' },
-  { title: 'JPA와 복합키', date: '2025-03-28', url: 'articles/composite-key-by-jpa.html' },
-  { title: '싱글톤 클래스 관리: Bean vs Static 방식의 차이점', date: '2025-03-07', url: 'articles/singleton-static-bean.html' },
-  { title: 'return 할 때 await을 붙이면 어떻게 될까?', date: '2025-02-12', url: 'articles/await-promise.html' },
-  { title: '자바스크립트의 sort', date: '2025-01-26', url: 'articles/javascript-sort.html' },
-  { title: '다중 인스턴스 환경을 고려해서 소켓 통신 동기화', date: '2025-01-15', url: 'articles/redis-adapter.html' },
-  { title: '[네이버 부스트캠프] 웹·모바일 9기 멤버십 과정 최종 회고', date: '2024-12-27', url: 'articles/naver-bostcamp-membership.html' },
-  { title: '배포 시간 절반 단축을 위한 파이프라인 분리', date: '2024-12-13', url: 'articles/deploy-independent-pipeline.html' },
-  { title: '[Naver Cloud] Green Developers 후기', date: '2024-12-11', url: 'articles/green-developers-review.html' },
-  { title: '[Docker] 도커를 이용해서 배포 프로세스를 최적화하자', date: '2024-11-24', url: 'articles/boostcamp-docker-updated.html' },
-  { title: '[Mysql] NOT IN 문제', date: '2024-09-10', url: 'articles/sql-not-in.html' },
-  { title: '[node] 미들웨어가 뭘까?', date: '2024-09-08', url: 'articles/express-middleware.html' },
-  { title: '[네이버 부스트캠프] 웹·모바일 9기 챌린지 과정 최종 회고', date: '2024-08-11', url: 'articles/naver-boostcamp-challenge.html' },
-  { title: '[네이버 부스트캠프] 웹·모바일 9기 베이직 과정 회고', date: '2024-07-08', url: 'articles/naver-boostcamp-basic.html' },
-  { title: '[클라우드] 로드 밸런싱', date: '2024-06-16', url: 'articles/loadbalancing.html' },
-  { title: '[스프링 시큐리티] 기본 인증 방식', date: '2024-05-03', url: 'articles/spring-security-lecture.html' },
-  { title: '[알고리즘] 누적합 알고리즘', date: '2024-04-17', url: 'articles/algorithm-prefix-sum.html' },
-  { title: '[알고리즘] 플로이드 워셜 알고리즘', date: '2024-04-06', url: 'articles/algorithm-floyd-warshall.html' },
-  { title: '[알고리즘] 다익스트라 알고리즘', date: '2024-03-18', url: 'articles/algorithm-dijkstra.html' },
-];
+// blogPosts 는 articles-data.js 에서 온다 (scripts/generate-excerpts.mjs 가 생성).
+// 해당 스크립트를 불러오지 않는 페이지에서도 안전하도록 접근을 감싼다.
+function allPosts() {
+  return typeof blogPosts === 'undefined' ? [] : blogPosts;
+}
 
 // ── 아이콘 SVG ─────────────────────────────────────────────────
 const ICONS = {
@@ -77,158 +135,204 @@ const ICONS = {
   pin: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 2a1 1 0 0 1 .707.293l5 5A1 1 0 0 1 21 9h-1v1a5.002 5.002 0 0 1-4 4.9V17l2 2v2H6v-2l2-2v-3.1A5.002 5.002 0 0 1 4 10V9H3a1 1 0 0 1-.707-1.707l5-5A1 1 0 0 1 8 2h8zm-4 16.5L10.5 21h3L12 18.5zM15 4H9L5.414 7.586A3.006 3.006 0 0 0 8 10a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3 3.006 3.006 0 0 0 2.586-2.414L15 4z"/></svg>`,
   github: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>`,
   notion: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>`,
+
+  // 프로젝트 카드용
+  server: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 3h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 3v1h2V6H6zm-2 8h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zm2 3v1h2v-1H6z"/></svg>`,
+  music: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 3v12.5a3.5 3.5 0 1 1-2-3.163V6.415l-8 1.6v9.485a3.5 3.5 0 1 1-2-3.163V5.18l12-2.4z"/></svg>`,
+  film: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm3 2v2h2V5H6zm10 0v2h2V5h-2zM4 9v6h16V9H4zm2 10v-2h2v2H6zm10 0v-2h2v2h-2z"/></svg>`,
+  code: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.7 15.9 4.8 12l3.9-3.9a1 1 0 0 0-1.4-1.4l-4.6 4.6a1 1 0 0 0 0 1.4l4.6 4.6a1 1 0 0 0 1.4-1.4zm6.6 0 3.9-3.9-3.9-3.9a1 1 0 0 1 1.4-1.4l4.6 4.6a1 1 0 0 1 0 1.4l-4.6 4.6a1 1 0 0 1-1.4-1.4z"/></svg>`,
+  file: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>`,
+  layout: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm1 6v10h5V9H4zm7 0v10h9V9h-9z"/></svg>`,
+  qr: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h3v3h-3v-3zm5 0h3v3h-3v-3zm-5 5h3v3h-3v-3zm5 0h3v3h-3v-3z"/></svg>`,
+  brain: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a4 4 0 0 0-4 4v.35A3.5 3.5 0 0 0 5.5 13 3.5 3.5 0 0 0 8 16.32V18a4 4 0 0 0 8 0v-1.68A3.5 3.5 0 0 0 18.5 13 3.5 3.5 0 0 0 16 6.35V6a4 4 0 0 0-4-4zm-1 5h2v10h-2V7z"/></svg>`,
+  game: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 6h10a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5 3 3 0 0 1-2.4-1.2L13 15h-2l-1.6 1.8A3 3 0 0 1 7 18a5 5 0 0 1-5-5v-2a5 5 0 0 1 5-5zm-1 4v1H5v2h1v1h2v-1h1v-2H8v-1H6zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm2 3a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>`,
 };
 
 const ICON_LABELS = { github: 'GitHub', notion: 'Notion' };
 
-// ── 블로그 행 템플릿 ────────────────────────────────────────────
-function blogRowHTML(p) {
+// ── 경로 헬퍼 (articles/ 하위 페이지는 한 단계 위를 봐야 함) ────
+function pageMode() {
+  const path = location.pathname.replace(/\\/g, '/');
+  if (path.includes('/articles/')) return 'detail';
+  if (/article\.html$/.test(path)) return 'articles';
+  if (/project\.html$/.test(path)) return 'projects';
+  return 'index';
+}
+
+function basePath() {
+  return pageMode() === 'detail' ? '../' : '';
+}
+
+// ── 아티클 카드 템플릿 ──────────────────────────────────────────
+function articleCardHTML(p) {
+  const base = basePath();
+  const badge = p.badge ? `<span class="acard-badge">${p.badge}</span>` : '';
+  const excerpt = p.excerpt ? `<p class="acard-excerpt">${p.excerpt}</p>` : '';
   return `
-  <a class="blog-row reveal" href="${p.url}">
-    <span class="blog-date">${p.date.slice(0, 7)}</span>
-    <span class="blog-title">${p.title}</span>
-    <span class="blog-arrow">${ICONS.arrow}</span>
+  <a class="acard reveal" href="${base}${p.url}">
+    <div class="acard-meta">
+      <span class="acard-date">${p.date}</span>
+      ${badge}
+    </div>
+    <h3 class="acard-title">${p.title}</h3>
+    ${excerpt}
+    <span class="acard-more">읽기 <span class="acard-arrow">${ICONS.arrow}</span></span>
   </a>`;
 }
 
 // limit: 숫자면 해당 개수만, 생략하면 전체 렌더링
-function renderBlogList(elementId, limit) {
+function renderArticleGrid(elementId, limit) {
   const el = document.getElementById(elementId);
   if (!el) return;
-  const posts = limit ? blogPosts.slice(0, limit) : blogPosts;
-  el.innerHTML = posts.map(blogRowHTML).join('');
+  const posts = limit ? allPosts().slice(0, limit) : allPosts();
+  el.innerHTML = posts.map(articleCardHTML).join('');
   observeReveals();
 }
 
-// ── 렌더링: 대표 프로젝트 ───────────────────────────────────────
-function renderFeatured() {
-  const grid = document.getElementById('featured-grid');
-  if (!grid) return;
-  grid.innerHTML = featured.map((p) => {
-    const tech  = p.tech.map((t) => `<span class="tech-chip">${t}</span>`).join('');
-    const hl    = p.highlights.map((h) => `<li>${h}</li>`).join('');
-    const extra = (p.extraLinks || []).map((l) => {
-      const key  = l.label.toLowerCase();
-      const icon = ICONS[key];
-      const label = ICON_LABELS[key] || l.label;
-      return icon
-        ? `<a class="btn-icon" href="${l.url}" target="_blank" rel="noopener" aria-label="${label}">${icon}</a>`
-        : `<a class="extra-link" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`;
-    }).join('');
+// ── 프로젝트 카드 그리드 ────────────────────────────────────────
+function cardVisualHTML(p) {
+  if (p.image) {
     return `
-    <article class="featured-card glass reveal">
-      <div class="featured-head">
-        <div>
-          <span class="featured-context"><span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period}</span>
-          <h4>${p.name}</h4>
-          <p class="featured-subtitle">${p.subtitle}</p>
+      <div class="pcard-visual ${p.gradient || 'grad-orange'}">
+        <img src="${basePath()}${p.image}" alt="${p.name} 스크린샷" loading="lazy" />
+      </div>`;
+  }
+  return `
+      <div class="pcard-visual pcard-fallback ${p.gradient || 'grad-purple'}">
+        <span class="pcard-lang">${p.lang || ''}</span>
+      </div>`;
+}
+
+function roleBadgeHTML(p) {
+  return `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '개인'}</span>`;
+}
+
+// compact: 부가 작업용 — 상단 비주얼 없이 텍스트만
+function projectCardHTML(p, { compact = false } = {}) {
+  const chips = p.featured
+    ? p.tech.slice(0, 3).map((t) => `<span class="tech-chip">${t}</span>`).join('')
+    : [p.lang, p.tag].filter(Boolean).map((t) => `<span class="tech-chip tech-chip-muted">${t}</span>`).join('');
+
+  return `
+    <button class="pcard reveal${compact ? ' pcard-compact' : ''}" type="button" data-id="${p.id}" aria-haspopup="dialog">
+      ${compact ? '' : cardVisualHTML(p)}
+      <div class="pcard-body">
+        <div class="pcard-head">
+          <span class="pcard-icon">${ICONS[p.icon] || ICONS.code}</span>
+          <h3>${p.name}</h3>
+          ${roleBadgeHTML(p)}
         </div>
-        ${p.siteUrl ? `<a class="btn btn-primary" href="${p.siteUrl}" target="_blank" rel="noopener">사이트 방문 ↗</a>` : ''}
+        <p class="pcard-desc">${p.desc}</p>
+        <div class="pcard-tags">${chips}</div>
       </div>
-      <p class="featured-desc">${p.desc}</p>
-      <ul class="featured-highlights bullet-list">${hl}</ul>
-      <div class="tech-list">${tech}</div>
-      <div class="featured-actions">
-        <a class="btn-icon" href="${p.url}" target="_blank" rel="noopener" aria-label="GitHub">${ICONS.github}</a>
-        ${extra}
-      </div>
-    </article>`;
+    </button>`;
+}
+
+function renderProjectGrid(elementId, { minor = false } = {}) {
+  const grid = document.getElementById(elementId);
+  if (!grid) return;
+  const list = projects.filter((p) => Boolean(p.minor) === minor);
+  grid.innerHTML = list.map((p) => projectCardHTML(p, { compact: minor })).join('');
+
+  // 개수는 목록에서 직접 센다 (분류를 바꿔도 라벨이 틀어지지 않도록)
+  if (minor) {
+    const summary = grid.closest('details')?.querySelector('summary');
+    if (summary) summary.textContent = `그 외 학습·과제용 작업 ${list.length}개 더 보기`;
+  }
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.pcard');
+    if (!card) return;
+    openModal(projects.find((p) => p.id === card.dataset.id));
+  });
+  observeReveals();
+}
+
+// ── 프로젝트 상세 모달 ──────────────────────────────────────────
+let lastFocused = null;
+
+function modalContentHTML(p) {
+  const visual = p.image
+    ? `<div class="modal-visual ${p.gradient || 'grad-orange'}"><img src="${basePath()}${p.image}" alt="${p.name} 스크린샷" /></div>`
+    : `<div class="modal-visual ${p.gradient || 'grad-purple'}"><span class="pcard-lang">${p.lang || ''}</span></div>`;
+
+  const role = `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '개인'}</span>`;
+  const meta = p.featured
+    ? `<span class="modal-context"><span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period} ${role}</span>`
+    : `<span class="modal-context">${[p.lang, p.tag].filter(Boolean).join(' · ')} ${role}</span>`;
+
+  const subtitle = p.subtitle ? `<p class="modal-subtitle">${p.subtitle}</p>` : '';
+
+  const highlights = p.highlights
+    ? `<ul class="modal-highlights bullet-list">${p.highlights.map((h) => `<li>${h}</li>`).join('')}</ul>`
+    : '';
+
+  const tech = p.tech
+    ? `<div class="tech-list">${p.tech.map((t) => `<span class="tech-chip">${t}</span>`).join('')}</div>`
+    : '';
+
+  const extra = (p.extraLinks || []).map((l) => {
+    const key = l.label.toLowerCase();
+    const icon = ICONS[key];
+    const label = ICON_LABELS[key] || l.label;
+    return icon
+      ? `<a class="btn-icon" href="${l.url}" target="_blank" rel="noopener" aria-label="${label}">${icon}</a>`
+      : `<a class="extra-link" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`;
   }).join('');
-  observeReveals();
-}
 
-// ── 렌더링: 프로젝트 목록 페이지 (featured 스타일로 통합) ───────
-function renderProjectPage() {
-  const grid = document.getElementById('all-projects-grid');
-  if (!grid) return;
-
-  const featuredHTML = featured.map((p) => {
-    const tech  = p.tech.map((t) => `<span class="tech-chip">${t}</span>`).join('');
-    const hl    = p.highlights.map((h) => `<li>${h}</li>`).join('');
-    const extra = (p.extraLinks || []).map((l) => {
-      const key  = l.label.toLowerCase();
-      const icon = ICONS[key];
-      const label = ICON_LABELS[key] || l.label;
-      return icon
-        ? `<a class="btn-icon" href="${l.url}" target="_blank" rel="noopener" aria-label="${label}">${icon}</a>`
-        : `<a class="extra-link" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`;
-    }).join('');
-    return `
-    <article class="featured-card glass reveal">
-      <div class="featured-head">
-        <div>
-          <span class="featured-context"><span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period}</span>
-          <h4>${p.name}</h4>
-          <p class="featured-subtitle">${p.subtitle}</p>
-        </div>
-        ${p.siteUrl ? `<a class="btn btn-primary" href="${p.siteUrl}" target="_blank" rel="noopener">사이트 방문 ↗</a>` : ''}
-      </div>
-      <p class="featured-desc">${p.desc}</p>
-      <ul class="featured-highlights bullet-list">${hl}</ul>
-      <div class="tech-list">${tech}</div>
-      <div class="featured-actions">
-        <a class="btn-icon" href="${p.url}" target="_blank" rel="noopener" aria-label="GitHub">${ICONS.github}</a>
-        ${extra}
-      </div>
-    </article>`;
-  });
-
-  const regularHTML = projects.map((p) => {
-    const chips = [p.lang, p.tag].map((t) => `<span class="tech-chip">${t}</span>`).join('');
-    return `
-    <article class="featured-card glass reveal">
-      <div class="featured-head">
-        <div>
-          <h4>${p.name}</h4>
-        </div>
-      </div>
-      <p class="featured-desc">${p.desc}</p>
-      <div class="tech-list">${chips}</div>
-      <div class="featured-actions">
-        <a class="btn-icon" href="${p.url}" target="_blank" rel="noopener" aria-label="GitHub">${ICONS.github}</a>
-      </div>
-    </article>`;
-  });
-
-  grid.innerHTML = [...featuredHTML, ...regularHTML].join('');
-  observeReveals();
-}
-
-// ── 렌더링: 프로젝트 그리드 ────────────────────────────────────
-function renderProjects(filter = 'All', limit) {
-  const grid = document.getElementById('project-grid');
-  if (!grid) return;
-  const filtered = filter === 'All' ? projects : projects.filter((p) => p.tag === filter);
-  const list = limit ? filtered.slice(0, limit) : filtered;
-  grid.innerHTML = list.map((p) => `
-    <a class="project-card glass reveal" href="${p.url}" target="_blank" rel="noopener">
-      <div class="card-top">
+  return `
+    <div class="modal" role="dialog" aria-modal="true" aria-label="${p.name}">
+      <button class="modal-close" type="button" aria-label="닫기">✕</button>
+      ${visual}
+      <div class="modal-body">
+        ${meta}
         <h3>${p.name}</h3>
-        <span class="card-arrow">↗</span>
+        ${subtitle}
+        <p class="modal-desc">${p.desc}</p>
+        ${highlights}
+        ${tech}
+        <div class="modal-actions">
+          ${p.siteUrl ? `<a class="btn btn-primary" href="${p.siteUrl}" target="_blank" rel="noopener">사이트 방문 ↗</a>` : ''}
+          <a class="btn-icon" href="${p.url}" target="_blank" rel="noopener" aria-label="GitHub">${ICONS.github}</a>
+          ${extra}
+        </div>
       </div>
-      <p>${p.desc}</p>
-      <div class="card-meta">
-        <span class="lang-badge"><span class="lang-dot"></span>${p.lang}</span>
-        <span class="card-tag">${p.tag}</span>
-      </div>
-    </a>`
-  ).join('');
-  observeReveals();
+    </div>`;
 }
 
-function renderFilters() {
-  const container = document.getElementById('filters');
-  if (!container) return;
-  const tags = ['All', ...new Set(projects.map((p) => p.tag))];
-  container.innerHTML = tags.map((t, i) =>
-    `<button class="filter-btn${i === 0 ? ' active' : ''}" data-tag="${t}">${t}</button>`
-  ).join('');
-  container.addEventListener('click', (e) => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-    container.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderProjects(btn.dataset.tag);
+function openModal(p) {
+  const backdrop = document.getElementById('project-modal');
+  if (!backdrop || !p) return;
+  lastFocused = document.activeElement;
+  backdrop.innerHTML = modalContentHTML(p);
+  backdrop.classList.add('open');
+  document.body.classList.add('modal-open');
+  backdrop.querySelector('.modal-close')?.focus();
+}
+
+// #project-<id> 로 들어오면 해당 프로젝트를 바로 연다 (공유 링크용)
+function openModalFromHash() {
+  const match = /^#project-(.+)$/.exec(location.hash);
+  if (!match) return;
+  openModal(projects.find((p) => p.id === match[1]));
+}
+
+function closeModal() {
+  const backdrop = document.getElementById('project-modal');
+  if (!backdrop || !backdrop.classList.contains('open')) return;
+  backdrop.classList.remove('open');
+  document.body.classList.remove('modal-open');
+  backdrop.innerHTML = '';
+  lastFocused?.focus();
+}
+
+function initModal() {
+  const backdrop = document.getElementById('project-modal');
+  if (!backdrop) return;
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop || e.target.closest('.modal-close')) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
   });
 }
 
@@ -248,83 +352,69 @@ function observeReveals() {
   document.querySelectorAll('.reveal:not(.visible)').forEach((el) => io.observe(el));
 }
 
-// ── 사이드바 (공유 컴포넌트) ─────────────────────────────────────
-function sidebarHTML(mode) {
-  const base = mode === 'detail' ? '../' : '';
+// ── 상단 헤더 (공유 컴포넌트) ───────────────────────────────────
+function headerHTML(mode) {
+  const base = basePath();
   const idx = `${base}index.html`;
   const isIndex = mode === 'index';
 
-  const aboutHref    = isIndex ? '#about' : `${idx}#about`;
-  const historyHref  = isIndex ? '#history' : `${idx}#history`;
-  const projectsHref = isIndex ? '#projects' : mode === 'projects' ? `${base}project.html` : `${idx}#projects`;
-  const articlesHref = `${base}article.html`;
+  // 헤더에는 페이지 이동만 남긴다 (같은 문서 내 앵커는 넣지 않음)
+  const links = [
+    { name: 'projects', label: 'Projects', href: `${base}project.html` },
+    { name: 'articles', label: 'Articles', href: `${base}article.html` },
+  ];
 
-  const mainActive     = mode === 'index' || mode === 'projects';
-  const articlesActive = mode === 'articles' || mode === 'detail';
-  const projectsSubActive = mode === 'projects';
+  const activeName = mode === 'projects' ? 'projects'
+    : mode === 'articles' || mode === 'detail' ? 'articles'
+    : null;
 
-  const ds = (name) => (isIndex ? ` data-section="${name}"` : '');
+  const navHTML = links.map((l) => {
+    const active = l.name === activeName ? ' active' : '';
+    return `<a class="nav-link${active}" href="${l.href}">${l.label}</a>`;
+  }).join('');
 
   return `
-    <div class="sb-top">
-      <a class="sb-logo" href="${isIndex ? '#about' : idx}">rdyjun</a>
-      <p class="sb-name">SungJun Joo</p>
-      <p class="sb-role">Backend Developer</p>
-    </div>
-
-    <nav class="sb-nav">
-      <div class="sb-nav-group">
-        <a class="sb-navlink sb-navlink-main${mainActive ? ' active' : ''}" href="${aboutHref}"${ds('main')}>
-          <span class="nav-num">01</span>Main
-        </a>
-        <div class="sb-subnav">
-          <a class="sb-sublink${isIndex ? ' active' : ''}" href="${aboutHref}"${ds('about')}>About</a>
-          <a class="sb-sublink" href="${historyHref}"${ds('history')}>History</a>
-          <a class="sb-sublink${projectsSubActive ? ' active' : ''}" href="${projectsHref}"${ds('projects')}>Projects</a>
-        </div>
+    <div class="header-inner">
+      <a class="brand" href="${isIndex ? '#top' : idx}">rdyjun</a>
+      <nav class="site-nav" id="site-nav">${navHTML}</nav>
+      <div class="header-actions">
+        <a class="btn-icon" href="https://github.com/rdyjun" target="_blank" rel="noopener" aria-label="GitHub">${ICONS.github}</a>
+        <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
+          <span class="theme-icon">☀️</span>
+        </button>
+        <button class="nav-toggle" id="nav-toggle" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-      <a class="sb-navlink${articlesActive ? ' active' : ''}" href="${articlesHref}">
-        <span class="nav-num">02</span>Articles
-      </a>
-    </nav>
-
-    <div class="sb-links">
-      <a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a>
-      <a href="mailto:rdyjun00@gmail.com">Email ↗</a>
-      <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">
-        <span class="theme-icon">☀️</span>
-      </button>
     </div>`;
 }
 
-function pageMode() {
-  const path = location.pathname.replace(/\\/g, '/');
-  if (path.includes('/articles/')) return 'detail';
-  if (/article\.html$/.test(path)) return 'articles';
-  if (/project\.html$/.test(path)) return 'projects';
-  return 'index';
+function initHeader() {
+  const header = document.getElementById('site-header');
+  if (!header) return;
+  header.innerHTML = headerHTML(pageMode());
 }
 
-function initSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-  sidebar.innerHTML = sidebarHTML(pageMode());
+// ── 모바일 메뉴 ────────────────────────────────────────────────
+function closeNav() {
+  document.getElementById('site-nav')?.classList.remove('open');
+  const btn = document.getElementById('nav-toggle');
+  btn?.classList.remove('open');
+  btn?.setAttribute('aria-expanded', 'false');
 }
 
-// ── 모바일 상단 바 (공유 컴포넌트) ────────────────────────────────
-function mobileBarHTML(mode) {
-  const logoHref = mode === 'index' ? '#about' : mode === 'detail' ? '../index.html' : 'index.html';
-  return `
-    <a class="sb-logo" href="${logoHref}">rdyjun</a>
-    <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
-      <span></span><span></span><span></span>
-    </button>`;
-}
-
-function initMobileBar() {
-  const bar = document.querySelector('.mobile-bar');
-  if (!bar) return;
-  bar.innerHTML = mobileBarHTML(pageMode());
+function initNavToggle() {
+  const btn = document.getElementById('nav-toggle');
+  const nav = document.getElementById('site-nav');
+  if (!btn || !nav) return;
+  btn.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  nav.addEventListener('click', (e) => {
+    if (e.target.closest('a')) closeNav();
+  });
 }
 
 // ── 푸터 (공유 컴포넌트) ─────────────────────────────────────────
@@ -340,59 +430,17 @@ function initFooter() {
   footer.innerHTML = footerHTML();
 }
 
-// ── 사이드바 active 링크 ────────────────────────────────────────
-const MAIN_SUB_SECTIONS = ['about', 'history', 'projects'];
-
-function initActiveNav() {
-  const sections = document.querySelectorAll('section[id]');
-  const links    = document.querySelectorAll('.sb-navlink[data-section], .sb-sublink[data-section]');
-  const mainLink = document.querySelector('.sb-navlink-main');
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        links.forEach((l) => l.classList.remove('active'));
-        const active = document.querySelector(`[data-section="${entry.target.id}"]`);
-        if (active) active.classList.add('active');
-        if (mainLink) {
-          mainLink.classList.toggle('active', MAIN_SUB_SECTIONS.includes(entry.target.id));
-        }
-      }
-    });
-  }, { rootMargin: '-40% 0px -55% 0px' });
-  sections.forEach((s) => obs.observe(s));
-}
-
 // ── 앵커 스크롤 ────────────────────────────────────────────────
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
     a.addEventListener('click', (e) => {
-      const target = document.querySelector(a.getAttribute('href'));
+      const id = a.getAttribute('href');
+      const target = id === '#top' ? document.body : document.querySelector(id);
       if (!target) return;
       e.preventDefault();
-      closeSidebar();
-      target.scrollIntoView({ behavior: 'smooth' });
+      closeNav();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-  });
-}
-
-// ── 모바일 햄버거 ───────────────────────────────────────────────
-function closeSidebar() {
-  const sidebar   = document.getElementById('sidebar');
-  const hamburger = document.getElementById('hamburger');
-  sidebar?.classList.remove('open');
-  hamburger?.classList.remove('open');
-}
-
-function initHamburger() {
-  const btn     = document.getElementById('hamburger');
-  const sidebar = document.getElementById('sidebar');
-  if (!btn || !sidebar) return;
-  btn.addEventListener('click', () => {
-    btn.classList.toggle('open');
-    sidebar.classList.toggle('open');
-  });
-  document.addEventListener('click', (e) => {
-    if (!sidebar.contains(e.target) && !btn.contains(e.target)) closeSidebar();
   });
 }
 
@@ -423,20 +471,21 @@ function initThemeToggle() {
 
 // ── 초기화 ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  initMobileBar();
-  initSidebar();
+  initHeader();
   initFooter();
   initTheme();
   initThemeToggle();
-  if (document.getElementById('all-projects-grid')) {
-    renderProjectPage();
-  } else {
-    renderFeatured();
-    renderProjects('All', 3);
-  }
-  renderBlogList('blog-preview', 5);
-  renderBlogList('blog-list');
+  initNavToggle();
+
+  renderProjectGrid('project-grid');
+  renderProjectGrid('minor-grid', { minor: true });
+  initModal();
+  openModalFromHash();
+  window.addEventListener('hashchange', openModalFromHash);
+
+  renderArticleGrid('blog-preview', 6);
+  renderArticleGrid('blog-list');
+
   initSmoothScroll();
-  initActiveNav();
-  initHamburger();
+  observeReveals();
 });
