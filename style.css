@@ -708,6 +708,34 @@ section {
   background: var(--accent-dim);
 }
 
+/* 운영중 등 프로젝트 상태 배지 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.1);
+  border-radius: 4px;
+  padding: 0.05rem 0.45rem;
+  white-space: nowrap;
+}
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 rgba(74, 222, 128, 0.6);
+  animation: status-pulse 2s infinite;
+}
+@keyframes status-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); }
+  70% { box-shadow: 0 0 0 5px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
 /* 과제 프로젝트 — 상단 비주얼 없이, 배경도 빼서 비중을 낮춘다 */
 .project-grid-sub {
   padding-top: 1rem;
@@ -817,6 +845,9 @@ section {
   object-position: top center;
   cursor: zoom-in;
 }
+.modal-visual img.portrait {
+  object-fit: contain;
+}
 .modal-visual .pcard-lang {
   font-family: var(--font-mono);
   font-size: 2rem;
@@ -846,6 +877,9 @@ section {
   object-fit: cover;
   object-position: top center;
   cursor: zoom-in;
+}
+.modal-gallery-track img.portrait {
+  object-fit: contain;
 }
 
 .modal-gallery-nav {
@@ -966,9 +1000,13 @@ section {
 .modal-context {
   font-size: 0.8125rem;
   color: var(--accent);
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.35rem;
 }
+.modal-context-info { flex: 1; }
+.modal-context .pcard-role { margin-left: 0; }
 .modal-body h3 {
   font-size: 1.5rem;
   font-weight: 700;
@@ -997,10 +1035,14 @@ body.modal-open { overflow: hidden; }
 
 /* ─── Theme toggle ───────────────────────── */
 .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   background: none;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 0.3rem 0.55rem;
   cursor: pointer;
   font-size: 0.9rem;
   line-height: 1;

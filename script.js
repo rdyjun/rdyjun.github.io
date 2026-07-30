@@ -5,7 +5,8 @@ const projects = [
   {
     id: 'dongsoop',
     team: true,
-    name: '동숲 (Dongsooop)',
+    status: '운영중',
+    name: '동숲',
     subtitle: '동양미래대학교 편의 앱 서비스',
     period: '2025.03 ~',
     context: '대학 프로젝트',
@@ -19,6 +20,14 @@ const projects = [
     siteUrl: 'https://dongsoop.site',
     url: 'https://github.com/dongsooop/backend',
     image: 'assets/projects/dongsoop.png',
+    images: [
+      'assets/projects/dongsoop.png',
+      'assets/projects/dongsoop-alert.gif',
+      'assets/projects/dongsoop-timetable.gif',
+      'assets/projects/dongsoop-recruit.gif',
+      'assets/projects/dongsoop-market.gif',
+      'assets/projects/dongsoop-chatbot.gif',
+    ],
     icon: 'server',
     featured: true,
   },
@@ -213,6 +222,10 @@ function roleBadgeHTML(p) {
   return `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '1인'}</span>`;
 }
 
+function statusBadgeHTML(p) {
+  return p.status ? `<span class="status-badge"><span class="status-dot"></span>${p.status}</span>` : '';
+}
+
 // compact: 부가 작업용 — 상단 비주얼 없이 텍스트만
 function projectCardHTML(p, { compact = false } = {}) {
   const chips = p.featured
@@ -226,6 +239,7 @@ function projectCardHTML(p, { compact = false } = {}) {
         <div class="pcard-head">
           <span class="pcard-icon">${ICONS[p.icon] || ICONS.code}</span>
           <h3>${p.name}</h3>
+          ${statusBadgeHTML(p)}
           ${roleBadgeHTML(p)}
         </div>
         <p class="pcard-desc">${p.desc}</p>
@@ -272,9 +286,11 @@ function modalContentHTML(p) {
     : `<div class="modal-visual ${p.gradient || 'grad-purple'}"><span class="pcard-lang">${p.lang || ''}</span></div>`;
 
   const role = `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '1인'}</span>`;
-  const meta = p.featured
-    ? `<span class="modal-context"><span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period} ${role}</span>`
-    : `<span class="modal-context">${[p.lang, p.tag].filter(Boolean).join(' · ')} ${role}</span>`;
+  const status = statusBadgeHTML(p);
+  const metaInfo = p.featured
+    ? `<span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period} ${status}`
+    : `${[p.lang, p.tag].filter(Boolean).join(' · ')} ${status}`;
+  const meta = `<span class="modal-context"><span class="modal-context-info">${metaInfo}</span>${role}</span>`;
 
   const subtitle = p.subtitle ? `<p class="modal-subtitle">${p.subtitle}</p>` : '';
 
@@ -328,6 +344,18 @@ function setModalGalleryIndex(index) {
   });
 }
 
+// 세로로 긴 스크린샷(GIF 등)은 cover 로 꽉 채우면 대부분 잘려나가므로
+// 실제 비율을 확인해 세로형이면 contain 으로 전체가 보이게 전환한다
+function markImageOrientation(img) {
+  const check = () => {
+    if (img.naturalWidth && img.naturalHeight) {
+      img.classList.toggle('portrait', img.naturalHeight > img.naturalWidth);
+    }
+  };
+  if (img.complete) check();
+  else img.addEventListener('load', check, { once: true });
+}
+
 function openModal(p) {
   const backdrop = document.getElementById('project-modal');
   if (!backdrop || !p) return;
@@ -335,6 +363,7 @@ function openModal(p) {
   currentProjectImages = p.images || (p.image ? [p.image] : []);
   modalGalleryIndex = 0;
   backdrop.innerHTML = modalContentHTML(p);
+  backdrop.querySelectorAll('.modal-visual img, .modal-gallery-track img').forEach(markImageOrientation);
   backdrop.classList.add('open');
   document.body.classList.add('modal-open');
   backdrop.querySelector('.modal-close')?.focus();
