@@ -424,13 +424,15 @@ let galleryWasDragged = false;
 
 function initModalGalleryDrag(backdrop) {
   backdrop.addEventListener('pointerdown', (e) => {
+    // 갤러리가 아닌 단일 이미지(.modal-visual) 클릭 시에도 이전 드래그 상태가
+    // 남아 있으면 클릭(확대)이 씹히므로, 대상에 상관없이 항상 리셋한다
+    galleryWasDragged = false;
     const track = e.target.closest('.modal-gallery-track');
     if (!track || track.children.length < 2) return;
     galleryDragTrack = track;
     galleryDragStartX = e.clientX;
     galleryDragDeltaX = 0;
     galleryDragWidth = track.parentElement.offsetWidth;
-    galleryWasDragged = false;
     track.style.transition = 'none';
     track.setPointerCapture(e.pointerId);
   });
