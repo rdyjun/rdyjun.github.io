@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://rdyjun.github.io/</loc>
-    <lastmod>2026-07-30</lastmod>
+    <lastmod>2026-08-03</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://rdyjun.github.io/project.html</loc>
-    <lastmod>2026-07-29</lastmod>
+    <lastmod>2026-08-03</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -38,6 +38,11 @@
   <url>
     <loc>https://rdyjun.github.io/articles/boostcamp-docker-updated.html</loc>
     <lastmod>2026-07-29</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://rdyjun.github.io/articles/cloudflare-tunnel-contribution.html</loc>
+    <lastmod>2026-08-03</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
