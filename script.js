@@ -70,7 +70,7 @@ const projects = [
     tech: ['Spring Boot', 'WebSocket', 'Java', 'Docker', 'MCProtocolLib'],
     siteUrl: 'https://mineportal.kr',
     url: 'https://github.com/rdyjun/mineportal',
-    gradient: 'grad-blue',
+    image: 'assets/projects/mineportal.png',
     icon: 'layers',
     featured: true,
   },
