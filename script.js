@@ -71,6 +71,7 @@ const projects = [
     siteUrl: 'https://mineportal.kr',
     url: 'https://github.com/rdyjun/mineportal',
     image: 'assets/projects/mineportal.png',
+    images: ['assets/projects/mineportal.png', 'assets/projects/mineportal-play.png'],
     icon: 'layers',
     featured: true,
   },
