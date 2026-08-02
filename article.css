@@ -273,6 +273,68 @@
   font-weight: 600;
 }
 
+/* ── 이전/이후 글 내비게이션 ─────────────────────────────────── */
+.article-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  transition: border-color 0.15s;
+}
+
+.pager-link.next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.pager-link:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.pager-label {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.pager-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.4;
+  transition: color 0.15s;
+}
+
+.pager-link:hover .pager-title {
+  color: var(--accent);
+}
+
+.pager-link.empty {
+  visibility: hidden;
+}
+
+@media (max-width: 560px) {
+  .article-pager {
+    grid-template-columns: 1fr;
+  }
+  .pager-link.empty {
+    display: none;
+  }
+}
+
 /* Bootstrap 잔재 클래스 무력화 */
 .article-content .d-flex,
 .article-content .align-items-center,

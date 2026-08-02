@@ -55,10 +55,30 @@ const projects = [
     featured: true,
   },
   {
+    id: 'mineportal',
+    name: 'MinePortal',
+    subtitle: '브라우저 마인크래프트 채팅 뷰어 & 데스크톱 클라이언트',
+    period: '2026.08 ~',
+    context: '개인 프로젝트',
+    desc: '설치 없이 브라우저에서 마인크래프트 서버에 접속해 채팅을 보내고 받는 웹 서비스. IP 제한 서버를 위한 데스크톱 클라이언트와 Toss 미니앱까지 함께 제공.',
+    highlights: [
+      'MCProtocolLib으로 백엔드가 마인크래프트 프로토콜을 직접 처리해, 클라이언트 설치 없이 브라우저에서 서버 채팅을 릴레이(체험 모드)',
+      'Mojang player-certificates 엔드포인트로 RSA 키를 발급받아 채팅에 서명해, 시큐어 챗을 강제하는 서버에서도 정상 동작',
+      'IP 제한/화이트리스트 서버 대응을 위한 Java 데스크톱 클라이언트로 백엔드 릴레이를 우회해 PC에서 직접 연결',
+      'push 시 SSH로 프로덕션에 자동 배포되는 GitHub Actions 파이프라인 구성',
+    ],
+    tech: ['Spring Boot', 'WebSocket', 'Java', 'Docker', 'MCProtocolLib'],
+    siteUrl: 'https://mineportal.kr',
+    url: 'https://github.com/rdyjun/mineportal',
+    gradient: 'grad-blue',
+    icon: 'layers',
+    featured: true,
+  },
+  {
     id: 'movie-review',
     name: 'Talk Film',
     desc: '영화 리뷰 서비스.',
-    tag: 'Backend',
+    tag: ['Backend', 'JSP'],
     lang: 'Java',
     url: 'https://github.com/rdyjun/talkfilm',
     image: 'assets/projects/movie-review.gif',
@@ -201,6 +221,46 @@ function renderArticleGrid(elementId, limit) {
   observeReveals();
 }
 
+// ── 이전/이후 글 내비게이션 (아티클 상세 페이지) ─────────────────
+function pagerCellHTML(post, cls, label) {
+  if (!post) return `<span class="pager-link empty" aria-hidden="true"></span>`;
+  return `
+  <a class="pager-link ${cls}" href="${basePath()}${post.url}">
+    <span class="pager-label">${label}</span>
+    <span class="pager-title">${post.title}</span>
+  </a>`;
+}
+
+function renderArticlePager() {
+  const body = document.querySelector('.article-body');
+  if (!body || document.querySelector('.article-pager')) return;
+  const posts = allPosts(); // 날짜 내림차순 (최신이 첫 번째)
+  const file = decodeURIComponent(location.pathname).split('/').pop();
+  const idx = posts.findIndex((p) => p.url.split('/').pop() === file);
+  if (idx === -1) return;
+  const older = posts[idx + 1];
+  const newer = posts[idx - 1];
+  if (!older && !newer) return;
+  const nav = document.createElement('nav');
+  nav.className = 'article-pager';
+  nav.setAttribute('aria-label', '이전/이후 글');
+  nav.innerHTML = pagerCellHTML(older, 'prev', '← 이전 글') + pagerCellHTML(newer, 'next', '이후 글 →');
+  body.appendChild(nav);
+}
+
+function initArticlePager() {
+  if (pageMode() !== 'detail') return;
+  if (typeof blogPosts !== 'undefined') {
+    renderArticlePager();
+    return;
+  }
+  // 상세 페이지는 articles-data.js 를 직접 포함하지 않으므로 여기서 주입한다
+  const s = document.createElement('script');
+  s.src = `${basePath()}articles-data.js`;
+  s.onload = renderArticlePager;
+  document.head.appendChild(s);
+}
+
 // ── 프로젝트 카드 그리드 ────────────────────────────────────────
 function cardVisualHTML(p) {
   if (p.image) {
@@ -226,11 +286,16 @@ function statusBadgeHTML(p) {
   return p.status ? `<span class="status-badge"><span class="status-dot"></span>${p.status}</span>` : '';
 }
 
+// tag 는 문자열 또는 배열 둘 다 허용한다
+function tagList(p) {
+  return Array.isArray(p.tag) ? p.tag : [p.tag];
+}
+
 // compact: 부가 작업용 — 상단 비주얼 없이 텍스트만
 function projectCardHTML(p, { compact = false } = {}) {
   const chips = p.featured
     ? p.tech.slice(0, 3).map((t) => `<span class="tech-chip">${t}</span>`).join('')
-    : [p.lang, p.tag].filter(Boolean).map((t) => `<span class="tech-chip tech-chip-muted">${t}</span>`).join('');
+    : [p.lang, ...tagList(p)].filter(Boolean).map((t) => `<span class="tech-chip tech-chip-muted">${t}</span>`).join('');
 
   return `
     <button class="pcard reveal${compact ? ' pcard-compact' : ''}" type="button" data-id="${p.id}" aria-haspopup="dialog">
@@ -289,7 +354,7 @@ function modalContentHTML(p) {
   const status = statusBadgeHTML(p);
   const metaInfo = p.featured
     ? `<span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period} ${status}`
-    : `${[p.lang, p.tag].filter(Boolean).join(' · ')} ${status}`;
+    : `${[p.lang, ...tagList(p)].filter(Boolean).join(' · ')} ${status}`;
   const meta = `<span class="modal-context"><span class="modal-context-info">${metaInfo}</span>${role}</span>`;
 
   const subtitle = p.subtitle ? `<p class="modal-subtitle">${p.subtitle}</p>` : '';
@@ -670,6 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderArticleGrid('blog-preview', 6);
   renderArticleGrid('blog-list');
+  initArticlePager();
 
   initSmoothScroll();
   observeReveals();

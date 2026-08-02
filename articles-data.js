@@ -1,6 +1,12 @@
 // 이 파일은 scripts/generate-excerpts.mjs 가 생성합니다. 직접 수정하지 마세요.
 const blogPosts = [
   {
+    "title": "첫 오픈소스 기여",
+    "date": "2026-07-31",
+    "url": "articles/cloudflare-tunnel-contribution.html",
+    "excerpt": "오픈소스 기여는 오래전부터 해보고 싶었던 일 중 하나였다. 하지만 막상 시작하려고 하면 어느 저장소에서 무엇부터 해야 할지 감이 잡히지 않아 계속 미루고 있었다. 그러다 오픈소스 기여에 다시 관심이 생겨서, 평소에 직접 쓰고 있는 서비스의 저장소부터 찾아보기로 했다.…"
+  },
+  {
     "title": "단일 인스턴스 환경에서 Redis MQ를 걷어내고 단일 큐로 전환하기",
     "date": "2026-07-19",
     "url": "articles/dongsoop-matching-lock.html",

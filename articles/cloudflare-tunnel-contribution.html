@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>첫 오픈소스 기여 | rdyjun</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../article.css" />
+    <style>
+      .diagram-figure { margin: 1.5rem 0 2rem; }
+      .diagram-box {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.4rem 1.4rem 1.6rem;
+        overflow-x: auto;
+      }
+      figcaption.diagram-caption {
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+
+    <header class="site-header" id="site-header"></header>
+
+    <div class="page">
+      <main class="page-head">
+        <div class="article-nav">
+          <a href="../article.html" class="back-link">← Articles</a>
+        </div>
+        <article class="article-body">
+          <header class="article-header">
+            <p class="article-date">2026-07-31</p>
+            <h1>첫 오픈소스 기여</h1>
+          </header>
+          <div class="article-content">
+
+<blockquote>
+  <p>
+    참고<br />
+    <a href="https://github.com/STRRL/cloudflare-tunnel-ingress-controller/issues/291">https://github.com/STRRL/cloudflare-tunnel-ingress-controller/issues/291</a><br />
+    <a href="https://github.com/STRRL/cloudflare-tunnel-ingress-controller/pull/292">https://github.com/STRRL/cloudflare-tunnel-ingress-controller/pull/292</a>
+  </p>
+</blockquote>
+
+<p>
+  오픈소스 기여는 오래전부터 해보고 싶었던 일 중 하나였다.
+  하지만 막상 시작하려고 하면 어느 저장소에서 무엇부터 해야 할지 감이 잡히지 않아 계속 미루고 있었다.
+</p>
+<p>
+  그러다 오픈소스 기여에 다시 관심이 생겨서, 평소에 직접 쓰는 서비스와 관련된 저장소를 찾아보기로 했다.
+  실제로 쓰는 도구라면 코드를 읽을 때도, 이슈를 판단할 때도 훨씬 감이 잡힐 것 같았다.
+  그렇게 Spring, Cloudflare 등을 위주로 찾아보다가, 우연히 쿠버네티스에서 Cloudflare를 편리하게 연동할 수 있는 저장소인
+  <code class="language-plaintext highlighter-rouge">STRRL/cloudflare-tunnel-ingress-controller</code>를 발견했다.
+  쿠버네티스의 Ingress 리소스를 감지해 Cloudflare Tunnel로 자동 연결해주는 컨트롤러로,
+  서버에 인바운드 포트를 열지 않고도 클러스터 안의 서비스를 외부에 노출할 수 있게 해준다.
+  마침 이 저장소에 <code class="language-plaintext highlighter-rouge">good first issue</code> 라벨이 붙은 이슈가 올라와 있어서, 이번엔 미루지 않고 기여해보기로 했다.
+</p>
+<p>
+  이 글은 그 이슈를 발견한 순간부터 PR이 머지되기까지, 넉 달의 과정을 정리한 글이다.
+</p>
+
+<h2 id="이슈-291">
+  <span class="me-2">이슈 #291 — 설정 통합</span>
+  <a href="#이슈-291" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+
+<figure class="diagram-figure">
+  <div class="diagram-box">
+    <img src="../assets/articles/cloudflare-tunnel-issue-291.png" alt="GitHub 이슈 #291 'Use Viper for controller configuration loading' 화면. good first issue, good first vibe 라벨이 붙어 있다." style="width: 100%; height: auto; border-radius: 6px;" />
+  </div>
+  <figcaption class="diagram-caption">이슈 #291 — good first issue 라벨이 붙어 있었다</figcaption>
+</figure>
+
+<p>
+  이슈의 내용은 이랬다. 컨트롤러 설정 대부분이 Cobra CLI 플래그로만 열려 있었고,
+  환경 변수가 필요한 일부 값만 코드 곳곳에서 <code class="language-plaintext highlighter-rouge">os.Getenv</code>로 따로 읽고 있었다.
+  메인테이너가 <code class="language-plaintext highlighter-rouge">.env</code> 파일로 로컬 디버깅을 하다가 이 구조의 불편함을 느끼고 직접 올린 이슈였다.
+  새 플래그를 추가할 때마다 환경 변수 지원을 수동으로 이어줘야 하고, 잊어버리기 쉽다는 것이다.
+</p>
+<p>
+  제안은 Viper를 도입해 설정 로딩을 한 경로로 모으고,
+  CLI 플래그 &gt; 환경 변수 순의 우선순위를 명확히 하자는 것이었다.
+</p>
+
+<h2 id="참여-의사-남기기">
+  <span class="me-2">참여 의사 남기기 — 댓글과 작업</span>
+  <a href="#참여-의사-남기기" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  이슈가 올라오고 세 시간쯤 지나 이 이슈를 발견했다.
+  바로 댓글을 남기고 코드베이스를 파악해 구현을 시작했다.
+</p>
+<p>
+  구현은 Claude와 함께 진행했다.
+  변경이 필요한 범위를 함께 짚어보고, 작성한 코드에 대한 1차 리뷰도 맡겼다.
+  덕분에 큰 부담 없이 PR을 열 수 있었다.
+</p>
+<p>
+  몇 시간 뒤 메인테이너가 흔쾌히 승낙해줬다.
+</p>
+
+<h2 id="구현">
+  <span class="me-2">구현 — 플래그와 환경 변수를 한 경로로</span>
+  <a href="#구현" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  변경의 핵심은 세 가지였다.
+</p>
+<ol>
+  <li>Cobra의 <code class="language-plaintext highlighter-rouge">PersistentFlags</code> 전부를 <code class="language-plaintext highlighter-rouge">BindPFlags</code>로 viper에 바인딩</li>
+  <li><code class="language-plaintext highlighter-rouge">AutomaticEnv</code>를 켜고, 플래그 이름의 하이픈을 언더스코어로 치환하는 리플레이서 등록</li>
+  <li><code class="language-plaintext highlighter-rouge">RunE</code> 안에서 모든 설정 값을 viper로 읽어, 우선순위 결정을 한 곳으로 모으기</li>
+</ol>
+<div class="language-go highlighter-rouge">
+  <div class="highlight"><pre><code><span class="nx">viper</span><span class="p">.</span><span class="nf">AutomaticEnv</span><span class="p">()</span>
+<span class="nx">viper</span><span class="p">.</span><span class="nf">SetEnvKeyReplacer</span><span class="p">(</span><span class="nx">strings</span><span class="p">.</span><span class="nf">NewReplacer</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">))</span>
+<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">viper</span><span class="p">.</span><span class="nf">BindPFlags</span><span class="p">(</span><span class="nx">rootCommand</span><span class="p">.</span><span class="nf">PersistentFlags</span><span class="p">());</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s2">"failed to bind flags to viper: %v"</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+</div>
+<p>
+  위 설정으로 아래 두 방식이 완전히 동일하게 동작한다.
+</p>
+<div class="language-bash highlighter-rouge">
+  <div class="highlight"><pre><code><span class="nv">--cloudflare-api-token</span><span class="o">=</span><span class="nx">xxx</span>
+<span class="nv">CLOUDFLARE_API_TOKEN</span><span class="o">=</span><span class="nx">xxx</span></code></pre></div>
+</div>
+<p>
+  기존에 <code class="language-plaintext highlighter-rouge">controlled-cloudflared-connector.go</code>에서 직접 호출하던
+  <code class="language-plaintext highlighter-rouge">os.Getenv</code>도 모두 viper로 교체해서
+  설정을 읽는 경로를 하나로 만들었다.
+  이렇게 하면 로컬에서 <code class="language-plaintext highlighter-rouge">.env</code> 파일만으로 디버깅이 가능해지고,
+  새 플래그를 추가할 때 환경 변수 지원을 따로 이어줄 필요가 없어진다.
+</p>
+
+<h2 id="첫-리뷰">
+  <span class="me-2">첫 리뷰 — Gemini</span>
+  <a href="#첫-리뷰" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  PR을 열고 6분 뒤에 첫 리뷰가 달렸다. 사람이 아니라 Gemini Code Assist였다.
+  그것도 high 배지가 붙은 지적이었다.
+</p>
+<p>
+  요지는 이랬다. cobra가 초기화될 때 options 구조체에 디폴트 값을 세팅해두는데
+  (예: ingress class의 <code class="language-plaintext highlighter-rouge">"cloudflare-tunnel"</code>),
+  <code class="language-plaintext highlighter-rouge">RunE</code>에서 <code class="language-plaintext highlighter-rouge">viper.Get</code> 계열로 덮어쓰면
+  플래그도 환경 변수도 주어지지 않은 키는 빈 문자열이나 0이 되어 <strong>디폴트 값이 유실되는 버그</strong>라는 것이다.
+  <code class="language-plaintext highlighter-rouge">viper.SetDefault</code>를 쓰라는 제안까지 함께였다.
+</p>
+<p>
+  솔직히 처음 읽었을 때는 뜨끔했다.
+  <code class="language-plaintext highlighter-rouge">viper.GetString()</code>이 값이 없으면 빈 문자열을 반환하는 것은
+  사실이기 때문에, 충분히 그럴듯하게 들렸다.
+</p>
+
+<h3 id="디폴트-값-유실-여부">
+  <span class="me-2">디폴트 값 유실 여부</span>
+  <a href="#디폴트-값-유실-여부" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h3>
+<p>
+  지적을 그대로 수용하기 전에, Viper v1.20.1 소스의 <code class="language-plaintext highlighter-rouge">find()</code> 함수를 직접 열어봤다.
+  확인해보니 pflag를 조회하는 지점이 한 곳이 아니라 두 곳이었다.
+</p>
+<ol>
+  <li>플래그가 명시적으로 전달된 경우(<code class="language-plaintext highlighter-rouge">HasChanged() == true</code>)에만 값을 읽는 지점</li>
+  <li>값을 어디에서도 찾지 못했을 때, <code class="language-plaintext highlighter-rouge">Changed</code> 여부와 무관하게 pflag의 디폴트 값을 읽는 "last chance" 지점</li>
+</ol>
+<p>
+  소스 주석에도 이 의도가 그대로 적혀 있다.
+</p>
+<div class="language-go highlighter-rouge">
+  <div class="highlight"><pre><code><span class="c1">// last chance: if no value is found and a flag does exist for the key,</span>
+<span class="c1">// get the flag's default value even if the flag's value has not been set.</span></code></pre></div>
+</div>
+<p>
+  <code class="language-plaintext highlighter-rouge">GetString()</code>은 내부적으로 이 fallback이 켜진 경로로 조회하기 때문에,
+  <code class="language-plaintext highlighter-rouge">SetDefault</code>를 따로 호출하지 않아도
+  cobra 플래그에 걸어둔 디폴트는 그대로 보존된다는 것을 알 수 있었다.
+</p>
+
+<h3 id="네-가지-케이스-검증">
+  <span class="me-2">네 가지 케이스 검증</span>
+  <a href="#네-가지-케이스-검증" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h3>
+<p>
+  소스만 읽고 반박하기에는 부담스러워서, PR과 동일한 버전(cobra v1.10.2 + viper v1.20.1)으로
+  로컬에서 네 가지 케이스를 모두 확인했다.
+</p>
+<table>
+  <thead>
+    <tr><th>입력</th><th>결과</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>플래그 X, 환경 변수 X</td>
+      <td><code class="language-plaintext highlighter-rouge">"cloudflare-tunnel"</code> — 디폴트 보존</td>
+    </tr>
+    <tr>
+      <td>환경 변수만</td>
+      <td><code class="language-plaintext highlighter-rouge">"from-env"</code> — 환경 변수 반영</td>
+    </tr>
+    <tr>
+      <td>플래그만</td>
+      <td><code class="language-plaintext highlighter-rouge">"from-flag"</code> — 플래그 반영</td>
+    </tr>
+    <tr>
+      <td>둘 다</td>
+      <td><code class="language-plaintext highlighter-rouge">"from-flag"</code> — 플래그 우선</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  이 근거를 정리해 리뷰 스레드에 반박 코멘트를 남겼다.
+  혹시 내가 놓친 부분이 있다면 알려달라는 말도 덧붙였다.
+</p>
+<p>
+  얼마 뒤 메인테이너가 스레드에 답을 남겼다.
+  Gemini의 지적은 오탐이고 너무 성가시다며, 반박을 그대로 받아들였다.
+  그러고는 저장소에서 Gemini 리뷰를 아예 꺼버렸다.
+</p>
+<p>
+  high 배지가 붙었다고 해서 맞는 지적이 아니라는 것을 알 수 있었다.
+  만약 그대로 <code class="language-plaintext highlighter-rouge">SetDefault</code>를 추가했다면,
+  cobra와 viper 양쪽에 디폴트를 중복 관리하는 코드가 남을 뻔했다.
+</p>
+
+<h2 id="두-번째-리뷰">
+  <span class="me-2">두 번째 리뷰 — Codex, 반영</span>
+  <a href="#두-번째-리뷰" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  Gemini를 꺼버린 메인테이너는 대신 Codex에게 리뷰를 요청했다.
+  Codex의 지적은 결이 달랐다. <code class="language-plaintext highlighter-rouge">go.mod</code>에는 viper를 추가했는데
+  <code class="language-plaintext highlighter-rouge">go.sum</code>에 대응하는 체크섬 항목이 없어서,
+  <code class="language-plaintext highlighter-rouge">-mod=readonly</code> 환경에서는 빌드가 깨진다는 것이다.
+</p>
+<p>
+  확인해보니 명백한 내 실수였다. <code class="language-plaintext highlighter-rouge">go.sum</code> 변경분을
+  커밋에 포함하는 것을 빠뜨렸다. 바로 반영하고 답을 남겼다.
+</p>
+<p>
+  같은 AI 리뷰였지만 하나는 반박했고 하나는 수용했다.
+  <strong>판단 기준은 리뷰어가 사람이냐 AI냐가 아니라, 지적이 실제 코드와 맞느냐였다.</strong>
+</p>
+
+<h2 id="병합">
+  <span class="me-2">병합 — 기다리던 병합</span>
+  <a href="#병합" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  리뷰 대응이 끝나고 열흘쯤 지나도 소식이 없어서, 더 처리할 것이 있는지 정중하게 물었다.
+  메인테이너는 오늘 안에 확인해보겠다고 답했지만, 이후로 별다른 소식 없이 넉 달이 흘렀다.
+  오픈소스 메인테이너는 본업이 따로 있는 경우가 대부분이고, 저장소의 PR 목록을 보면
+  기다리는 사람이 나만 있는 것도 아니었기에, 재촉하지 않고 기다리기로 했다.
+</p>
+<p>
+  7월 20일, 드디어 병합됐다.
+  넉 달 사이 master의 배포 관련 코드가 리팩터링되어 내 브랜치와 충돌이 있었는데,
+  메인테이너가 직접 충돌을 해결하면서 내 viper 설정을 새 구조에 맞게 이식해줬다.
+  fork에서 온 PR은 e2e 워크플로가 저장소 secrets에 접근할 수 없어서,
+  유닛/통합 테스트가 통과한 것을 확인한 뒤 admin 권한으로 병합했다고 한다.
+  메인테이너는 기여에 감사하다는 말도 함께 남겼다.
+</p>
+
+<h2 id="결론">
+  <span class="me-2">결론</span>
+  <a href="#결론" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+</h2>
+<p>
+  결국 이번 기여에서 내가 작성한 코드는 수십 줄이었지만, 배운 것은 대부분 코드 밖에 있었다.
+</p>
+<ul>
+  <li>기여는 코드를 짜는 일보다 근거를 갖고 대화하는 일에 가까웠다. 반박이든 수용이든, 소스와 검증 결과를 근거로 말하면 대화가 된다.</li>
+  <li>AI 리뷰어가 기본이 된 시대에는 지적을 검증하는 능력이 더 중요해진 것 같다. high 배지에 눌려 그대로 수정했다면 필요 없는 코드만 늘어날 뻔했다.</li>
+  <li>머지까지의 시간도 기여의 일부였다. 기다림을 재촉으로 채우지 않은 것은 잘한 선택이었다고 생각한다.</li>
+</ul>
+<p>
+  이번에는 메인테이너가 만들어둔 good first issue에 참여한 것이었지만,
+  다음에는 직접 사용하면서 느낀 불편을 이슈로 제안하는 것부터 시작해볼 계획이다.
+</p>
+
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <footer></footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

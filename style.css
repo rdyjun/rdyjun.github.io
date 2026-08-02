@@ -83,8 +83,8 @@ body {
   min-height: 100vh;
 }
 
-/* 다크 테마 상단 은은한 원형 그라데이션 글로우 */
-body::before {
+/* 다크 테마 상단 은은한 원형 그라데이션 글로우 (홈 화면 전용) */
+body#home::before {
   content: '';
   position: absolute;
   top: 0;
@@ -218,8 +218,7 @@ h1, h2, h3, h4,
 }
 .site-nav a:hover,
 .site-nav a.active {
-  background: var(--accent-dim);
-  color: var(--accent);
+  color: #fff;
   text-decoration: none;
 }
 
@@ -475,6 +474,14 @@ section {
 .group-more[open] > summary::after { transform: rotate(180deg); }
 .cert-more > summary:hover,
 .group-more > summary:hover { color: var(--accent); }
+
+.section-divider {
+  width: 48px;
+  height: 1px;
+  margin: 1.5rem 0;
+  border: none;
+  background: var(--border);
+}
 
 .cert-row-sub { padding: 0.5rem 0 0; }
 .cert-row-sub .cert-item {
