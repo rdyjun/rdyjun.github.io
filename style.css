@@ -111,7 +111,6 @@ strong { color: var(--fg); font-weight: 600; }
 
 /* 한글은 어절 단위로 끊어야 단어 중간에서 줄이 갈리지 않는다 */
 h1, h2, h3, h4,
-.hero-lead,
 .about-body,
 .acard-excerpt,
 .pcard-desc {
@@ -276,7 +275,7 @@ h1, h2, h3, h4,
 }
 
 /* 히어로가 없는 페이지의 첫 블록 */
-.page-head { padding-top: 3.5rem; }
+.page-head { padding-top: 3.5rem; text-align: center; }
 
 section {
   padding-bottom: 5rem;
@@ -293,17 +292,6 @@ section {
   gap: 0.75rem;
   color: var(--fg);
 }
-/* 섹션 대신 "내가 어떤 사람인지" 한 줄로 말하는 헤드라인 */
-.about-headline {
-  font-size: clamp(1.5rem, 3.2vw, 2.125rem);
-  font-weight: 700;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-  max-width: 24ch;
-  margin: 0 auto 2rem;
-}
-.about-headline strong { color: var(--accent); font-weight: 700; }
-
 /* ─── Hero ───────────────────────────────── */
 .hero {
   width: 100%;
@@ -337,13 +325,6 @@ section {
   margin-top: 0.35rem;
 }
 
-.hero-lead {
-  font-size: clamp(1rem, 2vw, 1.1875rem);
-  color: var(--fg-secondary);
-  max-width: 46ch;
-  margin: 1.5rem auto 2.25rem;
-}
-
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -353,18 +334,13 @@ section {
 }
 
 /* ─── About ──────────────────────────────── */
-.about-lead {
-  font-size: 1.15rem;
-  color: var(--fg-secondary);
-  max-width: 58ch;
-  margin: 0 auto 1rem;
-}
 .about-body {
   color: var(--muted);
   max-width: 58ch;
   font-size: 1rem;
   margin: 0 auto 2rem;
 }
+.about-body strong { color: var(--accent); font-weight: 700; }
 
 .skill-grid {
   list-style: none;
