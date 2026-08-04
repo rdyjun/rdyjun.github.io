@@ -12,7 +12,7 @@ const projects = [
     context: '대학 프로젝트',
     desc: '교내 정보 자동화·실시간 기능·무중단 배포를 포함해 전체 백엔드 아키텍처를 직접 설계·운영한 앱 서비스.',
     highlights: [
-      'Socket.IO Nest.js로 MVP 구현 후 Spring Boot In-Memory·락·스케줄링 기반으로 재설계해 오버엔지니어링 제거',
+      'Socket.IO Nest.js로 MVP 구현 후 Spring Boot In-Memory 큐·스케줄링 기반으로 재설계해 오버엔지니어링 제거',
       'JPA 기반 회원락·Map 락으로 소셜 연동 동시성 처리',
       'Spring Security JWT·App Check Filter로 요청 신뢰도 검증',
     ],
@@ -67,7 +67,7 @@ const projects = [
       'IP 제한/화이트리스트 서버 대응을 위한 Java 데스크톱 클라이언트로 백엔드 릴레이를 우회해 PC에서 직접 연결',
       'push 시 SSH로 프로덕션에 자동 배포되는 GitHub Actions 파이프라인 구성',
     ],
-    tech: ['Spring Boot', 'WebSocket', 'Java', 'Docker', 'MCProtocolLib'],
+    tech: ['Vibe', 'Spring Boot', 'WebSocket', 'Java', 'Docker', 'MCProtocolLib'],
     siteUrl: 'https://mineportal.kr',
     url: 'https://github.com/rdyjun/mineportal',
     image: 'assets/projects/mineportal.png',
@@ -280,7 +280,7 @@ function cardVisualHTML(p) {
 }
 
 function roleBadgeHTML(p) {
-  return `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '1인'}</span>`;
+  return `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '개인'}</span>`;
 }
 
 function statusBadgeHTML(p) {
@@ -340,7 +340,7 @@ function modalContentHTML(p) {
   const visual = p.images
     ? `<div class="modal-gallery">
         <div class="modal-gallery-track">
-          ${p.images.map((src) => `<img src="${basePath()}${src}" alt="${p.name} 스크린샷" loading="lazy" draggable="false" />`).join('')}
+          ${p.images.map((src) => `<img src="${basePath()}${src}" alt="${p.name} 스크린샷" draggable="false" />`).join('')}
         </div>
         ${p.images.length > 1 ? `
         <button class="modal-gallery-nav modal-gallery-prev" type="button" aria-label="이전 이미지">${ICONS.chevron}</button>
@@ -351,7 +351,7 @@ function modalContentHTML(p) {
     ? `<div class="modal-visual ${p.gradient || 'grad-orange'}"><img src="${basePath()}${p.image}" alt="${p.name} 스크린샷" /></div>`
     : `<div class="modal-visual ${p.gradient || 'grad-purple'}"><span class="pcard-lang">${p.lang || ''}</span></div>`;
 
-  const role = `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '1인'}</span>`;
+  const role = `<span class="pcard-role${p.team ? ' is-team' : ''}">${p.team ? '팀' : '개인'}</span>`;
   const status = statusBadgeHTML(p);
   const metaInfo = p.featured
     ? `<span class="pin-icon">${ICONS.pin}</span>${p.context} · ${p.period} ${status}`
@@ -529,7 +529,10 @@ function initModalGalleryDrag(backdrop) {
     galleryDragDeltaX = 0;
     galleryDragWidth = track.parentElement.offsetWidth;
     track.style.transition = 'none';
-    track.setPointerCapture(e.pointerId);
+    // setPointerCapture는 쓰지 않는다 — backdrop이 position:fixed·inset:0로 화면 전체를
+    // 덮고 있어 캡처 없이도 pointermove/pointerup이 정상적으로 버블링되고, 캡처를 걸면
+    // 이후 click 이벤트의 target이 캡처한 track으로 재지정되어(브라우저 재타겟팅)
+    // img 클릭(확대)이 인식되지 않는 문제가 있었다
   });
 
   backdrop.addEventListener('pointermove', (e) => {
@@ -546,7 +549,8 @@ function initModalGalleryDrag(backdrop) {
     track.style.transition = '';
     // 실제로 의미 있게 움직였을 때만 드래그로 취급 — 클릭 시 손 떨림 정도의
     // 미세한 이동까지 드래그로 오인해 클릭(확대)이 씹히는 걸 방지
-    galleryWasDragged = Math.abs(galleryDragDeltaX) > 10;
+    // (트랙패드·마우스 클릭은 실제로 20px 안팎까지 흔들리는 경우가 흔해 임계값을 넉넉히 잡는다)
+    galleryWasDragged = Math.abs(galleryDragDeltaX) > 24;
     const threshold = galleryDragWidth * 0.18;
     if (galleryDragDeltaX < -threshold) setModalGalleryIndex(modalGalleryIndex + 1);
     else if (galleryDragDeltaX > threshold) setModalGalleryIndex(modalGalleryIndex - 1);

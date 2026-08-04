@@ -275,7 +275,8 @@ h1, h2, h3, h4,
 }
 
 /* 히어로가 없는 페이지의 첫 블록 */
-.page-head { padding-top: 3.5rem; text-align: center; }
+.page-head { padding-top: 3.5rem; }
+.page-head-center { text-align: center; }
 
 section {
   padding-bottom: 5rem;
@@ -602,7 +603,7 @@ section {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 1.25rem 1.25rem 0;
+  padding: 0.5rem 0.5rem 0;
 }
 .pcard-visual img {
   width: 100%;
@@ -900,6 +901,7 @@ section {
   height: 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
   transition: background 0.15s, width 0.15s;
 }
 .modal-gallery-dots .dot.active { background: #fff; width: 16px; }
@@ -940,8 +942,10 @@ section {
 }
 .lightbox-backdrop.open { opacity: 1; pointer-events: auto; }
 .lightbox-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 80vw;
+  height: 80vh;
+  max-width: 80vw;
+  max-height: 80vh;
   object-fit: contain;
   border-radius: 8px;
 }
