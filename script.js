@@ -685,6 +685,74 @@ function initFooter() {
   footer.innerHTML = footerHTML();
 }
 
+// ── 아티클 목차 (우측 고정 사이드바) ─────────────────────────────
+function tocLinkHTML(h) {
+  const label = h.querySelector('.me-2')?.textContent ?? h.textContent;
+  const level = h.tagName.toLowerCase();
+  return `<a href="#${h.id}" class="toc-link toc-${level}">${label}</a>`;
+}
+
+function renderArticleToc() {
+  if (pageMode() !== 'detail') return;
+  if (document.querySelector('.article-toc')) return;
+
+  const headings = Array.from(document.querySelectorAll('.article-content h2, .article-content h3')).filter(
+    (h) => h.id
+  );
+  if (headings.length < 2) return;
+
+  const aside = document.createElement('aside');
+  aside.className = 'article-toc';
+  aside.setAttribute('aria-label', '이 글의 목차');
+  aside.innerHTML = '<p class="article-toc-title">목차</p>';
+
+  const nav = document.createElement('nav');
+  let currentChildren = null;
+
+  headings.forEach((h) => {
+    if (h.tagName === 'H2') {
+      const group = document.createElement('div');
+      group.className = 'toc-group';
+      group.innerHTML = tocLinkHTML(h);
+      const children = document.createElement('div');
+      children.className = 'toc-children';
+      group.appendChild(children);
+      nav.appendChild(group);
+      currentChildren = children;
+    } else if (currentChildren) {
+      currentChildren.insertAdjacentHTML('beforeend', tocLinkHTML(h));
+    }
+  });
+
+  aside.appendChild(nav);
+  document.body.appendChild(aside);
+
+  const setActive = (id) => {
+    aside.querySelectorAll('a.active').forEach((a) => a.classList.remove('active'));
+    aside.querySelectorAll('.toc-group.open').forEach((g) => g.classList.remove('open'));
+    const link = aside.querySelector(`a[href="#${CSS.escape(id)}"]`);
+    if (!link) return;
+    link.classList.add('active');
+    link.closest('.toc-group')?.classList.add('open');
+  };
+
+  aside.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => setActive(a.getAttribute('href').slice(1)));
+  });
+
+  const headerOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 60;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.filter((e) => e.isIntersecting);
+      if (visible.length === 0) return;
+      const top = visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      setActive(top.target.id);
+    },
+    { rootMargin: `-${headerOffset + 16}px 0px -70% 0px`, threshold: 0 }
+  );
+  headings.forEach((h) => observer.observe(h));
+}
+
 // ── 앵커 스크롤 ────────────────────────────────────────────────
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
@@ -741,6 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderArticleGrid('blog-preview', 6);
   renderArticleGrid('blog-list');
   initArticlePager();
+  renderArticleToc();
 
   initSmoothScroll();
   observeReveals();

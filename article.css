@@ -19,6 +19,61 @@
   max-width: 780px;
 }
 
+/* ── 우측 목차(TOC) — article-body(780px) 옆에 자리가 나는 넓은 화면에서만 ── */
+.article-toc { display: none; }
+
+@media (min-width: 1320px) {
+  .article-toc {
+    display: block;
+    position: fixed;
+    top: calc(var(--header-h) + 2rem);
+    left: calc(50% + 410px);
+    width: 220px;
+    max-height: calc(100vh - var(--header-h) - 4rem);
+    overflow-y: auto;
+  }
+}
+
+.article-toc-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.toc-group { margin-bottom: 0.15rem; }
+
+.toc-link {
+  display: block;
+  padding: 0.35rem 0 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--muted);
+  border-left: 2px solid var(--border);
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+.toc-link:hover { color: var(--fg); }
+.toc-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.toc-children {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.toc-group.open .toc-children { max-height: 400px; }
+
+.toc-children .toc-link.toc-h3 {
+  padding-left: 1.4rem;
+  font-size: 0.8rem;
+}
+
 .article-header {
   margin-bottom: 2.5rem;
   padding-bottom: 1.5rem;
@@ -177,6 +232,18 @@
   font-size: inherit;
 }
 
+/* articles-src/*.md 빌드 파이프라인이 highlight.js 로 생성하는 코드블록엔
+   .highlight 래퍼 div가 없어서 배경을 pre 자체에 직접 준다 */
+.article-content pre:has(> code.hljs) {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 1.25rem 0;
+}
+[data-theme="light"] .article-content pre:has(> code.hljs) {
+  background: #1e1e1e;
+}
+
 /* ── 문법 강조 (GitHub Dark 코드 테마 색상) ─────────────────────── */
 .article-content .highlight .c,
 .article-content .highlight .c1,
@@ -239,6 +306,47 @@
 
 .article-content .highlight .err,
 .article-content .highlight .gr { color: #f85149; }
+
+/* highlight.js (articles-src/*.md 빌드 파이프라인) 용 — 위와 같은 GitHub Dark 팔레트 */
+.article-content .hljs-comment,
+.article-content .hljs-quote { color: #8b949e; font-style: italic; }
+
+.article-content .hljs-keyword,
+.article-content .hljs-selector-tag,
+.article-content .hljs-built_in,
+.article-content .hljs-type,
+.article-content .hljs-literal { color: #ff7b72; }
+
+.article-content .hljs-string,
+.article-content .hljs-doctag,
+.article-content .hljs-template-variable,
+.article-content .hljs-regexp,
+.article-content .hljs-subst { color: #a5d6ff; }
+
+.article-content .hljs-number { color: #79c0ff; }
+
+.article-content .hljs-title.function_ { color: #d2a8ff; }
+.article-content .hljs-title.class_,
+.article-content .hljs-title.class_.inherited__ { color: #ffa657; }
+
+.article-content .hljs-attr,
+.article-content .hljs-attribute,
+.article-content .hljs-variable,
+.article-content .hljs-property,
+.article-content .hljs-params { color: #79c0ff; }
+
+.article-content .hljs-tag,
+.article-content .hljs-name,
+.article-content .hljs-selector-id,
+.article-content .hljs-selector-class { color: #7ee787; }
+
+.article-content .hljs-meta,
+.article-content .hljs-symbol,
+.article-content .hljs-bullet,
+.article-content .hljs-link { color: #8b949e; }
+
+.article-content .hljs-emphasis { font-style: italic; }
+.article-content .hljs-strong { font-weight: 700; }
 
 .article-content img {
   max-width: 100%;

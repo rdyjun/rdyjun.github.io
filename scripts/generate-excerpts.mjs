@@ -30,7 +30,7 @@ function pick(html, re) {
 }
 
 // 본문 <p> 들을 순서대로 이어붙여 발췌를 만든다.
-// 코드블록(table/pre)은 통째로 걷어내고, 링크만 있는 문단은 건너뛴다.
+// 코드블록(table/pre)과 안내용 인용구(blockquote)는 통째로 걷어내고, 링크만 있는 문단은 건너뛴다.
 function excerptOf(html) {
   const body = /<div class="article-content">([\s\S]*)/.exec(html);
   if (!body) return '';
@@ -38,6 +38,7 @@ function excerptOf(html) {
   const cleaned = body[1]
     .replace(/<table[\s\S]*?<\/table>/gi, ' ')
     .replace(/<pre[\s\S]*?<\/pre>/gi, ' ')
+    .replace(/<blockquote[\s\S]*?<\/blockquote>/gi, ' ')
     .replace(/<figure[\s\S]*?<\/figure>/gi, ' ');
 
   let out = '';
