@@ -44,10 +44,11 @@ const blogPosts = [
     "excerpt": "QueryDSL을 사용해서 각 행으로 분리된 권한 데이터를 List로 합치는 과정에서 아래와 같은 문제에 직면했다. 기존에 string_agg 방식으로 구현했을 때 발생한 문제는 아니고, transform 방식으로 변경하려다 발생한 문제이다. 기존 코드에서 QueryD…"
   },
   {
-    "title": "JPA와 복합키",
+    "title": "JPA와 복합키: @IdClass, @EmbeddedId, @MapsId 선택 기준",
     "date": "2025-03-28",
+    "badge": "Updated 2026-10-10",
     "url": "articles/composite-key-by-jpa.html",
-    "excerpt": "공지사항을 개발하던 도중 복합키를 사용하게 되었다. 단순히 @Id를 두 번 넣으면 되겠지라고 생각했던 것은 오산이었다. 아래 사진을 확인하면 Entity has more than one id attribute. 라는 문구를 출력한다. 이 의미는 한 개 보다 많은 id…"
+    "excerpt": "JPA에서 복합키를 표현하는 방법은 @IdClass 와 @EmbeddedId 두 가지다. 둘 다 같은 테이블을 매핑할 수 있지만, 엔티티에서 식별자를 어떻게 다루고 연관관계를 어디에 둘지에 따라 코드의 모양과 의미가 달라진다. 이 글의 결론부터 말하면 다음과 같다. 복…"
   },
   {
     "title": "싱글톤 클래스 관리: Bean vs Static 방식의 차이점",
