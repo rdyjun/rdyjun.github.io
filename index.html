@@ -1,179 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Junby | SungJun Joo</title>
-    <meta name="description" content="주성준(SungJun Joo) · Backend Developer 포트폴리오" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body id="home">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Junby | 주성준</title>
+<meta name="description" content="주성준 · Backend Developer. 프로젝트와 개발 기록.">
+<style>
+:root{color-scheme:dark;--bg:#0b0c0e;--text:#f1f2f4;--muted:#909398;--line:#24262a;--accent:#b7e6bc}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:6px}header{height:82px;max-width:1200px;margin:auto;padding:0 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{font-size:21px;letter-spacing:-1px;font-weight:700}.brand span{color:var(--muted);font-weight:400}nav{display:flex;gap:28px;align-items:center;font-size:13px;color:#b7b9be}.nav-github{border:1px solid var(--line);padding:10px 16px;border-radius:30px}.hero{height:710px;max-width:1320px;margin:auto;position:relative;isolation:isolate;display:grid;place-items:center;overflow:hidden}.hero:before{content:"";position:absolute;inset:0;z-index:-2;background-image:linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%)}.hero:after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 48%,#17312225,transparent 50%)}.intro{text-align:center;z-index:2;pointer-events:none}.intro a{pointer-events:auto}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin:0 0 24px}.intro h1{font-size:clamp(64px,8vw,108px);line-height:1.08;letter-spacing:-6px;font-weight:600;margin:0}.intro .english{margin:16px 0 0;font-size:24px;letter-spacing:-.7px;color:#9da0a6}.actions{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:38px;font-size:14px}.primary{background:#f1f2f4;color:#141619;border-radius:10px;padding:16px 23px;font-weight:600;transition:transform .2s}.primary:hover{transform:translateY(-3px)}.secondary{color:#b7b9be}.secondary:hover{color:white}.tile{position:absolute;left:var(--x);top:var(--y);width:90px;transform:translate(var(--mx,0px),var(--my,0px));transition:transform .7s ease-out;z-index:1}.tile-inner{height:90px;border:1px solid #ffffff16;border-radius:22px;background:linear-gradient(145deg,#24272b,#131518);box-shadow:inset 0 1px 0 #ffffff0c,0 16px 34px #0005;display:flex;align-items:center;justify-content:center;animation:float var(--duration,7s) ease-in-out infinite;animation-delay:var(--delay,0s);rotate:var(--rotate,-8deg)}.tile svg{width:48px;height:48px}.tile .word{font-size:30px;font-weight:700;letter-spacing:-2px;color:var(--color)}.tile small{display:block;text-align:center;margin-top:14px;font-size:11px;color:#7e828a;letter-spacing:.4px}.tile:hover .tile-inner{border-color:#ffffff40;background:#272b2f}.tile:hover small{color:white}@keyframes float{0%,100%{transform:translate(0,0) rotate(-2deg)}50%{transform:translate(7px,-18px) rotate(3deg)}}.hero-bottom{position:absolute;bottom:26px;left:36px;right:36px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:1.5px;color:#646970}.motion{background:none;border:none;color:#93979f;font-size:11px;cursor:pointer}.paused .tile-inner{animation-play-state:paused}.paused .tile{transform:none}.content{max-width:1128px;margin:auto;padding:55px 36px 0}.section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:26px}.section-head h2{font-size:27px;letter-spacing:-1px;font-weight:500;margin:0}.section-head a{font-size:12px;color:var(--muted)}.section-head a:hover{color:white}.projects{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.project{display:block;min-width:0}.picture{height:205px;border-radius:12px;overflow:hidden;background:#16191d;border:1px solid #ffffff0d;position:relative}.picture img{width:100%;height:100%;object-fit:cover;transition:transform .5s;opacity:.83}.project:hover img{transform:scale(1.035);opacity:1}.project-head{display:flex;align-items:center;justify-content:space-between;margin-top:19px}.project h3{font-size:19px;letter-spacing:-.6px;font-weight:500;margin:0}.arrow{color:#717780}.project p{font-size:13px;color:#92969e;line-height:1.6;margin:9px 0}.tags{font-size:10px;color:#636a73;margin-top:13px;letter-spacing:.3px}.status{position:absolute;left:14px;top:14px;border:1px solid #ffffff20;background:#0b100edb;border-radius:20px;padding:5px 9px;font-size:10px;color:#b7e6bc}.status:before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#a8dcb1;margin-right:5px}.lower{display:grid;grid-template-columns:1.25fr 1fr;gap:70px;padding:88px 0}.list-row{padding:21px 0;border-top:1px solid var(--line);display:flex;gap:20px;align-items:baseline;justify-content:space-between}.list-row h3{font-size:14px;font-weight:400;line-height:1.6;margin:0}.list-row time{font-size:11px;color:#707680;white-space:nowrap}.list-row:hover h3{color:var(--accent)}.history-row{padding:21px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:90px 1fr;gap:14px;font-size:13px}.history-row time{font-size:11px;color:#707680}.history-row p{margin:0 0 7px}.history-row small{color:#757b84;font-size:11px}.contact{border-top:1px solid var(--line);padding:55px 0 65px;display:flex;align-items:center;justify-content:space-between}.contact h2{font-size:36px;font-weight:500;letter-spacing:-1.5px;margin:0 0 12px}.contact p{font-size:13px;color:var(--muted);margin:0}.contact a{border-bottom:1px solid #626b67;padding-bottom:6px;font-size:15px}.contact a:hover{color:var(--accent)}footer{max-width:1128px;margin:auto;padding:23px 36px 30px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#646970;font-size:11px}footer span:last-child{letter-spacing:1px}.draft{color:#79827b}
+@media(min-width:1500px){.hero{height:760px}}@media(max-width:800px){header{padding:0 24px;height:72px}nav{gap:18px}.hero{height:650px}.intro h1{font-size:75px;letter-spacing:-4px}.tile{width:68px}.tile-inner{height:68px;border-radius:17px}.tile svg{width:37px;height:37px}.tile .word{font-size:23px}.tile small{font-size:9px}.projects{gap:15px}.picture{height:150px}.content{padding:45px 24px 0}.lower{gap:35px}.project p{font-size:12px}.contact h2{font-size:28px}}@media(max-width:560px){nav a:nth-child(3){display:none}nav{gap:16px;font-size:11px}.nav-github{padding:8px 12px}.hero{height:635px}.intro{margin-top:-8px}.intro h1{font-size:64px;letter-spacing:-3px}.intro .english{font-size:19px}.eyebrow{font-size:10px;letter-spacing:2px}.actions{gap:18px;margin-top:30px;font-size:12px}.primary{padding:14px 18px}.tile{left:var(--mobile-x);top:var(--mobile-y);width:58px}.tile-inner{height:58px;border-radius:15px}.tile svg{width:32px;height:32px}.tile .word{font-size:21px}.tile small{margin-top:9px;font-size:9px}.tile.extra{display:none}.hero-bottom{left:24px;right:24px;font-size:8px;letter-spacing:1px}.projects{grid-template-columns:1fr;gap:32px}.picture{height:230px}.project p{font-size:13px}.lower{grid-template-columns:1fr;gap:45px;padding:60px 0}.section-head h2{font-size:25px}.contact{display:block;padding:36px 0 45px}.contact a{display:inline-block;margin-top:28px}footer{padding:22px 24px}.tags{font-size:11px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tile-inner{animation:none}.tile,.primary,.picture img{transition:none}}
 
-    <header class="site-header" id="site-header"></header>
+/* Liquid glass concept — official brand artwork stays unchanged. */
+.hero:after{background:radial-gradient(ellipse at 18% 24%,#6bbd9820,transparent 28%),radial-gradient(ellipse at 78% 25%,#588ce723,transparent 32%),radial-gradient(ellipse at 52% 80%,#cba7f21a,transparent 33%)}
+.tile{width:104px}.tile-inner{height:104px;border-radius:29px;border:1px solid #ffffff35;position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#ffffff20 0%,#ffffff06 42%,#ffffff0c 70%,#ffffff1c 100%);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);box-shadow:inset 1px 1px 1px #ffffff65,inset -1px -1px 2px #ffffff23,inset 0 0 22px #ffffff05,0 20px 40px #0005,0 2px 7px #0003}
+.tile-inner:before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;background:radial-gradient(ellipse at 15% 0%,#fff5,transparent 52%),linear-gradient(125deg,transparent 38%,#ffffff08 45%,#ffffff03 55%,transparent 65%);pointer-events:none}
+.tile-inner:after{content:"";position:absolute;inset:2px;border-radius:27px;border-top:1px solid #ffffff42;border-bottom:1px solid #ffffff1c;pointer-events:none}
+.stack-logo{width:55px;height:55px;object-fit:contain;filter:drop-shadow(0 3px 4px #0003)}.stack-logo.logo-java{width:72px}.stack-logo.logo-aws{width:66px}.tile small{color:#a0a7b3;margin-top:16px}.tile:hover .tile-inner{background:linear-gradient(145deg,#ffffff30,#ffffff0b 50%,#ffffff20);border-color:#ffffff70}
+.primary{background:linear-gradient(135deg,#ffffff30,#ffffff12);color:#f1f2f4;border:1px solid #ffffff4a;box-shadow:inset 0 1px 1px #ffffff55,0 8px 24px #0002;backdrop-filter:blur(18px);border-radius:15px}.nav-github{background:#ffffff08;backdrop-filter:blur(14px);border-color:#ffffff24}
+@media(max-width:800px){.tile{width:78px}.tile-inner{height:78px;border-radius:23px}.tile-inner:after{border-radius:21px}.stack-logo{width:43px;height:43px}.stack-logo.logo-java{width:57px}.stack-logo.logo-aws{width:51px}}
+@media(max-width:560px){.tile{width:64px}.tile-inner{height:64px;border-radius:20px}.tile-inner:after{border-radius:18px}.stack-logo{width:36px;height:36px}.stack-logo.logo-java{width:48px}.stack-logo.logo-aws{width:43px}.tile small{margin-top:10px}}
+@media(min-width:561px) and (max-width:800px){.tile:has(.logo-aws){left:8%}.tile:has(.logo-docker){left:82%}}
+/* Softer glass: faint surface, restrained reflections. */
+.hero:after{background:radial-gradient(ellipse at 18% 24%,#6bbd9808,transparent 28%),radial-gradient(ellipse at 78% 25%,#588ce709,transparent 32%),radial-gradient(ellipse at 52% 80%,#cba7f206,transparent 33%)}
+.tile-inner{border-color:#ffffff15;background:linear-gradient(145deg,#ffffff08,#ffffff03 60%,#ffffff06);backdrop-filter:blur(8px) saturate(105%);-webkit-backdrop-filter:blur(8px) saturate(105%);box-shadow:inset 0 1px 0 #ffffff12,0 8px 18px #0002}
+.tile-inner:before{background:linear-gradient(145deg,#ffffff07,transparent 45%)}
+.tile-inner:after{border-top-color:#ffffff0c;border-bottom-color:transparent}
+.stack-logo{filter:none}.tile:hover .tile-inner{background:linear-gradient(145deg,#ffffff0e,#ffffff05);border-color:#ffffff26}
 
-    <div class="page">
+/* Uneven scale and scattered placement. */
+.tile{width:var(--size)}.tile-inner{height:var(--size);border-radius:calc(var(--size)*.25)}.tile-inner:after{border-radius:calc(var(--size)*.25 - 2px)}
+.stack-logo{width:54%;height:54%}.stack-logo.logo-java,.stack-logo.logo-aws{width:69%;height:58%}.stack-logo.logo-claude,.stack-logo.logo-codex{width:60%;height:60%}
+@media(max-width:800px) and (min-width:561px){.tile{width:calc(var(--size)*.88)}.tile-inner{height:calc(var(--size)*.88)}}
+@media(max-width:560px){.tile{width:var(--mobile-size)}.tile-inner{height:var(--mobile-size);border-radius:calc(var(--mobile-size)*.25)}.tile-inner:after{border-radius:calc(var(--mobile-size)*.25 - 2px)}}
 
-      <!-- ── Hero ── -->
-      <section class="hero section-wide" id="top">
-        <p class="hero-eyebrow">Backend Developer</p>
-        <h1>
-          주성준
-          <span class="hero-en">SungJun Joo</span>
-        </h1>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="project.html">프로젝트 보기</a>
-          <a class="btn btn-ghost" href="https://github.com/rdyjun" target="_blank" rel="noopener">
-            <svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-            GitHub
-          </a>
-          <a class="btn btn-ghost" href="mailto:rdyjun00@gmail.com">
-            <svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5zm2.4.8L12 11.6l7.6-5.8H4.4zM20 8.1l-7.4 5.6a1 1 0 0 1-1.2 0L4 8.1V19h16V8.1z"/></svg>
-            Email
-          </a>
-        </div>
-      </section>
+/* Asymmetric scatter; shallow corners instead of soft bubbles. */
+.tile-inner{border-radius:14px}.tile-inner:after{border-radius:12px}
+@media(max-width:560px){.tile-inner{border-radius:11px}.tile-inner:after{border-radius:9px}}
+@media(min-width:561px) and (max-width:800px){.tile:has(.logo-aws){left:6%}.tile:has(.logo-docker){left:82%}}
 
-      <!-- About -->
-      <section id="about">
-        <p class="about-body">
-          <strong>사용자 경험 가치</strong>를 최우선으로 생각하며 개발하는 백엔드 개발자입니다. <br />
-          시나리오에 따른 사용자 병목 지점 개선, 인프라 최적화로 프로젝트 전반에 기여하고 있습니다.
-        </p>
-        <ul class="skill-grid">
-          <li><span class="skill-label">Language</span><span>Java · TypeScript</span></li>
-          <li><span class="skill-label">Framework</span><span>Spring Boot · Nest.js</span></li>
-          <li><span class="skill-label">Infra</span><span>Docker · Nginx · AWS · NCP · OCI</span></li>
-          <li><span class="skill-label">Database</span><span>PostgreSQL · MySQL · Redis</span></li>
-        </ul>
-      </section>
+.tile-inner{animation-name:drift-a}.tile:nth-of-type(3n) .tile-inner{animation-name:drift-b}.tile:nth-of-type(3n + 1) .tile-inner{animation-name:drift-c}
+@keyframes drift-a{0%,100%{transform:translate(0,0) rotate(-3deg)}50%{transform:translate(5px,-12px) rotate(4deg)}}
+@keyframes drift-b{0%,100%{transform:translate(0,-5px) rotate(2deg)}50%{transform:translate(-8px,6px) rotate(-5deg)}}
+@keyframes drift-c{0%,100%{transform:translate(-3px,0) rotate(4deg)}50%{transform:translate(6px,-8px) rotate(-3deg)}}
+@media(prefers-reduced-motion:reduce){.tile-inner{animation:none}}
 
-      <!-- History -->
-      <section id="history">
-        <h2 class="section-title">History</h2>
+/* Independent breathing cycles make scale fluid rather than a ranking. */
+.stack-logo{animation:breathe 12s ease-in-out infinite;animation-delay:var(--delay);transform-origin:center}
+.tile:nth-of-type(3n) .stack-logo{animation-duration:15s;animation-name:breathe-wide}
+.tile:nth-of-type(3n + 1) .stack-logo{animation-duration:17s}
+.tile-inner{overflow:visible}.tile-inner:before{border-radius:inherit}
+@keyframes breathe{0%,100%{scale:.85}45%{scale:1.14}75%{scale:.96}}
+@keyframes breathe-wide{0%,100%{scale:1.08}45%{scale:.78}75%{scale:1.16}}
+.paused .stack-logo{animation-play-state:paused}
+@media(min-width:561px) and (max-width:800px){.tile:has(.logo-claude){left:77%}.tile:has(.logo-spring-boot){left:6%}}
+@media(max-width:560px){.tile:has(.logo-claude){left:76%;top:29%}.tile:has(.logo-nodejs){left:72%}.tile:has(.logo-docker){left:75%}.tile:has(.logo-spring-boot){left:5%}}
+@media(prefers-reduced-motion:reduce){.stack-logo{animation:none}}
 
-        <div class="history-group">
-          <h3 class="history-group-title">경력</h3>
-          <article class="history-item">
-            <div class="hi-left">
-              <span class="hi-period">2026.03 ~</span>
-            </div>
-            <div class="hi-body">
-              <h4>주식회사 앤유코퍼레이션</h4>
-              <ul>
-                <li>AWS Step Functions + SAGA 패턴으로 결제 흐름 멱등성·동시성 보장</li>
-                <li>R2·SQS·Lambda 기반 비동기 영상 인코딩 파이프라인 구축</li>
-                <li>DynamoDB 트랜잭션 키 제약으로 닉네임 유일성 동시성 버그 예방 (<a href="articles/page-handle-unique-constraint.html">글 보기 ↗</a>)</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="history-group">
-          <h3 class="history-group-title">교육</h3>
-          <article class="history-item">
-            <div class="hi-left">
-              <span class="hi-period">2024.06 – 12</span>
-            </div>
-            <div class="hi-body">
-              <h4>네이버 부스트캠프 9기</h4>
-              <ul>
-                <li>웹 프론트엔드·백엔드 미션 기반 구현, 페어프로그래밍</li>
-                <li>현직자 멘토링을 통한 아키텍처 설계·코드 품질 향상</li>
-                <li>팀 내 개발일지·트러블슈팅 문서화 시스템 구축</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="history-group">
-          <h3 class="history-group-title">학력</h3>
-          <article class="history-item">
-            <div class="hi-left">
-              <span class="hi-period">2022 – 2026</span>
-            </div>
-            <div class="hi-body">
-              <h4>동양미래대학교 컴퓨터소프트웨어공학과</h4>
-              <ul>
-                <li>전문학사 조기졸업 2024.08 · GPA 4.46 / 4.5 · 성적우수 장학금 4회</li>
-                <li>전공심화 과정(야간) 졸업예정 · GPA 4.36 / 4.5 · 교내 스마트 프로젝트 경진대회 입상</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="history-group">
-          <h3 class="history-group-title">오픈소스</h3>
-          <article class="history-item">
-            <div class="hi-left">
-              <span class="hi-period">2026.07</span>
-            </div>
-            <div class="hi-body">
-              <h4>cloudflare-tunnel-ingress-controller</h4>
-              <ul>
-                <li>Cobra CLI 플래그와 Viper 기반 환경변수 설정을 통합해 배포 환경별 설정 유연성 개선 (<a href="https://github.com/STRRL/cloudflare-tunnel-ingress-controller/pull/292" target="_blank" rel="noopener">PR #292 병합 ↗</a>)</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="history-group">
-          <h3 class="history-group-title">자격증</h3>
-          <div class="cert-row">
-            <div class="cert-item glass">
-              <p class="cert-name">정보처리기사</p>
-              <p class="cert-sub">한국산업인력공단 · 2025.12</p>
-            </div>
-            <div class="cert-item glass">
-              <p class="cert-name">PCCE Lv.4</p>
-              <p class="cert-sub">(주) 그렙 · 2025.06</p>
-            </div>
-            <div class="cert-item glass">
-              <p class="cert-name">SQLD</p>
-              <p class="cert-sub">한국데이터산업진흥원 · 2026.03</p>
-            </div>
-          </div>
-
-          <details class="cert-more">
-            <summary>비개발 자격증 더 보기</summary>
-            <div class="cert-row cert-row-sub">
-              <div class="cert-item">
-                <p class="cert-name">웹디자인개발기능사</p>
-                <p class="cert-sub">2018.09</p>
-              </div>
-              <div class="cert-item">
-                <p class="cert-name">컴퓨터그래픽기능사</p>
-                <p class="cert-sub">2018.07</p>
-              </div>
-            </div>
-          </details>
-        </div>
-      </section>
-
-      <!-- Projects -->
-      <section id="projects" class="section-wide">
-        <h2 class="section-title">Projects</h2>
-        <div class="project-grid" id="project-grid"></div>
-
-        <details class="group-more">
-          <summary>그 외 작업 더 보기</summary>
-          <div class="project-grid project-grid-sub" id="minor-grid"></div>
-        </details>
-      </section>
-
-      <!-- Articles -->
-      <section id="articles" class="section-wide">
-        <h2 class="section-title">Articles</h2>
-        <div class="article-grid" id="blog-preview"></div>
-        <a class="btn btn-ghost more-btn" href="article.html">더보기 →</a>
-      </section>
-
-    </div>
-
-    <footer></footer>
-
-    <div class="modal-backdrop" id="project-modal"></div>
-
-    <script src="articles-data.js"></script>
-    <script src="script.js"></script>
-  </body>
-</html>
+.stack-logo{animation:none}
+.tile-inner{animation-name:drift-a,breathe;animation-duration:var(--duration),16s;animation-delay:var(--delay),var(--delay)}
+.tile:nth-of-type(3n) .tile-inner{animation-name:drift-b,breathe-wide;animation-duration:var(--duration),19s}
+.tile:nth-of-type(3n + 1) .tile-inner{animation-name:drift-c,breathe;animation-duration:var(--duration),21s}
+@media(prefers-reduced-motion:reduce){.tile-inner{animation:none}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="#">Junby<span>.</span></a><nav aria-label="주 메뉴"><a href="#projects">Projects</a><a href="#writing">Writing</a><a href="#history">History</a><a class="nav-github" href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a></nav></header>
+<main>
+<section class="hero" aria-label="소개와 기술 스택">
+<div class="intro"><p class="eyebrow">Backend Developer</p><h1>주성준</h1><div class="actions"><a class="primary" href="#projects">프로젝트 보기 <span style="margin-left:14px">↗</span></a><a class="secondary" href="mailto:rdyjun00@gmail.com">Email ↗</a></div></div>
+<div class="tile" role="img" aria-label="Spring Boot" title="Spring Boot" style="--size:106px;--mobile-size:84px;--x:8%;--y:21%;--mobile-x:8%;--mobile-y:12%;--rotate:-13deg;--duration:7.0s;--delay:-0s"><div class="tile-inner"><img class="stack-logo logo-spring-boot" src="assets/mockup-logos/spring-boot.svg" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="Java" title="Java" style="--size:76px;--mobile-size:64px;--x:29%;--y:7%;--mobile-x:42%;--mobile-y:6%;--rotate:6deg;--duration:7.7s;--delay:-1s"><div class="tile-inner"><img class="stack-logo logo-java" src="assets/mockup-logos/java.svg" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="Node.js" title="Node.js" style="--size:88px;--mobile-size:70px;--x:65%;--y:11%;--mobile-x:73%;--mobile-y:13%;--rotate:-5deg;--duration:8.4s;--delay:-2s"><div class="tile-inner"><img class="stack-logo logo-nodejs" src="assets/mockup-logos/nodejs.svg" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="Docker" title="Docker" style="--size:100px;--mobile-size:76px;--x:79%;--y:68%;--mobile-x:76%;--mobile-y:80%;--rotate:11deg;--duration:9.1s;--delay:-3s"><div class="tile-inner"><img class="stack-logo logo-docker" src="assets/mockup-logos/docker.svg" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="PostgreSQL" title="PostgreSQL" style="--size:74px;--mobile-size:62px;--x:34%;--y:81%;--mobile-x:30%;--mobile-y:85%;--rotate:-8deg;--duration:9.8s;--delay:-4s"><div class="tile-inner"><img class="stack-logo logo-postgresql" src="assets/mockup-logos/postgresql.svg" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="AWS" title="AWS" style="--size:92px;--mobile-size:70px;--x:16%;--y:64%;--mobile-x:5%;--mobile-y:77%;--rotate:-11deg;--duration:10.5s;--delay:-5s"><div class="tile-inner"><img class="stack-logo logo-aws" src="assets/mockup-logos/aws.svg" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="Claude" title="Claude" style="--size:110px;--mobile-size:82px;--x:85%;--y:25%;--mobile-x:82%;--mobile-y:33%;--rotate:8deg;--duration:11.2s;--delay:-6s"><div class="tile-inner"><img class="stack-logo logo-claude" src="assets/mockup-logos/claude.png" alt="" aria-hidden="true"></div></div>
+<div class="tile" role="img" aria-label="Codex" title="Codex" style="--size:82px;--mobile-size:64px;--x:67%;--y:82%;--mobile-x:59%;--mobile-y:79%;--rotate:-6deg;--duration:11.899999999999999s;--delay:-7s"><div class="tile-inner"><img class="stack-logo logo-codex" src="assets/mockup-logos/codex.png" alt="" aria-hidden="true"></div></div>
+<div class="hero-bottom"><span>JAVA · NODE.JS · BACKEND</span><button class="motion" aria-pressed="false">Ⅱ 모션 멈추기</button></div>
+</section>
+<div class="content">
+<section id="projects"><div class="section-head"><h2>Selected projects<span style="color:#60656e">.</span></h2><a href="project.html">전체 프로젝트 ↗</a></div><div class="projects">
+<a class="project" href="https://dongsoop.site" target="_blank" rel="noopener"><div class="picture"><img src="assets/projects/dongsoop.png" alt="동숲 앱 화면"><span class="status">운영중</span></div><div class="project-head"><h3>동숲</h3><span class="arrow">↗</span></div><p>동양미래대학교 편의 앱 서비스</p><div class="tags">Spring Boot &nbsp; / &nbsp; PostgreSQL &nbsp; / &nbsp; Redis</div></a>
+<a class="project" href="https://mineportal.kr" target="_blank" rel="noopener"><div class="picture"><img src="assets/projects/mineportal.png" alt="MinePortal 웹 화면"></div><div class="project-head"><h3>MinePortal</h3><span class="arrow">↗</span></div><p>브라우저에서 연결하는 마인크래프트 채팅</p><div class="tags">Java &nbsp; / &nbsp; WebSocket &nbsp; / &nbsp; Docker</div></a>
+<a class="project" href="https://github.com/boostcampwm-2024/web18-inear" target="_blank" rel="noopener"><div class="picture"><img src="assets/projects/inear.png" alt="Inear 스트리밍 서비스 화면"></div><div class="project-head"><h3>Inear</h3><span class="arrow">↗</span></div><p>실시간 앨범 스트리밍 & 소통 서비스</p><div class="tags">Nest.js &nbsp; / &nbsp; MySQL &nbsp; / &nbsp; Redis</div></a>
+</div></section>
+<div class="lower"><section id="writing"><div class="section-head"><h2>Writing<span style="color:#60656e">.</span></h2><a href="article.html">전체 글 ↗</a></div><a class="list-row" href="articles/page-handle-unique-constraint.html"><h3>DynamoDB 유일성을 키 제약으로 옮기기</h3><time datetime="2026-08-06">2026.08 ↗</time></a><a class="list-row" href="articles/cloudflare-tunnel-contribution.html"><h3>첫 오픈소스 기여</h3><time datetime="2026-07-31">2026.07 ↗</time></a><a class="list-row" href="articles/dongsoop-matching-lock.html"><h3>Redis MQ를 걷어내고 단일 큐로 전환하기</h3><time datetime="2026-07-19">2026.07 ↗</time></a></section>
+<section id="history"><div class="section-head"><h2>History<span style="color:#60656e">.</span></h2></div><div class="history-row"><time>2026.03 —</time><div><p>앤유코퍼레이션</p><small>Backend Developer</small></div></div><div class="history-row"><time>2024.06 — 12</time><div><p>네이버 부스트캠프 9기</p><small>웹·모바일</small></div></div><div class="history-row"><time>2022 — 2026</time><div><p>동양미래대학교</p><small>컴퓨터소프트웨어공학과</small></div></div></section></div>
+<section class="contact"><div><h2>Let’s connect.</h2><p>GitHub에서 코드를, 블로그에서 기록을.</p></div><a href="mailto:rdyjun00@gmail.com">rdyjun00@gmail.com ↗</a></section>
+</div></main><footer><span>© SungJun Joo</span><a href="https://github.com/rdyjun" target="_blank" rel="noopener">GitHub ↗</a></footer>
+<script>
+const hero=document.querySelector('.hero'),motion=document.querySelector('.motion');const reduced=matchMedia('(prefers-reduced-motion: reduce)');let paused=reduced.matches;function sync(){hero.classList.toggle('paused',paused);motion.setAttribute('aria-pressed',String(paused));motion.textContent=paused?'▷ 모션 재생':'Ⅱ 모션 멈추기'}sync();motion.addEventListener('click',()=>{paused=!paused;sync()});hero.addEventListener('pointermove',e=>{if(paused||e.pointerType!=='mouse')return;const r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;hero.querySelectorAll('.tile').forEach((tile,i)=>{const depth=10+(i%3)*8;tile.style.setProperty('--mx',x*depth+'px');tile.style.setProperty('--my',y*depth+'px')})});hero.addEventListener('pointerleave',()=>hero.querySelectorAll('.tile').forEach(tile=>{tile.style.setProperty('--mx','0px');tile.style.setProperty('--my','0px')}));reduced.addEventListener('change',e=>{paused=e.matches;sync()});
+</script></body></html>
