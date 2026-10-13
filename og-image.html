@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Junby OG Image</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <style>
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;background:#08090b}
+    body{display:grid;place-items:start center;font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#f2f3f4}
+    .canvas{position:relative;width:1200px;height:630px;overflow:hidden;background:#0b0c0e;isolation:isolate}
+    .canvas::before{content:"";position:absolute;inset:-60px;z-index:-2;background:radial-gradient(ellipse at 28% 48%,rgba(255,106,0,.14),transparent 39%),radial-gradient(ellipse at 83% 35%,rgba(255,143,67,.09),transparent 33%)}
+    .canvas::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(11,12,14,.12),rgba(11,12,14,.38) 62%,rgba(11,12,14,.68));box-shadow:inset 0 0 120px rgba(0,0,0,.22)}
+    .top{position:absolute;left:58px;right:58px;top:0;height:86px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.1)}
+    .brand{font-size:25px;font-weight:750;letter-spacing:-1.2px}.brand span{color:#ff6a00}
+    .edition{color:#777c84;font-size:12px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase}
+    .copy{position:absolute;left:72px;top:164px;width:680px}
+    .kicker{margin:0 0 20px;color:#ff7a1a;font-size:13px;font-weight:650;letter-spacing:3px;text-transform:uppercase}
+    h1{margin:0;font-size:66px;font-weight:670;line-height:1.18;letter-spacing:-3.6px}
+    h1 .hello{color:#f2f3f4;font-weight:430}
+    h1 strong{color:#ff6a00;font-weight:inherit}
+    .description{margin:27px 0 0;color:#9b9fa6;font-size:20px;font-weight:420;line-height:1.55;letter-spacing:-.35px}
+    .footer{position:absolute;left:72px;right:72px;bottom:48px;display:flex;align-items:center;justify-content:space-between;color:#70757d;font-size:15px;letter-spacing:.35px}
+    .footer strong{color:#c6c9ce;font-weight:560}
+    .stack{position:absolute;right:88px;top:143px;width:300px;height:350px}
+    .tile{position:absolute;display:grid;place-items:center;width:96px;height:96px;border:1px solid rgba(255,255,255,.18);border-radius:26px;background:radial-gradient(circle at 18% 0%,rgba(255,255,255,.17),transparent 46%),linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.03) 58%,rgba(255,255,255,.07));box-shadow:inset 0 1px 0 rgba(255,255,255,.23),0 18px 42px rgba(0,0,0,.35);backdrop-filter:blur(18px)}
+    .tile::before{content:"";position:absolute;inset:5px;border-radius:21px;background:radial-gradient(circle at 28% 23%,var(--glow),transparent 62%);filter:blur(11px);opacity:.1}
+    .tile img{position:relative;width:54px;height:54px;object-fit:contain;filter:drop-shadow(0 4px 7px rgba(0,0,0,.28))}
+    .java{left:5px;top:12px;transform:rotate(-8deg);--glow:#f89820}.java img{width:66px;height:66px}
+    .spring{right:4px;top:54px;transform:rotate(8deg);--glow:#6db33f}.spring img{width:58px;height:58px}
+    .postgres{left:30px;bottom:14px;transform:rotate(7deg);--glow:#4169e1}
+    .aws{right:12px;bottom:47px;transform:rotate(-7deg);--glow:#ff9900}.aws img{width:62px;height:62px}
+  </style>
+</head>
+<body>
+  <main class="canvas" aria-label="주성준 개발 블로그 공유 이미지">
+    <header class="top"><div class="brand">Junby<span>.</span></div><div class="edition">Portfolio / 2026</div></header>
+    <section class="copy">
+      <h1><span class="hello">안녕하세요</span><br>백엔드 개발자<br><strong>주성준</strong>입니다.</h1>
+    </section>
+    <div class="stack" aria-hidden="true">
+      <div class="tile java"><img src="assets/mockup-logos/java.svg" alt=""></div>
+      <div class="tile spring"><img src="assets/mockup-logos/spring-boot.svg" alt=""></div>
+      <div class="tile postgres"><img src="assets/mockup-logos/postgresql.svg" alt=""></div>
+      <div class="tile aws"><img src="assets/mockup-logos/aws.svg" alt=""></div>
+    </div>
+    <footer class="footer"><strong>rdyjun.github.io</strong><span>BACKEND DEVELOPER</span></footer>
+  </main>
+</body>
+</html>
