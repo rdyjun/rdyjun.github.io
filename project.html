@@ -5,18 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Projects | SungJun Joo</title>
     <meta name="description" content="주성준(SungJun Joo) · 프로젝트 모음" />
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="shared-header.css" />
+    <script src="shared-header.js" defer></script>
   </head>
-  <body>
+  <body class="projects-page">
 
-    <header class="site-header" id="site-header"></header>
+    <header class="shared-header" data-shared-header data-base="."></header>
 
     <div class="page">
       <section class="section-wide page-head page-head-center">
-        <h2 class="section-title">Projects</h2>
+        <div class="projects-hero">
+          <p class="projects-eyebrow">Selected work</p>
+          <h1>Projects<span>.</span></h1>
+          <p>문제를 발견하고, 설계하고, 실제 운영까지 이어간 작업들입니다.</p>
+        </div>
+        <div class="projects-section-head"><h2>Featured projects<span>.</span></h2><span>05 selected</span></div>
         <div class="project-grid" id="project-grid"></div>
 
         <hr class="section-divider" />
+        <div class="projects-section-head projects-section-head-sub"><h2>More projects<span>.</span></h2><span>Archive</span></div>
         <div class="project-grid project-grid-sub" id="minor-grid"></div>
       </section>
     </div>

@@ -86,6 +86,29 @@ const projects = [
     icon: 'film',
   },
   {
+    id: 'offtherecords',
+    team: true,
+    status: '운영중',
+    name: 'Off The Records',
+    subtitle: '보내지 못한 말을 남기고 이름으로 찾는 익명 편지 서비스',
+    period: '2026.09 ~',
+    context: 'getagripclub',
+    desc: '폴더폰 액정에서 영감을 받은 화면에 전하지 못한 짧은 메시지를 남기고, 이름으로 다시 찾아볼 수 있는 웹 서비스.',
+    highlights: [
+      '승인된 편지만 노출하는 커서 기반 메시지 피드와 이름 검색 경험 구현',
+      '관리자 승인·거절·복구 흐름과 Discord 웹훅 알림을 연결해 콘텐츠 운영 자동화',
+      '승인된 편지를 1080×1080 이미지로 생성해 Instagram에 자동 게시',
+      '웹과 앱인토스 정적 빌드를 분리하고 Docker·GitHub Actions 기반 배포 구성',
+    ],
+    tech: ['Kotlin', 'Spring Boot', 'PostgreSQL', 'Next.js', 'TypeScript', 'React Query', 'Docker'],
+    siteUrl: 'https://offtherecords.kr',
+    url: 'https://github.com/getagripclub',
+    image: 'assets/projects/offtherecords.svg',
+    images: ['assets/projects/offtherecords.svg'],
+    icon: 'file',
+    featured: true,
+  },
+  {
     id: 'coding-test',
     minor: true,
     name: 'coding-test',
@@ -616,7 +639,7 @@ function headerHTML(mode) {
   // 헤더에는 페이지 이동만 남긴다 (같은 문서 내 앵커는 넣지 않음)
   const links = [
     { name: 'projects', label: 'Projects', href: `${base}project.html` },
-    { name: 'articles', label: 'Articles', href: `${base}article.html` },
+    { name: 'articles', label: 'Writing', href: `${base}article.html` },
   ];
 
   const activeName = mode === 'projects' ? 'projects'

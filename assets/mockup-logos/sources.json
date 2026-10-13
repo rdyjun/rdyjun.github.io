@@ -1,10 +1,10 @@
 {
   "spring-boot.svg": "https://spring.io/img/projects/spring-boot.svg",
-  "java.svg": "https://www.java.com/jcom/images/Java-horz-wht.svg",
+  "java.svg": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg — cup symbol only",
   "nodejs.svg": "https://nodejs.org/static/logos/nodejsHex.svg",
   "docker.svg": "https://www.docker.com/static/Docker-Logos-1.zip → docker-mark-ocean-blue.svg",
   "postgresql.svg": "https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg",
   "aws.svg": "https://aws.amazon.com/ → navigation SVG (official white variant)",
-  "claude.png": "https://claude.com/icon.png",
-  "codex.png": "https://developers.openai.com/favicon.png — official OpenAI symbol used for Codex tile"
+  "claude.svg": "https://cdn.simpleicons.org/claude/D97757",
+  "codex.svg": "https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/openai/default.svg — OpenAI symbol used for Codex tile"
 }
