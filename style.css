@@ -151,7 +151,7 @@ h1, h2, h3, h4,
   position: absolute;
   left: 0;
   color: var(--accent);
-  font-size: 0.8125rem;
+  font-size: 0.926rem;
   top: 0.15em;
 }
 
@@ -159,7 +159,7 @@ h1, h2, h3, h4,
 .group-title,
 .sub-heading,
 .history-group-title {
-  font-size: 0.825rem;
+  font-size: 0.94rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted2);
@@ -196,7 +196,7 @@ h1, h2, h3, h4,
 .brand {
   font-weight: 700;
   color: var(--accent);
-  font-size: 1.0625rem;
+  font-size: 1.211rem;
   letter-spacing: 0.02em;
   flex-shrink: 0;
 }
@@ -210,7 +210,7 @@ h1, h2, h3, h4,
 }
 .site-nav a {
   color: var(--muted);
-  font-size: 0.9375rem;
+  font-size: 1.069rem;
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
   transition: background 0.15s, color 0.15s;
@@ -284,7 +284,7 @@ section {
 }
 
 .section-title {
-  font-size: 1.45rem;
+  font-size: 1.653rem;
   font-weight: 700;
   margin-bottom: 2rem;
   display: flex;
@@ -303,7 +303,7 @@ section {
 }
 .hero-eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: 0.997rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
@@ -338,7 +338,7 @@ section {
 .about-body {
   color: var(--muted);
   max-width: 58ch;
-  font-size: 1rem;
+  font-size: 1.14rem;
   margin: 0 auto 2rem;
 }
 .about-body strong { color: var(--accent); font-weight: 700; }
@@ -353,11 +353,11 @@ section {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  font-size: 1rem;
+  font-size: 1.14rem;
 }
 .skill-label {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.926rem;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -383,17 +383,17 @@ section {
 }
 .hi-period {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.969rem;
   color: var(--muted);
   white-space: nowrap;
 }
 
 .hi-body h4 {
-  font-size: 1rem;
+  font-size: 1.14rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
-.hi-body ul { font-size: 1rem; }
+.hi-body ul { font-size: 1.14rem; }
 
 /* 자격증 */
 .cert-row {
@@ -411,9 +411,9 @@ section {
   flex-direction: column;
   gap: 0.3rem;
 }
-.cert-name { font-size: 1.15rem; font-weight: 700; color: var(--fg); }
+.cert-name { font-size: 1.311rem; font-weight: 700; color: var(--fg); }
 .cert-sub {
-  font-size: 0.85rem;
+  font-size: 0.969rem;
   color: var(--muted);
   font-family: var(--font-sans);
 }
@@ -433,7 +433,7 @@ section {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.8125rem;
+  font-size: 0.926rem;
   color: var(--muted2);
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
@@ -444,7 +444,7 @@ section {
 .cert-more > summary::after,
 .group-more > summary::after {
   content: '▾';
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   transition: transform 0.2s;
 }
 .cert-more[open] > summary::after,
@@ -468,11 +468,11 @@ section {
   min-width: 150px;
 }
 .cert-row-sub .cert-name {
-  font-size: 1rem;
+  font-size: 1.14rem;
   font-weight: 600;
   color: var(--fg-secondary);
 }
-.cert-row-sub .cert-sub { font-size: 0.775rem; color: var(--muted2); }
+.cert-row-sub .cert-sub { font-size: 0.883rem; color: var(--muted2); }
 
 /* ─── 01 About · 02 History 가운데 정렬 ──── */
 #about,
@@ -505,7 +505,7 @@ section {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.026rem;
   transition: transform 0.15s, opacity 0.15s;
   white-space: nowrap;
 }
@@ -550,7 +550,7 @@ section {
 }
 .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
 
-.extra-link { font-size: 0.9rem; color: var(--muted); }
+.extra-link { font-size: 1.026rem; color: var(--muted); }
 .extra-link:hover { color: var(--accent); text-decoration: none; }
 
 /* ─── Projects: 카드 그리드 ──────────────── */
@@ -563,7 +563,7 @@ section {
 .section-title-row .section-title { margin-bottom: 0; }
 
 .more-link {
-  font-size: 0.875rem;
+  font-size: 0.997rem;
   color: var(--muted);
   white-space: nowrap;
   transition: color 0.15s;
@@ -623,7 +623,7 @@ section {
 }
 .pcard-fallback .pcard-lang {
   font-family: var(--font-mono);
-  font-size: 1.5rem;
+  font-size: 1.71rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.92);
@@ -665,12 +665,12 @@ section {
 }
 .pcard-icon svg { width: 15px; height: 15px; fill: currentColor; }
 .pcard h3 {
-  font-size: 1.0625rem;
+  font-size: 1.211rem;
   font-weight: 700;
   line-height: 1.35;
 }
 .pcard-desc {
-  font-size: 0.9375rem;
+  font-size: 1.069rem;
   color: var(--muted);
   line-height: 1.6;
 }
@@ -679,7 +679,7 @@ section {
 .pcard-role {
   margin-left: auto;
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   color: var(--muted);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -698,7 +698,7 @@ section {
   align-items: center;
   gap: 0.35rem;
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   color: #4ade80;
   border: 1px solid rgba(74, 222, 128, 0.35);
   background: rgba(74, 222, 128, 0.1);
@@ -736,7 +736,7 @@ section {
 }
 
 .tech-chip {
-  font-size: 0.8125rem;
+  font-size: 0.926rem;
   color: var(--accent);
   border: 1px solid rgba(255, 106, 0, 0.25);
   background: var(--accent-dim);
@@ -807,7 +807,7 @@ section {
   background: rgba(10, 10, 10, 0.65);
   backdrop-filter: blur(6px);
   color: var(--fg);
-  font-size: 1.05rem;
+  font-size: 1.197rem;
   line-height: 1;
   cursor: pointer;
   z-index: 2;
@@ -834,7 +834,7 @@ section {
 }
 .modal-visual .pcard-lang {
   font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: 2.28rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.92);
 }
@@ -920,7 +920,7 @@ section {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
   font-family: var(--font-mono);
 }
@@ -970,7 +970,7 @@ section {
   right: 1.25rem;
   width: 40px;
   height: 40px;
-  font-size: 1.1rem;
+  font-size: 1.254rem;
 }
 .lightbox-nav {
   top: 50%;
@@ -985,7 +985,7 @@ section {
 .modal-body { padding: 1.75rem; }
 
 .modal-context {
-  font-size: 0.8125rem;
+  font-size: 0.926rem;
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -995,21 +995,21 @@ section {
 .modal-context-info { flex: 1; }
 .modal-context .pcard-role { margin-left: 0; }
 .modal-body h3 {
-  font-size: 1.5rem;
+  font-size: 1.71rem;
   font-weight: 700;
   line-height: 1.3;
 }
 .modal-subtitle {
-  font-size: 0.9375rem;
+  font-size: 1.069rem;
   color: var(--muted);
   margin-top: 0.25rem;
 }
 .modal-desc {
-  font-size: 1rem;
+  font-size: 1.14rem;
   color: var(--fg-secondary);
   margin: 1.25rem 0;
 }
-.modal-highlights { font-size: 0.95rem; margin-bottom: 1.4rem; }
+.modal-highlights { font-size: 1.083rem; margin-bottom: 1.4rem; }
 .modal-actions {
   display: flex;
   align-items: center;
@@ -1031,7 +1031,7 @@ body.modal-open { overflow: hidden; }
   border: 1px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.026rem;
   line-height: 1;
   transition: border-color 0.15s;
 }
@@ -1042,7 +1042,7 @@ body.modal-open { overflow: hidden; }
   display: flex;
   width: fit-content;
   margin: 1.75rem auto 0;
-  font-size: 0.9375rem;
+  font-size: 1.069rem;
 }
 
 /* ─── Articles: 발췌 카드 그리드 ─────────── */
@@ -1077,11 +1077,11 @@ body.modal-open { overflow: hidden; }
 }
 .acard-date {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.926rem;
   color: var(--muted);
 }
 .acard-badge {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--muted);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1089,14 +1089,14 @@ body.modal-open { overflow: hidden; }
 }
 
 .acard-title {
-  font-size: 1.0625rem;
+  font-size: 1.211rem;
   font-weight: 700;
   line-height: 1.45;
 }
 .acard:hover .acard-title { color: var(--accent); }
 
 .acard-excerpt {
-  font-size: 0.9rem;
+  font-size: 1.026rem;
   color: var(--muted);
   line-height: 1.65;
   /* 카드 높이를 맞추기 위해 4줄에서 끊는다 */
@@ -1112,7 +1112,7 @@ body.modal-open { overflow: hidden; }
   gap: 0.3rem;
   margin-top: auto;
   padding-top: 0.4rem;
-  font-size: 0.85rem;
+  font-size: 0.969rem;
   color: var(--muted);
   transition: color 0.15s;
 }
@@ -1145,7 +1145,7 @@ footer {
   padding: 2rem;
   border-top: 1px solid var(--border);
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: 0.997rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1225,12 +1225,12 @@ footer p + p { margin-top: 0.25rem; }
 
 .projects-page .brand {
   color: #f1f2f4;
-  font-size: 21px;
+  font-size: 26px;
   letter-spacing: -1px;
 }
 
 .projects-page .site-nav { gap: 12px; }
-.projects-page .site-nav a { color: #909398; font-size: 13px; }
+.projects-page .site-nav a { color: #909398; font-size: 16px; }
 .projects-page .site-nav a.active { color: #ff8a3d; }
 .projects-page .theme-toggle { display: none; }
 .projects-page .header-actions .btn-icon,
@@ -1266,7 +1266,7 @@ footer p + p { margin-top: 0.25rem; }
 .projects-eyebrow {
   margin: 0 0 18px;
   color: #ff7a1a;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -1285,7 +1285,7 @@ footer p + p { margin-top: 0.25rem; }
 .projects-hero > p:last-child {
   margin-top: 22px;
   color: #92969e;
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .projects-section-head {
@@ -1295,8 +1295,8 @@ footer p + p { margin-top: 0.25rem; }
   margin-bottom: 26px;
   text-align: left;
 }
-.projects-section-head h2 { margin: 0; font-size: 27px; font-weight: 500; letter-spacing: -1px; }
-.projects-section-head > span { color: #70757d; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; }
+.projects-section-head h2 { margin: 0; font-size: 33px; font-weight: 500; letter-spacing: -1px; }
+.projects-section-head > span { color: #70757d; font-size: 14px; letter-spacing: .8px; text-transform: uppercase; }
 
 .projects-page .project-grid { gap: 42px 22px; }
 .projects-page .pcard {
@@ -1331,15 +1331,15 @@ footer p + p { margin-top: 0.25rem; }
   border-radius: 8px;
   background: rgba(255,255,255,.035);
 }
-.projects-page .pcard h3 { font-size: 19px; font-weight: 500; letter-spacing: -.6px; }
-.projects-page .pcard-desc { color: #92969e; font-size: 13px; line-height: 1.6; }
+.projects-page .pcard h3 { font-size: 23px; font-weight: 500; letter-spacing: -.6px; }
+.projects-page .pcard-desc { color: #92969e; font-size: 16px; line-height: 1.6; }
 .projects-page .tech-chip {
   padding: 0;
   border: 0;
   background: transparent;
   color: #737982;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: .25px;
 }
 .projects-page .tech-chip + .tech-chip::before { content: "/"; margin-right: .35rem; color: #444951; }
@@ -1393,11 +1393,11 @@ footer p + p { margin-top: 0.25rem; }
   border-color: rgba(255,255,255,.09);
   transform: none;
 }
-.writing-page .acard-date { color: #70757d; font-family: inherit; font-size: 11px; letter-spacing: .35px; }
-.writing-page .acard-title { font-size: 18px; font-weight: 600; line-height: 1.45; letter-spacing: -.35px; }
+.writing-page .acard-date { color: #70757d; font-family: inherit; font-size: 14px; letter-spacing: .35px; }
+.writing-page .acard-title { font-size: 22px; font-weight: 600; line-height: 1.45; letter-spacing: -.35px; }
 .writing-page .acard:hover .acard-title { color: #f1f2f4; }
-.writing-page .acard-excerpt { color: #8d929a; font-size: 13px; line-height: 1.7; }
-.writing-page .acard-more { color: #737982; font-size: 12px; }
+.writing-page .acard-excerpt { color: #8d929a; font-size: 16px; line-height: 1.7; }
+.writing-page .acard-more { color: #737982; font-size: 15px; }
 .writing-page .acard:hover .acard-more { color: #737982; }
 .writing-page .acard:hover .acard-arrow { transform: none; }
 
@@ -1406,14 +1406,14 @@ footer p + p { margin-top: 0.25rem; }
   .projects-page .header-inner { padding-inline: 24px; }
   .projects-page .page { padding-inline: 24px; }
   .projects-hero { min-height: 330px; }
-  .projects-hero h1 { font-size: 72px; letter-spacing: -4px; }
+  .projects-hero h1 { font-size: 81px; letter-spacing: -4px; }
   .projects-page .pcard-visual { height: 180px; }
 }
 
 @media (max-width: 560px) {
   .projects-page .page { padding-inline: 20px; }
   .projects-hero { min-height: 300px; }
-  .projects-hero h1 { font-size: 56px; letter-spacing: -3px; }
+  .projects-hero h1 { font-size: 63px; letter-spacing: -3px; }
   .projects-hero > p:last-child { max-width: 28ch; margin-inline: auto; }
   .projects-page .pcard-visual { height: 230px; }
   .projects-page .project-grid { gap: 34px; }
