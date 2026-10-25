@@ -3,12 +3,12 @@
   height: 82px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 36px;
+  padding: 0 var(--space-8);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex: 0 0 auto;
-  border-bottom: 1px solid #24262a;
+  border-bottom: 1px solid var(--color-border);
   background: transparent;
   box-sizing: border-box;
 }
@@ -19,30 +19,30 @@
 }
 
 .shared-header .brand {
-  color: #f1f2f4;
+  color: var(--color-text);
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
-  font-size: 26px;
+  font-size: var(--text-2xl);
   font-weight: 700;
   letter-spacing: -1px;
   flex-shrink: 0;
 }
 
 .shared-header .brand span {
-  color: #909398;
+  color: var(--color-text-muted);
   font-weight: 400;
 }
 
 .shared-header nav {
   display: flex;
   align-items: center;
-  gap: 28px;
-  color: #b7b9be;
+  gap: var(--space-6);
+  color: var(--color-text-secondary);
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 
 .shared-header .nav-github {
-  padding: 10px 16px;
+  padding: var(--space-2) var(--space-4);
   border: 1px solid rgba(255,255,255,.19);
   border-radius: 30px;
   background: radial-gradient(circle at 18% 0%,rgba(255,255,255,.16),transparent 44%),linear-gradient(135deg,rgba(255,255,255,.105),rgba(255,255,255,.035) 52%,rgba(255,255,255,.075));
@@ -52,25 +52,25 @@
 }
 
 @media (max-width: 800px) {
-  .shared-header { height: 72px; padding-inline: 24px; }
-  .shared-header nav { gap: 18px; }
+  .shared-header { height: 72px; padding-inline: var(--space-6); }
+  .shared-header nav { gap: var(--space-4); }
 }
 
 @media (max-width: 560px) {
-  .shared-header nav { gap: 16px; font-size: 14px; }
+  .shared-header nav { gap: var(--space-4); font-size: var(--text-xs); }
   .shared-header nav a:nth-child(3) { display: none; }
-  .shared-header .nav-github { padding: 8px 12px; }
+  .shared-header .nav-github { padding: var(--space-2) var(--space-3); }
 }
 
 /* Keep enlarged navigation usable on narrow screens. */
 @media (max-width: 560px) {
-  .shared-header { padding-inline: 18px; }
-  .shared-header nav { gap: 14px; font-size: 14px; }
-  .shared-header .brand { font-size: 24px; }
-  .shared-header .nav-github { padding: 8px 10px; }
+  .shared-header { padding-inline: var(--space-4); }
+  .shared-header nav { gap: var(--space-3); font-size: var(--text-xs); }
+  .shared-header .brand { font-size: var(--text-xl); }
+  .shared-header .nav-github { padding: var(--space-2) var(--space-2); }
 }
 @media (max-width: 370px) {
-  .shared-header { padding-inline: 14px; }
-  .shared-header nav { gap: 10px; }
-  .shared-header .brand { font-size: 21px; }
+  .shared-header { padding-inline: var(--space-3); }
+  .shared-header nav { gap: var(--space-2); }
+  .shared-header .brand { font-size: var(--text-xl); }
 }

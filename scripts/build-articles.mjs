@@ -69,6 +69,7 @@ function articleTemplate({ title, date, badge, bodyHtml }) {
     <title>${title} | rdyjun</title>
     <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="../article.css" />
+  <link rel="stylesheet" href="../component-rhythm.css">
   </head>
   <body>
 
